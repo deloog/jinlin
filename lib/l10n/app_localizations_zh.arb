@@ -1,0 +1,193 @@
+{
+    "@@locale": "zh",
+    "reminderAppTitle": "鲸灵提醒",
+    "appTitle": "鲸灵提醒",
+    "someOtherKey": "一些其他的文本",
+    "settingsTooltip": "设置",
+    "addReminderTooltip": "添加提醒",
+    "noReminders": "没有提醒事项，尝试添加一个吧！",
+    "deleteTooltip": "删除提醒",
+    "addReminder": "添加纪念日",
+    "anniversaryName": "纪念日名称",
+    "date": "日期",
+    "time": "时间",
+    "lunarCalendarOnlyChina": "农历 (仅在中国区使用)",
+    "save": "保存",
+    "reminders": "纪念日提醒",
+    "noRemindersAdded": "还没有添加任何纪念日",
+    "speechRecognitionFailed": "语音识别失败，请稍后重试。",
+    "unableToUnderstandInput": "无法理解您的输入。",
+    "manualInput": "手动填写",
+    "voiceInput": "语音输入",
+    "naturalLanguageInput": "自然语言输入",
+    "enterReminderDetails": "输入提醒详情",
+    "deleteReminder": "删除提醒",
+    "confirmDeletionTitle": "确认删除",
+    "confirmDeletionContent": "确定要删除 \"{reminderTitle}\" 吗？",
+    "addReminderTitle": "添加新提醒",
+  "editReminderTitle": "编辑提醒",
+  "reminderContentLabel": "输入提醒内容或标题",
+  "reminderContentHint": "例如：明天下午3点和张总开会",
+  "smartInputTooltip": "智能识别标题和日期",
+  "micStopTooltip": "停止",
+  "micListenTooltip": "语音输入",
+  "descriptionLabel": "提醒描述（可选）",
+  "descriptionHint": "详细内容，可由 AI 自动生成",
+  "addDateTimeButton": "添加日期和时间",
+  "clearDateTimeTooltip": "清除日期",
+  "generateDescriptionButton": "AI 辅助生成描述",
+  "generatingButton": "生成中...",
+  "saveReminderButton": "保存提醒",
+  "updateReminderButton": "更新提醒",
+  "listeningStatus": "正在聆听...",
+  "speechInitStatus": "正在准备语音功能...",
+  "inputTitleFirstInfo": "请先在标题框输入内容",
+  "smartInputFailedError": "智能识别失败: {error}",
+  "@smartInputFailedError": {
+    "description": "智能识别失败时的错误信息",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "dateParseFailedInfo": "已识别标题，但日期格式无法识别",
+  "titleEmptyError": "提醒标题不能为空",
+  "conflictDialogTitle": "时间冲突",
+  "conflictDialogContent": "你设置的时间与提醒 \"{title}\" 存在冲突，确定要继续保存吗？",
+  "@conflictDialogContent": {
+    "description": "时间冲突对话框的内容",
+    "placeholders": {
+      "title": {
+        "type": "String",
+        "example": "团队会议"
+      }
+    }
+  },
+  "inputTitleForDesc": "请先输入标题才能生成描述",
+  "descGeneratedSuccess": "描述已生成",
+  "descGeneratedError": "生成描述失败: {error}",
+  "reminderDetailTitle": "提醒详情",
+  "editButtonTooltip": "编辑",
+  "deleteButtonTooltip": "删除",
+  "deleteConfirmationTitle": "确认删除",
+  "deleteConfirmationContent": "确定要删除这个提醒事项吗？此操作无法撤销。",
+  "dateNotSet": "未设置日期",
+  "descriptionSectionTitle": "描述:",
+  "aiAssistantSectionTitle": "AI 助手",
+  "smartTipsSectionTitle": "智能提示",
+  "noDescription": "无描述",
+  "aiBlessingsPlaceholder": "[AI 生成的祝福语将显示在这里...]",
+  "aiGiftsPlaceholder": "[AI 推荐的礼物建议将显示在这里...]",
+  "aiTipsPlaceholder": "[根据事件特点提供的提示将显示在这里...]",
+  "swapBlessingsButton": "换三条",
+  "aiBlessingSectionTitle": "祝福语:",
+  "aiGiftSectionTitle": "礼物推荐:",
+  "cannotChangeLanguageError": "无法更改语言，请重试",
+  "saveButton": "保存",
+
+  "settingsTitle": "设置",
+  "settingsSectionPersonal": "个人",
+  "settingsNicknameTitle": "昵称",
+  "settingsNicknameSubtitle": "编辑您的昵称",
+  "settingsAvatarTitle": "头像管理",
+  "settingsAvatarSubtitle": "管理自己和亲友的头像",
+  "settingsSectionFunction": "功能",
+  "settingsLanguageTitle": "语言选择",
+  "settingsLanguageSubtitle": "当前: {locale}",
+  "@settingsLanguageSubtitle": {
+      "description": "显示当前语言代码的副标题",
+      "placeholders": {
+        "locale": { "type": "String", "example": "zh-CN" }
+      }
+  },
+  "settingsNotificationTitle": "通知设置",
+  "settingsNotificationSubtitle": "自定义提醒方式、声音等",
+  "settingsSectionData": "数据与内容",
+  "settingsAddFestivalTitle": "添加节日",
+  "settingsAddFestivalSubtitle": "添加地方性或个性化节日",
+  "settingsImportExportTitle": "导入/导出数据",
+  "settingsImportExportSubtitle": "从日历导入或备份数据",
+  "settingsSectionAbout": "关于",
+  "settingsAboutAppTitle": "关于鲸灵提醒",
+  "settingsPrivacyPolicyTitle": "隐私政策",
+  "settingsFeatureNotImplemented": "{featureName} 功能待实现",
+  "@settingsFeatureNotImplemented": {
+      "description": "未实现功能的提示信息",
+      "placeholders": {
+        "featureName": { "type": "String", "example": "昵称设置" }
+      }
+  },
+  "cancelButton": "取消",
+  "saveAnywayButton": "仍然保存",
+    "cancel": "取消",
+    "delete": "删除",
+    "select": "选择",
+    "naturalInputHint": "例如：明天下午3点开会",
+    "pleaseEnterTitle": "请输入有效标题",
+    "detectedDateTime": "识别结果",
+    "lunar": "农历",
+    "recordingInProgress": "正在录音...",
+    "processingAudio": "正在处理...",
+    "recordingStartFailed": "启动录音失败。",
+    "recordingStopFailed": "停止录音失败。",
+    "noRecordingPermission": "没有录音权限",
+    "errorCheckingPermission": "检查权限时出错",
+    "startRecording": "开始录音",
+    "stopRecording": "停止录音",
+    "processText": "处理文本",
+    "switchToManualInput": "切换到手动输入",
+    "switchToNaturalInput": "切换到自然语言输入",
+    "errorProcessingInput": "处理输入时出错。",
+    "pleaseWait": "请稍候...",
+    "invalidDateTime": "选择了无效的日期或时间",
+    "clearTitle": "清除标题",
+    "eventDate": "事件日期",
+    "reminderTime": "提醒时间",
+    "remainingDays": "还剩 {days} 天",
+    "@remainingDays": {
+      "description": "显示距离事件还剩多少天",
+      "placeholders": {
+        "days": {
+          "type": "int",
+          "example": "12"
+        }
+      }
+    },
+
+    "detectedEventsTitle": "识别出的事件",
+    "noTitlePlaceholder": "（无标题）",
+    "noDatePlaceholder": "（无日期）",
+    "notesTitle": "📌 注意事项：",
+    "selectEventsToSave": "请选择要保存的事件",
+    "saveSelectedEvents": "保存选中的 {count} 项",
+    "@saveSelectedEvents": {
+      "description": "保存选中事件的按钮文本",
+      "placeholders": {
+        "count": {
+          "type": "int",
+          "example": "3"
+        }
+      }
+    },
+    "noValidEventsSelected": "没有选中有效的事件来保存。",
+    "analyzingText": "正在分析文本...",
+    "multipleEventsDetected": "识别到 {count} 个事件，已在下方列出。请选择处理。",
+    "@multipleEventsDetected": {
+      "description": "多个事件被识别时的提示",
+      "placeholders": {
+        "count": {
+          "type": "int",
+          "example": "3"
+        }
+      }
+    },
+    "singleEventDetected": "识别到 1 个事件，已在下方列出。",
+    "noValidEventsDetected": "未能识别出有效的提醒事件。",
+    "emptyStateMessage": "还没有任何提醒或节日呢，\n快去添加一个吧！",
+    "closeButton": "关闭",
+    "today": "今天",
+    "loadingRemindersError": "加载提醒事项失败",
+    "cannotOpenReminderDetails": "无法打开提醒详情，数据可能未同步，请刷新重试",
+    "deleteFailed": "删除失败，请重试"
+  }

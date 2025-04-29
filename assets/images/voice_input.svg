@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- 背景圆形 -->
+  <circle cx="100" cy="100" r="80" fill="#f0f0f0" />
+  
+  <!-- 麦克风图标 -->
+  <g transform="translate(100, 100) scale(2.5)">
+    <path d="M-8,-16 L-8,0 C-8,4.4 -4.4,8 0,8 C4.4,8 8,4.4 8,0 L8,-16 C8,-20.4 4.4,-24 0,-24 C-4.4,-24 -8,-20.4 -8,-16 Z" fill="#673ab7" />
+    <path d="M-16,0 L-12,0 C-12,6.6 -6.6,12 0,12 C6.6,12 12,6.6 12,0 L16,0 C16,8.8 8.8,16 0,16 L0,24 L-8,24 L-8,16 C-16.8,16 -24,8.8 -24,0 L-20,0 L-16,0 Z" fill="#673ab7" />
+  </g>
+  
+  <!-- 声波效果 -->
+  <g stroke="#673ab7" stroke-width="2" fill="none">
+    <circle cx="100" cy="100" r="50" opacity="0.3" />
+    <circle cx="100" cy="100" r="60" opacity="0.2" />
+    <circle cx="100" cy="100" r="70" opacity="0.1" />
+  </g>
+</svg>

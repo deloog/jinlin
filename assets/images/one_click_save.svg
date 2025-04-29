@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- 背景圆形 -->
+  <circle cx="100" cy="100" r="80" fill="#f0f0f0" />
+  
+  <!-- 保存图标 -->
+  <g transform="translate(100, 100) scale(1.5)">
+    <path d="M-30,-30 L-30,30 L30,30 L30,-30 Z" fill="white" stroke="#673ab7" stroke-width="4" />
+    
+    <!-- 磁盘上部 -->
+    <path d="M-30,-30 L-30,-10 L30,-10 L30,-30" fill="none" stroke="#673ab7" stroke-width="4" />
+    
+    <!-- 中心圆形 -->
+    <circle cx="0" cy="10" r="15" fill="white" stroke="#673ab7" stroke-width="4" />
+    
+    <!-- 对勾 -->
+    <path d="M-8,10 L-2,16 L8,4" fill="none" stroke="#673ab7" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+  </g>
+  
+  <!-- 点击效果 -->
+  <g transform="translate(100, 100)">
+    <circle cx="0" cy="0" r="60" stroke="#673ab7" stroke-width="2" stroke-dasharray="5,5" fill="none" />
+    <circle cx="0" cy="0" r="70" stroke="#673ab7" stroke-width="1" stroke-dasharray="3,3" fill="none" />
+    
+    <!-- 手指点击 -->
+    <g transform="translate(50, -50) rotate(45)">
+      <path d="M0,0 C3,0 5,2 5,5 L5,15 C5,18 7,20 10,20 C13,20 15,18 15,15 L15,5 C15,2 17,0 20,0" fill="none" stroke="#673ab7" stroke-width="3" stroke-linecap="round" />
+    </g>
+  </g>
+</svg>

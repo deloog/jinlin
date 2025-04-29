@@ -1,0 +1,10 @@
+# 指定包含 .arb 文件的目录
+arb-dir: lib/l10n
+# 指定用于生成 Dart 代码的模板 .arb 文件
+template-arb-file: app_localizations_en.arb
+# 指定生成的 Dart 文件的名称
+output-localization-file: app_localizations.dart
+# 指定生成的本地化类名
+output-class: AppLocalizations
+# 设置生成的 getter 是否可空。false 通常更好，但前提是你要确保所有语言的 .arb 文件都包含所有 key
+nullable-getter: false

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- 背景圆形 -->
+  <circle cx="100" cy="100" r="80" fill="#f0f0f0" />
+  
+  <!-- 大脑图标 -->
+  <g transform="translate(100, 100) scale(0.8)">
+    <path d="M0,-60 C-33.1,-60 -60,-33.1 -60,0 C-60,33.1 -33.1,60 0,60 C33.1,60 60,33.1 60,0 C60,-33.1 33.1,-60 0,-60 Z" fill="#f0f0f0" stroke="#673ab7" stroke-width="5" />
+    
+    <!-- 大脑纹路 -->
+    <path d="M-30,-20 C-25,-30 -15,-35 -5,-30 C5,-25 15,-30 20,-40" stroke="#673ab7" stroke-width="5" fill="none" />
+    <path d="M-30,0 C-20,-5 -10,5 0,0 C10,-5 20,5 30,0" stroke="#673ab7" stroke-width="5" fill="none" />
+    <path d="M-30,20 C-20,30 -10,25 0,30 C10,25 20,30 30,20" stroke="#673ab7" stroke-width="5" fill="none" />
+  </g>
+  
+  <!-- 魔法星星效果 -->
+  <g fill="#673ab7">
+    <circle cx="70" cy="70" r="5" />
+    <circle cx="130" cy="70" r="5" />
+    <circle cx="70" cy="130" r="5" />
+    <circle cx="130" cy="130" r="5" />
+    
+    <!-- 小星星 -->
+    <path d="M60,50 L63,56 L70,57 L65,62 L66,69 L60,66 L54,69 L55,62 L50,57 L57,56 Z" fill="#673ab7" opacity="0.7" />
+    <path d="M140,50 L143,56 L150,57 L145,62 L146,69 L140,66 L134,69 L135,62 L130,57 L137,56 Z" fill="#673ab7" opacity="0.7" />
+    <path d="M100,150 L103,156 L110,157 L105,162 L106,169 L100,166 L94,169 L95,162 L90,157 L97,156 Z" fill="#673ab7" opacity="0.7" />
+  </g>
+</svg>
