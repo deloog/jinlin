@@ -70,7 +70,31 @@ class HiveDatabaseService {
 
   /// 获取所有节日
   static List<HolidayModel> getAllHolidays() {
-    return _holidaysBox.values.toList();
+    final holidays = _holidaysBox.values.toList();
+    debugPrint("数据库中共有 ${holidays.length} 个节日记录");
+    return holidays;
+  }
+
+  /// 打印所有节日信息（调试用）
+  static void printAllHolidays() {
+    final holidays = getAllHolidays();
+    debugPrint("========== 数据库中的所有节日 ==========");
+    for (var holiday in holidays) {
+      debugPrint("ID: ${holiday.id}, 名称: ${holiday.name}, 地区: ${holiday.regions.join(', ')}, 计算规则: ${holiday.calculationRule}");
+    }
+    debugPrint("======================================");
+
+    // 特别检查劳动节相关记录
+    debugPrint("========== 劳动节相关记录 ==========");
+    final labourDayHolidays = holidays.where((h) =>
+        h.calculationRule == "05-01" ||
+        h.name.toLowerCase().contains("labour") ||
+        h.name.contains("劳动")).toList();
+
+    for (var holiday in labourDayHolidays) {
+      debugPrint("ID: ${holiday.id}, 名称: ${holiday.name}, 地区: ${holiday.regions.join(', ')}, 计算规则: ${holiday.calculationRule}");
+    }
+    debugPrint("======================================");
   }
 
   /// 根据ID获取节日
@@ -79,39 +103,93 @@ class HiveDatabaseService {
   }
 
   /// 根据地区获取节日
-  static List<HolidayModel> getHolidaysByRegion(String region) {
+  static List<HolidayModel> getHolidaysByRegion(String region, {bool isChineseLocale = false}) {
     // 获取所有节日
     final allHolidays = _holidaysBox.values.toList();
 
-    // 创建一个集合，用于存储已处理的节日名称
-    final Set<String> processedHolidayNames = {};
+    // 创建一个映射，用于存储每个计算规则对应的最佳节日
+    // 键是"计算规则"，值是节日模型
+    final Map<String, HolidayModel> bestHolidayByRule = {};
 
-    // 创建结果列表
-    final List<HolidayModel> result = [];
-
-    // 首先添加当前地区的节日
+    // 首先处理当前地区的节日
     for (var holiday in allHolidays) {
       if (holiday.regions.contains(region)) {
-        // 如果节日名称尚未处理，则添加到结果列表
-        if (!processedHolidayNames.contains(holiday.name)) {
-          result.add(holiday);
-          processedHolidayNames.add(holiday.name);
+        String key = holiday.calculationRule;
+
+        // 检查节日名称是否与当前语言环境匹配
+        bool isNameMatchLocale = isChineseLocale
+            ? _isChinese(holiday.name)  // 中文环境下检查是否为中文名称
+            : !_isChinese(holiday.name); // 非中文环境下检查是否为非中文名称
+
+        // 如果这个计算规则还没有对应的节日，或者当前节日名称更符合语言环境，则更新
+        if (!bestHolidayByRule.containsKey(key) || isNameMatchLocale) {
+          bestHolidayByRule[key] = holiday;
+          debugPrint("添加/更新地区节日: ${holiday.id} (${holiday.name}) - ${holiday.calculationRule} - 匹配语言: $isNameMatchLocale");
         }
       }
     }
 
-    // 然后添加国际节日
+    // 然后处理国际节日
     for (var holiday in allHolidays) {
       if (holiday.regions.contains('INTL') || holiday.regions.contains('ALL')) {
-        // 如果节日名称尚未处理，则添加到结果列表
-        if (!processedHolidayNames.contains(holiday.name)) {
-          result.add(holiday);
-          processedHolidayNames.add(holiday.name);
+        String key = holiday.calculationRule;
+
+        // 如果这个计算规则已经有对应的节日，则跳过
+        if (bestHolidayByRule.containsKey(key)) {
+          debugPrint("跳过国际节日(已有地区节日): ${holiday.id} (${holiday.name}) - ${holiday.calculationRule}");
+          continue;
+        }
+
+        // 检查节日名称是否与当前语言环境匹配
+        bool isNameMatchLocale = isChineseLocale
+            ? _isChinese(holiday.name)  // 中文环境下检查是否为中文名称
+            : !_isChinese(holiday.name); // 非中文环境下检查是否为非中文名称
+
+        // 如果这个计算规则还没有对应的节日，或者当前节日名称更符合语言环境，则更新
+        if (!bestHolidayByRule.containsKey(key) || isNameMatchLocale) {
+          bestHolidayByRule[key] = holiday;
+          debugPrint("添加/更新国际节日: ${holiday.id} (${holiday.name}) - ${holiday.calculationRule} - 匹配语言: $isNameMatchLocale");
         }
       }
     }
 
+    // 将映射中的节日转换为列表
+    final result = bestHolidayByRule.values.toList();
+
+    // 特别检查劳动节相关记录
+    final labourDayHolidays = result.where((h) =>
+        h.calculationRule == "05-01" ||
+        h.name.toLowerCase().contains("labour") ||
+        h.name.contains("劳动")).toList();
+
+    if (labourDayHolidays.length > 1) {
+      debugPrint("警告：发现多个劳动节记录！");
+      for (var holiday in labourDayHolidays) {
+        debugPrint("  ID: ${holiday.id}, 名称: ${holiday.name}, 地区: ${holiday.regions.join(', ')}, 计算规则: ${holiday.calculationRule}");
+      }
+
+      // 只保留一个劳动节记录
+      final preferredLabourDay = labourDayHolidays.firstWhere(
+        (h) => isChineseLocale ? _isChinese(h.name) : !_isChinese(h.name),
+        orElse: () => labourDayHolidays.first
+      );
+
+      // 从结果中移除其他劳动节记录
+      result.removeWhere((h) =>
+          h.calculationRule == "05-01" &&
+          h.id != preferredLabourDay.id);
+
+      debugPrint("保留的劳动节记录: ID: ${preferredLabourDay.id}, 名称: ${preferredLabourDay.name}");
+    }
+
+    debugPrint("总共获取到 ${result.length} 个节日 (语言环境: ${isChineseLocale ? '中文' : '非中文'})");
     return result;
+  }
+
+  /// 判断文本是否为中文
+  static bool _isChinese(String text) {
+    // 简单判断：如果包含中文字符，则认为是中文
+    return RegExp(r'[\u4e00-\u9fa5]').hasMatch(text);
   }
 
   /// 更新节日重要性
@@ -185,5 +263,11 @@ class HiveDatabaseService {
     await _holidaysBox.clear();
     await _userPreferencesBox.clear();
     _initialized = false;
+  }
+
+  /// 只清空节日数据，保留用户偏好设置
+  static Future<void> clearHolidays() async {
+    await _holidaysBox.clear();
+    debugPrint('节日数据已清空');
   }
 }

@@ -15,17 +15,14 @@ import 'package:collection/collection.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:lunar/lunar.dart';
 import 'utils/date_formatter.dart';
-import 'package:jinlin_app/data/holidays_cn.dart'; // 中国节日数据
-import 'package:jinlin_app/data/holidays_intl.dart' as intl_holidays; // 国际节日数据
-import 'package:jinlin_app/data/holidays_asia.dart' as asia_holidays; // 亚洲节日数据
-import 'package:jinlin_app/data/special_days.dart' as special_days; // 特殊纪念日数据
+
 import 'package:jinlin_app/holiday_filter_dialog.dart'; // 节日筛选对话框
 import 'package:jinlin_app/special_date.dart'; // 特殊日期数据模型
 import 'timeline_item.dart';
 import 'package:jinlin_app/services/holiday_storage_service.dart'; // 节日存储服务
 import 'package:jinlin_app/services/hive_database_service.dart'; // Hive数据库服务
 import 'package:jinlin_app/services/holiday_migration_service.dart'; // 节日数据迁移服务
-import 'package:jinlin_app/models/holiday_model.dart' hide DateCalculationType, ImportanceLevel; // 节日数据模型
+
 import 'package:jinlin_app/adapters/holiday_adapter.dart'; // 节日适配器
 
 import 'widgets/page_transitions.dart';
@@ -469,6 +466,34 @@ if (result is Reminder) { // --- 处理单个添加/编辑的情况 ---
                    ),
                  );
               },
+            ),
+            // 临时：添加重置数据库的按钮，方便测试
+            IconButton(
+              icon: const Icon(Icons.refresh),
+              onPressed: () async {
+                // 保存当前语言环境
+                final isChineseLocale = Localizations.localeOf(context).languageCode == 'zh';
+
+                // 重置数据库
+                await HolidayMigrationService.resetDatabase();
+
+                if (mounted) {
+                  // 重新迁移数据
+                  await HolidayMigrationService.migrateHolidays(context);
+
+                  // 打印所有节日信息
+                  HiveDatabaseService.printAllHolidays();
+
+                  // 重新加载节日列表
+                  _prepareTimelineItems();
+
+                  // 显示提示
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('数据库已重置并重新迁移')),
+                  );
+                }
+              },
+              tooltip: '重置数据库',
             ),
          ],
           bottom: PreferredSize( // 使用 PreferredSize 指定 AppBar 底部区域的高度
@@ -1134,49 +1159,7 @@ Future<void> _prepareTimelineItems() async {
   // --- 农历年底日期计算结束 ---
 
 
-  // 2. 计算节日 (根据语言环境选择不同区域的节日)
-  try {
-    DateTime now = DateTime.now();
-    // 根据语言选择区域和节日数据源
-    String region;
-    List<SpecialDate> regionHolidays;
-
-    final languageCode = Localizations.localeOf(context).languageCode;
-    if (mounted && languageCode == 'zh') {
-      // 中文环境：使用中国节日
-      region = 'CN';
-      regionHolidays = getHolidaysForRegion(context, region); // 来自 holidays_cn.dart
-    } else if (mounted && (languageCode == 'ja' || languageCode == 'ko')) {
-      // 日语或韩语环境：使用相应的亚洲节日
-      region = languageCode == 'ja' ? 'JP' : 'KR';
-      regionHolidays = asia_holidays.getHolidaysForRegion(context, region); // 来自 holidays_asia.dart
-    } else if (mounted && languageCode == 'hi') {
-      // 印地语环境：使用印度节日
-      region = 'IN';
-      regionHolidays = asia_holidays.getHolidaysForRegion(context, region); // 来自 holidays_asia.dart
-    } else {
-      // 其他语言环境：使用国际节日
-      region = 'INTL';
-      regionHolidays = intl_holidays.getHolidaysForRegion(context, region); // 来自 holidays_intl.dart
-    }
-
-    // 根据筛选状态过滤节日
-    for (var holiday in regionHolidays) {
-      // 检查节日类型是否在筛选列表中
-      if (_selectedHolidayTypes.contains(holiday.type)) {
-        DateTime? occurrence = holiday.getUpcomingOccurrence(now);
-        if (occurrence != null) {
-          combinedItems.add(TimelineItem(
-            displayDate: occurrence,
-            itemType: TimelineItemType.holiday,
-            originalObject: holiday,
-          ));
-        }
-      }
-    }
-  } catch (e) {
-    debugPrint("计算节日失败: $e");
-  }
+  // 2. 计算节日 - 已移至步骤3中从数据库加载
 
   // 3. 从数据库加载特殊纪念日
   try {
@@ -1192,6 +1175,9 @@ Future<void> _prepareTimelineItems() async {
 
     // 初始化Hive数据库
     await HiveDatabaseService.initialize();
+
+    // 打印所有节日信息（调试用）
+    HiveDatabaseService.printAllHolidays();
 
     // 检查数据库迁移是否完成
     final migrationComplete = HiveDatabaseService.isMigrationComplete();
@@ -1240,12 +1226,15 @@ Future<void> _prepareTimelineItems() async {
 
     // 如果数据库迁移已完成，从数据库获取节日
     if (migrationComplete) {
-      // 获取用户所在地区的节日
-      final holidayModels = HiveDatabaseService.getHolidaysByRegion(region);
+      // 获取当前语言环境
+      final isChineseLocale = mounted && Localizations.localeOf(context).languageCode == 'zh';
+
+      // 获取用户所在地区的节日，并传递语言环境参数
+      final holidayModels = HiveDatabaseService.getHolidaysByRegion(region, isChineseLocale: isChineseLocale);
 
       // 将HolidayModel转换为SpecialDate
       specialDays = HolidayAdapter.toSpecialDateList(holidayModels);
-      debugPrint("从Hive数据库加载了 ${specialDays.length} 个节日");
+      debugPrint("从Hive数据库加载了 ${specialDays.length} 个节日 (语言环境: ${isChineseLocale ? '中文' : '非中文'})");
     } else {
       // 如果数据库迁移未完成，使用本地存储服务获取节日
       if (mounted) {

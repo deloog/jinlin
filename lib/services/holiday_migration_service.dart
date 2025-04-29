@@ -30,21 +30,54 @@ class HolidayMigrationService {
     final specialDays = special_days.getSpecialDays(context);
 
     try {
-      // 迁移中国节日
-      debugPrint('迁移中国节日...');
-      await HiveDatabaseService.migrateFromSpecialDates(cnHolidays);
+      // 清理数据库中的所有节日，确保没有重复
+      await HiveDatabaseService.clearHolidays();
 
-      // 迁移国际节日
-      debugPrint('迁移国际节日...');
-      await HiveDatabaseService.migrateFromSpecialDates(intlHolidays);
+      // 创建一个集合，用于存储已处理的计算规则
+      final Set<String> processedRules = {};
 
-      // 迁移亚洲节日
-      debugPrint('迁移亚洲节日...');
-      await HiveDatabaseService.migrateFromSpecialDates(asiaHolidays);
+      // 预处理节日列表，去除重复的计算规则
+      final List<dynamic> allHolidays = [];
 
-      // 迁移特殊纪念日
-      debugPrint('迁移特殊纪念日...');
-      await HiveDatabaseService.migrateFromSpecialDates(specialDays);
+      // 处理中国节日（优先级最高）
+      for (var holiday in cnHolidays) {
+        final rule = holiday.calculationRule;
+        if (!processedRules.contains(rule)) {
+          allHolidays.add(holiday);
+          processedRules.add(rule);
+        }
+      }
+
+      // 处理国际节日
+      for (var holiday in intlHolidays) {
+        final rule = holiday.calculationRule;
+        if (!processedRules.contains(rule)) {
+          allHolidays.add(holiday);
+          processedRules.add(rule);
+        }
+      }
+
+      // 处理亚洲节日
+      for (var holiday in asiaHolidays) {
+        final rule = holiday.calculationRule;
+        if (!processedRules.contains(rule)) {
+          allHolidays.add(holiday);
+          processedRules.add(rule);
+        }
+      }
+
+      // 处理特殊纪念日
+      for (var holiday in specialDays) {
+        final rule = holiday.calculationRule;
+        if (!processedRules.contains(rule)) {
+          allHolidays.add(holiday);
+          processedRules.add(rule);
+        }
+      }
+
+      // 迁移所有节日
+      debugPrint('迁移所有节日...');
+      await HiveDatabaseService.migrateFromSpecialDates(allHolidays);
 
       // 标记迁移完成
       await HiveDatabaseService.setMigrationComplete(true);
@@ -64,8 +97,10 @@ class HolidayMigrationService {
 
   /// 重置数据库
   static Future<void> resetDatabase() async {
+    debugPrint('开始重置数据库...');
     await HiveDatabaseService.clearAll();
     await HiveDatabaseService.initialize();
     await HiveDatabaseService.setMigrationComplete(false);
+    debugPrint('数据库重置完成');
   }
 }
