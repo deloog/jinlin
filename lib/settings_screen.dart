@@ -4,22 +4,25 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
 
-  
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
 
-  
-  
+
+
 }
 @override
 class _SettingsScreenState extends State<SettingsScreen> {
   String _currentNickname = '';
+  int _specialDaysRange = 10; // 默认显示10天内的特殊纪念日
+
   @override
   void initState() {
     super.initState();
     _loadNickname(); // 加载已保存的昵称
+    _loadSpecialDaysRange(); // 加载特殊纪念日显示范围
   }
 
   Future<void> _loadNickname() async {
@@ -27,6 +30,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
     if (mounted) { // 检查 widget 是否还在屏幕上
       setState(() {
         _currentNickname = prefs.getString('userNickname') ?? ''; // 如果没存过，默认为空字符串
+      });
+    }
+  }
+
+  // 加载特殊纪念日显示范围
+  Future<void> _loadSpecialDaysRange() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _specialDaysRange = prefs.getInt('specialDaysRange') ?? 10; // 默认为10天
       });
     }
   }
@@ -79,6 +92,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               _showLanguagePicker(context);
+            },
+          ),
+          // 特殊纪念日显示范围设置
+          ListTile(
+            leading: const Icon(Icons.date_range),
+            title: Text(l10n.specialDaysRangeTitle),
+            subtitle: Text(l10n.specialDaysRangeSubtitle(_specialDaysRange)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              _showSpecialDaysRangePicker(context);
             },
           ),
            ListTile(
@@ -213,13 +236,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
   // --- 方法添加结束 ---
   void _showLanguagePicker(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!; // 获取 l10n 用于显示选项
+    final l10n = AppLocalizations.of(context); // 获取 l10n 用于显示选项
     // 使用 MyApp.of(context) 查找 _MyAppState
     final myAppState = MyApp.of(context);
 
     // 安全检查，确保找到了 _MyAppState
     if (myAppState == null) {
-       print("错误：无法从 SettingsScreen 访问 _MyAppState");
+       debugPrint("错误：无法从 SettingsScreen 访问 _MyAppState");
        // 可以显示一个错误提示给用户
        ScaffoldMessenger.of(context).showSnackBar(
          SnackBar(content: Text(l10n.cannotChangeLanguageError))
@@ -261,5 +284,80 @@ class _SettingsScreenState extends State<SettingsScreen> {
       },
     );
   }
-  
+
+  // 显示特殊纪念日显示范围选择器
+  Future<void> _showSpecialDaysRangePicker(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+
+    // 创建一个临时变量，用于存储用户选择的值
+    int tempRange = _specialDaysRange;
+
+    // 显示对话框
+    final int? result = await showDialog<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(l10n.specialDaysRangeTitle ?? '特殊纪念日显示范围'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.specialDaysRangeDescription ?? '选择提前多少天显示特殊纪念日：'),
+                  const SizedBox(height: 16),
+                  Slider(
+                    value: tempRange.toDouble(),
+                    min: 1,
+                    max: 30,
+                    divisions: 29,
+                    label: tempRange.toString(),
+                    onChanged: (double value) {
+                      setState(() {
+                        tempRange = value.round();
+                      });
+                    },
+                  ),
+                  Center(
+                    child: Text(
+                      '${tempRange.toString()} ${l10n.daysText ?? '天'}',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(l10n.cancelButton),
+                ),
+                ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(tempRange),
+                  child: Text(l10n.applyButton),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    // 如果用户选择了新的值，保存并更新状态
+    if (result != null && result != _specialDaysRange) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setInt('specialDaysRange', result);
+
+      if (mounted) {
+        setState(() {
+          _specialDaysRange = result;
+        });
+
+        // 通知主页面更新特殊纪念日显示范围
+        final myAppState = MyApp.of(context);
+        if (myAppState != null) {
+          myAppState.updateSpecialDaysRange(result);
+        }
+      }
+    }
+  }
 }

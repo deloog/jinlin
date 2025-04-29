@@ -48,10 +48,13 @@ class MyApp extends StatefulWidget {
 }
 class _MyAppState extends State<MyApp> {
   Locale? _currentLocale; // 用于存储当前选择的语言
+  int _specialDaysRange = 10; // 默认显示10天内的特殊纪念日
+
   @override
   void initState() {
     super.initState();
     _loadLocale(); // 启动时调用加载函数
+    _loadSpecialDaysRange(); // 加载特殊纪念日显示范围
   }
 
   Future<void> _loadLocale() async {
@@ -65,6 +68,42 @@ class _MyAppState extends State<MyApp> {
        setState(() {
           _currentLocale = initialLocale;
        });
+    }
+  }
+
+  // 加载特殊纪念日显示范围
+  Future<void> _loadSpecialDaysRange() async {
+    final prefs = await SharedPreferences.getInstance();
+    final int range = prefs.getInt('specialDaysRange') ?? 10; // 默认为10天
+
+    if (mounted) {
+      setState(() {
+        _specialDaysRange = range;
+      });
+    }
+  }
+
+  // 更新特殊纪念日显示范围
+  Future<void> updateSpecialDaysRange(int range) async {
+    if (_specialDaysRange == range) return; // 范围没变，不用操作
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('specialDaysRange', range); // 保存新范围
+
+    if (mounted) {
+      setState(() {
+        _specialDaysRange = range; // 更新状态
+      });
+
+      // 通知所有需要刷新的页面
+      final context = this.context;
+      if (context.mounted) {
+        // 找到 MyHomePage 的状态并刷新
+        final homeState = context.findAncestorStateOfType<_MyHomePageState>();
+        if (homeState != null && homeState.mounted) {
+          homeState._prepareTimelineItems();
+        }
+      }
     }
   }
   Future<void> changeLocale(Locale newLocale) async {
@@ -1136,8 +1175,12 @@ Future<void> _prepareTimelineItems() async {
           // 计算与当前日期的天数差
           int daysDifference = occurrence.difference(now).inDays;
 
-          // 只添加10天内的特殊纪念日
-          if (daysDifference >= 0 && daysDifference <= 10) {
+          // 获取 MyApp 的状态以访问特殊纪念日显示范围
+          final myAppState = context.findAncestorStateOfType<_MyAppState>();
+          final specialDaysRange = myAppState?._specialDaysRange ?? 10; // 默认为10天
+
+          // 只添加指定天数范围内的特殊纪念日
+          if (daysDifference >= 0 && daysDifference <= specialDaysRange) {
             combinedItems.add(TimelineItem(
               displayDate: occurrence,
               itemType: TimelineItemType.holiday,

@@ -271,5 +271,10 @@
   "applyButton": "Apply",
   "cancelButton": "Cancel",
   "filterHolidays": "Filter",
-  "customEvent": "Custom Event"
+  "customEvent": "Custom Event",
+
+  "specialDaysRangeTitle": "Special Days Display Range",
+  "specialDaysRangeDescription": "Choose how many days in advance to display special days:",
+  "specialDaysRangeSubtitle": "Show special days {days} days in advance",
+  "daysText": "days"
   }

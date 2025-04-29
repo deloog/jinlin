@@ -261,5 +261,10 @@
   "applyButton": "应用",
   "cancelButton": "取消",
   "filterHolidays": "筛选",
-  "customEvent": "自定义事件"
+  "customEvent": "自定义事件",
+
+  "specialDaysRangeTitle": "特殊纪念日显示范围",
+  "specialDaysRangeDescription": "选择提前多少天显示特殊纪念日：",
+  "specialDaysRangeSubtitle": "提前{days}天显示特殊纪念日",
+  "daysText": "天"
   }
