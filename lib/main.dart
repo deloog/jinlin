@@ -22,6 +22,7 @@ import 'package:jinlin_app/data/special_days.dart' as special_days; // 特殊纪
 import 'package:jinlin_app/holiday_filter_dialog.dart'; // 节日筛选对话框
 import 'package:jinlin_app/special_date.dart'; // 特殊日期数据模型
 import 'timeline_item.dart';
+import 'package:jinlin_app/services/holiday_storage_service.dart'; // 节日存储服务
 
 import 'widgets/page_transitions.dart';
 
@@ -32,9 +33,29 @@ Future<void> main() async {
   try {
     await dotenv.load(fileName: ".env");
   } catch (e) {
-    print("无法加载 .env 文件: $e");
+    debugPrint("无法加载 .env 文件: $e");
   }
-  final prefs = await SharedPreferences.getInstance(); await prefs.remove('reminders');
+
+  // 暂时不初始化数据库，使用 SharedPreferences 存储节日重要性信息
+
+  // 创建一个临时的 BuildContext 用于数据迁移
+  final navigatorKey = GlobalKey<NavigatorState>();
+  final app = MaterialApp(
+    navigatorKey: navigatorKey,
+    home: const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
+    ),
+  );
+
+  // 运行临时应用
+  runApp(app);
+
+  // 等待框架渲染第一帧
+  await Future.delayed(const Duration(milliseconds: 100));
+
+  // 暂时不执行数据迁移
+
+  // 运行实际应用
   runApp(const MyApp());
 }
 
@@ -678,48 +699,12 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
     elevation: 3.0,
     child: ListTile(
        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-      leading: Container(
-        width: 40,
-        height: 40,
-        decoration: BoxDecoration(
-          color: holiday.getHolidayColor().withValues(alpha: 51), // 背景色
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 26), // 0.1 * 255 ≈ 26
-              blurRadius: 2,
-              offset: const Offset(0, 1),
-            ),
-          ],
-        ),
-        child: ClipOval(
-          child: Stack(
-            children: [
-              // 图标
-              Center(
-                child: Icon(
-                  holiday.typeIcon,
-                  color: holiday.getHolidayColor(),
-                  size: 24,
-                ),
-              ),
-              // 半透明蒙版
-              Positioned.fill(
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Colors.white.withValues(alpha: 77), // 0.3 * 255 ≈ 77
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
+      leading: CircleAvatar(
+        backgroundColor: holiday.getHolidayColor().withValues(alpha: 40), // 降低背景透明度
+        child: Icon(
+          holiday.typeIcon,
+          color: holiday.getHolidayColor(),
+          size: 24,
         ),
       ),
       title: Text(
@@ -1189,63 +1174,40 @@ Future<void> _prepareTimelineItems() async {
     debugPrint("计算节日失败: $e");
   }
 
-  // 3. 加载特殊纪念日（国际纪念日、职业节日等）
+  // 3. 从数据库加载特殊纪念日
   try {
     // 获取当前日期
     DateTime now = DateTime.now();
 
-    // 根据语言环境选择地区
-    String region;
-    if (mounted && Localizations.localeOf(context).languageCode == 'zh') {
-      region = 'CN'; // 中文环境
-    } else if (mounted && Localizations.localeOf(context).languageCode == 'en') {
-      region = 'US'; // 英文环境
-    } else {
-      region = 'INTL'; // 其他语言环境
-    }
-
-    // 获取特殊纪念日列表
-    List<SpecialDate> specialDays = [];
+    // 获取 MyApp 的状态以访问特殊纪念日显示范围
+    int specialDaysRange = 10; // 默认为10天
     if (mounted) {
-      specialDays = special_days.getSpecialDaysForRegion(context, region);
+      final myAppState = context.findAncestorStateOfType<_MyAppState>();
+      specialDaysRange = myAppState?._specialDaysRange ?? 10;
     }
 
-    // 智能显示策略：只显示10天内的特殊纪念日
+    // 获取用户自定义的节日重要性
+    final Map<String, int> holidayImportance = await HolidayStorageService.getHolidayImportance();
+
+    // 从数据库获取节日
+    List<SpecialDate> specialDays = [];
+
+    // 使用本地存储服务获取节日
+    if (mounted) {
+      // 获取用户所在地区
+      final String region = HolidayStorageService.getUserRegion(context);
+
+      // 获取用户所在地区的节日
+      specialDays = HolidayStorageService.getHolidaysForRegion(context, region);
+    }
+
+    // 智能显示策略：根据重要性和时间范围显示节日
     for (var specialDay in specialDays) {
       if (_selectedHolidayTypes.contains(specialDay.type)) {
         DateTime? occurrence = specialDay.getUpcomingOccurrence(now);
         if (occurrence != null) {
           // 计算与当前日期的天数差
           int daysDifference = occurrence.difference(now).inDays;
-
-          // 获取 MyApp 的状态以访问特殊纪念日显示范围
-          final myAppState = context.findAncestorStateOfType<_MyAppState>();
-          final specialDaysRange = myAppState?._specialDaysRange ?? 10; // 默认为10天
-
-          // 获取用户自定义的节日重要性
-          final prefs = await SharedPreferences.getInstance();
-          final String? importanceStr = prefs.getString('holidayImportance');
-          Map<String, dynamic> holidayImportance = {};
-
-          if (importanceStr != null) {
-            try {
-              // 解析字符串格式 {key1: value1, key2: value2}
-              final String cleanStr = importanceStr.replaceAll('{', '').replaceAll('}', '');
-              final List<String> pairs = cleanStr.split(',');
-
-              for (final pair in pairs) {
-                if (pair.trim().isEmpty) continue;
-                final List<String> keyValue = pair.split(':');
-                if (keyValue.length == 2) {
-                  final String key = keyValue[0].trim();
-                  final int value = int.tryParse(keyValue[1].trim()) ?? 0;
-                  holidayImportance[key] = value;
-                }
-              }
-            } catch (e) {
-              debugPrint("解析节日重要性失败: $e");
-            }
-          }
 
           // 获取当前节日的重要性
           final int importance = holidayImportance[specialDay.id] ?? 0;

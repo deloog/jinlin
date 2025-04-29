@@ -29,6 +29,10 @@ dependencies:
   path_provider: ^2.1.2 # 用于获取路径
   file_picker: ^6.1.1 # 用于文件选择
   share_plus: ^7.2.2 # 用于分享
+  sqflite: ^2.3.2 # 用于SQLite数据库
+  sqflite_common_ffi: ^2.3.2+1 # 用于在非移动平台上使用SQLite
+  sqflite_common_ffi_web: ^0.4.2+3 # 用于在Web平台上使用SQLite
+  path: ^1.9.0 # 用于处理路径
 
 dev_dependencies:
   flutter_test:

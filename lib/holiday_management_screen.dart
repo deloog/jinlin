@@ -1,8 +1,7 @@
 // 文件： lib/holiday_management_screen.dart
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jinlin_app/special_date.dart';
-import 'package:jinlin_app/data/special_days.dart' as special_days;
+import 'package:jinlin_app/services/holiday_storage_service.dart';
 
 class HolidayManagementScreen extends StatefulWidget {
   const HolidayManagementScreen({super.key});
@@ -35,56 +34,30 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
       _isLoading = true;
     });
 
+    // 获取用户所在地区
+    final String userRegion = HolidayStorageService.getUserRegion(context);
+
     // 获取用户所在地区的节日
-    final isChinese = Localizations.localeOf(context).languageCode == 'zh';
+    if (mounted) {
+      _allHolidays = HolidayStorageService.getHolidaysForRegion(context, userRegion);
+    }
 
-    // 根据语言环境确定用户所在地区
-    final String userRegion = isChinese ? 'CN' : 'US'; // 中文用户显示中国节日，其他用户显示美国节日
-
-    // 获取用户所在地区和国际性的节日
-    _allHolidays = special_days.getSpecialDays(context)
-        .where((holiday) =>
-            holiday.regions.contains(userRegion) ||
-            holiday.regions.contains('INTL') ||
-            holiday.regions.contains('ALL'))
-        .toList();
-
-    setState(() {
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   // 加载用户自定义节日重要性
   Future<void> _loadHolidayImportance() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final String? importanceStr = prefs.getString('holidayImportance');
+      final importanceMap = await HolidayStorageService.getHolidayImportance();
 
-      if (importanceStr != null && mounted) {
-        try {
-          // 将字符串转换为Map
-          final Map<String, dynamic> importanceMap = {};
-
-          // 解析字符串格式 {key1: value1, key2: value2}
-          final String cleanStr = importanceStr.replaceAll('{', '').replaceAll('}', '');
-          final List<String> pairs = cleanStr.split(',');
-
-          for (final pair in pairs) {
-            if (pair.trim().isEmpty) continue;
-            final List<String> keyValue = pair.split(':');
-            if (keyValue.length == 2) {
-              final String key = keyValue[0].trim();
-              final int value = int.tryParse(keyValue[1].trim()) ?? 0;
-              importanceMap[key] = value;
-            }
-          }
-
-          setState(() {
-            _holidayImportance = Map<String, int>.from(importanceMap);
-          });
-        } catch (parseError) {
-          debugPrint("解析节日重要性字符串失败: $parseError");
-        }
+      if (mounted) {
+        setState(() {
+          _holidayImportance = importanceMap;
+        });
       }
     } catch (e) {
       debugPrint("加载节日重要性失败: $e");
@@ -94,14 +67,20 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
   // 保存用户自定义节日重要性
   Future<void> _saveHolidayImportance() async {
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('holidayImportance', _holidayImportance.toString());
+      // 保存到本地存储
+      final success = await HolidayStorageService.saveHolidayImportance(_holidayImportance);
 
       // 通知主页面刷新特殊纪念日显示
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('节日重要性设置已保存')),
-        );
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('节日重要性设置已保存')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('保存节日重要性失败，请重试')),
+          );
+        }
       }
     } catch (e) {
       debugPrint("保存节日重要性失败: $e");
@@ -114,11 +93,16 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
   }
 
   // 设置节日重要性
-  void _setHolidayImportance(String holidayId, int importance) {
+  Future<void> _setHolidayImportance(String holidayId, int importance) async {
     setState(() {
       _holidayImportance[holidayId] = importance;
     });
-    _saveHolidayImportance();
+
+    // 更新本地存储
+    await HolidayStorageService.updateHolidayImportance(holidayId, importance);
+
+    // 保存所有节日重要性
+    await _saveHolidayImportance();
   }
 
   // 获取节日重要性
@@ -194,9 +178,9 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
             subtitle: Text(_getImportanceText(_getHolidayImportance(holiday.id), isChinese)),
             trailing: DropdownButton<int>(
               value: _getHolidayImportance(holiday.id),
-              onChanged: (int? newValue) {
+              onChanged: (int? newValue) async {
                 if (newValue != null) {
-                  _setHolidayImportance(holiday.id, newValue);
+                  await _setHolidayImportance(holiday.id, newValue);
                 }
               },
               items: [
