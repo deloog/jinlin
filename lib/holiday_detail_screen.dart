@@ -18,6 +18,7 @@ class HolidayDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
+    final isChinese = Localizations.localeOf(context).languageCode == 'zh';
 
     // 格式化公历日期
     final dateFormatter = DateFormat.yMMMMd(Localizations.localeOf(context).toString());
@@ -76,7 +77,7 @@ class HolidayDetailScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(
-                  color: holiday.getHolidayColor().withOpacity(0.3),
+                  color: holiday.getHolidayColor().withValues(alpha: 77), // 0.3 * 255 ≈ 77
                   width: 1.5,
                 ),
               ),
@@ -89,7 +90,7 @@ class HolidayDetailScreen extends StatelessWidget {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundColor: holiday.getHolidayColor().withOpacity(0.2),
+                          backgroundColor: holiday.getHolidayColor().withValues(alpha: 51), // 0.2 * 255 ≈ 51
                           child: Icon(
                             holiday.typeIcon,
                             color: holiday.getHolidayColor(),
@@ -197,6 +198,28 @@ class HolidayDetailScreen extends StatelessWidget {
 
             const SizedBox(height: 24),
 
+            // 历史背景（如果有）
+            if (holiday.history != null && holiday.history!.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  isChinese ? '历史背景' : 'History',
+                  style: theme.textTheme.titleLarge,
+                ),
+              ),
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    holiday.history!,
+                    style: theme.textTheme.bodyLarge,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+
             // 节日习俗标题
             Padding(
               padding: const EdgeInsets.only(bottom: 8.0),
@@ -206,33 +229,101 @@ class HolidayDetailScreen extends StatelessWidget {
               ),
             ),
 
-            // 节日习俗内容（这部分内容可以根据节日ID动态生成）
+            // 节日习俗内容
             Card(
               elevation: 2,
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: _getHolidayCustoms(holiday.id, l10n).map((custom) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(Icons.circle, size: 10, color: theme.colorScheme.primary),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(custom, style: theme.textTheme.bodyMedium),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                  children: (holiday.customs != null && holiday.customs!.isNotEmpty)
+                      ? _formatBulletPoints(holiday.customs!, theme.colorScheme.primary)
+                      : _getHolidayCustoms(holiday.id, l10n).map((custom) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(Icons.circle, size: 10, color: theme.colorScheme.primary),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(custom, style: theme.textTheme.bodyMedium),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
                 ),
               ),
             ),
 
             const SizedBox(height: 24),
+
+            // 传统食物（如果有）
+            if (holiday.foods != null && holiday.foods!.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  isChinese ? '传统食物' : 'Traditional Foods',
+                  style: theme.textTheme.titleLarge,
+                ),
+              ),
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _formatBulletPoints(holiday.foods!, Colors.orange[700]!),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+
+            // 传统活动（如果有）
+            if (holiday.activities != null && holiday.activities!.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  isChinese ? '相关活动' : 'Activities',
+                  style: theme.textTheme.titleLarge,
+                ),
+              ),
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _formatBulletPoints(holiday.activities!, Colors.green[700]!),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
+
+            // 传统问候语（如果有）
+            if (holiday.greetings != null && holiday.greetings!.isNotEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  isChinese ? '传统问候语' : 'Traditional Greetings',
+                  style: theme.textTheme.titleLarge,
+                ),
+              ),
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: _formatBulletPoints(holiday.greetings!, Colors.blue[700]!),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+            ],
 
             // 节日禁忌标题
             Padding(
@@ -250,24 +341,78 @@ class HolidayDetailScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: _getHolidayTaboos(holiday.id, l10n).map((taboo) {
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 12.0),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Icon(Icons.do_not_disturb, size: 14, color: Colors.red[700]),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(taboo, style: theme.textTheme.bodyMedium),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                  children: (holiday.taboos != null && holiday.taboos!.isNotEmpty)
+                      ? _formatBulletPoints(holiday.taboos!, Colors.red[700]!)
+                      : _getHolidayTaboos(holiday.id, l10n).map((taboo) {
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12.0),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Icon(Icons.do_not_disturb, size: 14, color: Colors.red[700]),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(taboo, style: theme.textTheme.bodyMedium),
+                                ),
+                              ],
+                            ),
+                          );
+                        }).toList(),
                 ),
               ),
             ),
+
+            // 节日图片（如果有）
+            if (holiday.imageUrl != null && holiday.imageUrl!.isNotEmpty) ...[
+              const SizedBox(height: 24),
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8.0),
+                child: Text(
+                  isChinese ? '节日图片' : 'Holiday Image',
+                  style: theme.textTheme.titleLarge,
+                ),
+              ),
+              Card(
+                elevation: 2,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: Image.network(
+                      holiday.imageUrl!,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Container(
+                          height: 200,
+                          color: Colors.grey[300],
+                          child: Center(
+                            child: Icon(
+                              Icons.error_outline,
+                              color: Colors.grey[600],
+                              size: 48,
+                            ),
+                          ),
+                        );
+                      },
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return Container(
+                          height: 200,
+                          color: Colors.grey[200],
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ],
         ),
       ),
@@ -289,8 +434,6 @@ class HolidayDetailScreen extends StatelessWidget {
         return l10n.otherHoliday;
       case SpecialDateType.custom:
         return l10n.customEvent;
-      default:
-        return l10n.holiday;
     }
   }
 
@@ -427,6 +570,31 @@ class HolidayDetailScreen extends StatelessWidget {
           l10n.genericCustom3,
         ];
     }
+  }
+
+  // 格式化项目符号列表
+  List<Widget> _formatBulletPoints(String content, Color bulletColor) {
+    // 将内容按换行符分割成列表
+    final List<String> items = content.split('\n')
+        .where((item) => item.trim().isNotEmpty)
+        .toList();
+
+    // 为每个项目创建带项目符号的行
+    return items.map((item) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.circle, size: 10, color: bulletColor),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(item.trim(), style: const TextStyle(fontSize: 14)),
+            ),
+          ],
+        ),
+      );
+    }).toList();
   }
 
   // 根据节日ID获取禁忌列表

@@ -36,6 +36,15 @@ class SpecialDate {
   final String? description;
   final ImportanceLevel importanceLevel;
 
+  // 新增字段
+  final String? customs;         // 习俗
+  final String? taboos;          // 禁忌
+  final String? foods;           // 传统食物
+  final String? greetings;       // 传统问候语
+  final String? activities;      // 相关活动
+  final String? history;         // 历史背景
+  final String? imageUrl;        // 图片URL
+
   SpecialDate({
     required this.id,
     required this.name,
@@ -45,6 +54,13 @@ class SpecialDate {
     required this.calculationRule,
     this.description,
     this.importanceLevel = ImportanceLevel.low, // 默认为低重要性
+    this.customs,
+    this.taboos,
+    this.foods,
+    this.greetings,
+    this.activities,
+    this.history,
+    this.imageUrl,
   });
 
   // 计算从指定日期开始的下一个发生日期 (优化逻辑)
