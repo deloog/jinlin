@@ -1,6 +1,7 @@
 // 文件： jinlin_app/lib/main.dart
 import 'reminder_detail_screen.dart';
 import 'settings_screen.dart';
+import 'holiday_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
@@ -652,22 +653,16 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
         ],
       ), // 使用 special_date.dart 中的格式化方法
       onTap: () {
-        // 点击卡片，显示节日描述 (如果 description 不为空)
-        if (holiday.description != null && holiday.description!.isNotEmpty) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text(holiday.name), // 假设 name 已本地化
-              content: Text(holiday.description!), // 假设 description 已本地化
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: Text(l10n.closeButton),
-                ),
-              ],
+        // 导航到节日详情页
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => HolidayDetailScreen(
+              holiday: holiday,
+              occurrenceDate: upcomingDate,
             ),
-          );
-        }
+          ),
+        );
       },
     ),
   );

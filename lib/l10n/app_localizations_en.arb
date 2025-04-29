@@ -226,5 +226,37 @@
   "holiday_Christmas": "Christmas",
   "holiday_NewYearsEve": "New Year's Eve",
   "holiday_MothersDay": "Mother's Day",
-  "holiday_FathersDay": "Father's Day"
+  "holiday_FathersDay": "Father's Day",
+
+  "aboutHoliday": "About this Holiday",
+  "holidayCustoms": "Holiday Customs",
+  "statutoryHoliday": "Statutory Holiday",
+  "traditionalHoliday": "Traditional Holiday",
+  "memorialDay": "Memorial Day",
+  "otherHoliday": "Other Holiday",
+  "holiday": "Holiday",
+  "tomorrow": "Tomorrow",
+  "daysRemaining": "{days} days left",
+  "@daysRemaining": {
+    "description": "Number of days remaining until the holiday",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "daysAgo": "{days} days ago",
+  "@daysAgo": {
+    "description": "Number of days since the holiday passed",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "genericCustom1": "Gathering with family and friends",
+  "genericCustom2": "Preparing special foods and decorations",
+  "genericCustom3": "Exchanging gifts or greetings"
   }

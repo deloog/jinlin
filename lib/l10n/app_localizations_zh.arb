@@ -216,5 +216,37 @@
   "holiday_DoubleSeventhFestival": "七夕节",
   "holiday_DoubleNinthFestival": "重阳节",
   "holiday_LabaFestival": "腊八节",
-  "holiday_TreePlantingDay": "植树节"
+  "holiday_TreePlantingDay": "植树节",
+
+  "aboutHoliday": "关于这个节日",
+  "holidayCustoms": "节日习俗",
+  "statutoryHoliday": "法定节日",
+  "traditionalHoliday": "传统节日",
+  "memorialDay": "纪念日",
+  "otherHoliday": "其他节日",
+  "holiday": "节日",
+  "tomorrow": "明天",
+  "daysRemaining": "还有 {days} 天",
+  "@daysRemaining": {
+    "description": "距离节日还有多少天",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "5"
+      }
+    }
+  },
+  "daysAgo": "{days} 天前",
+  "@daysAgo": {
+    "description": "节日已经过去多少天",
+    "placeholders": {
+      "days": {
+        "type": "int",
+        "example": "3"
+      }
+    }
+  },
+  "genericCustom1": "与家人和朋友团聚",
+  "genericCustom2": "准备特色食品和装饰",
+  "genericCustom3": "交换礼物或祝福"
   }
