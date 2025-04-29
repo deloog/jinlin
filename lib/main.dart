@@ -551,8 +551,10 @@ Widget _buildEmptyStateWidget() {
 Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upcomingDate) {
   // 获取本地化实例
   final l10n = AppLocalizations.of(context);
+  final locale = Localizations.localeOf(context).toString();
   DateTime now = DateTime.now();
-  String formattedGregorianDate = holiday.formatUpcomingDate(upcomingDate, now); // 先获取公历和剩余天数
+  // 传递语言环境参数
+  String formattedGregorianDate = holiday.formatUpcomingDate(upcomingDate, now, locale: locale);
 
   // --- 新增：计算农历日期 (仅当节日类型是农历且是中文环境时) ---
   String? lunarDateString;
