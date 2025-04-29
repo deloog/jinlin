@@ -35,8 +35,19 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
       _isLoading = true;
     });
 
-    // 获取所有节日
-    _allHolidays = special_days.getSpecialDays(context);
+    // 获取用户所在地区的节日
+    final isChinese = Localizations.localeOf(context).languageCode == 'zh';
+
+    // 根据语言环境确定用户所在地区
+    final String userRegion = isChinese ? 'CN' : 'US'; // 中文用户显示中国节日，其他用户显示美国节日
+
+    // 获取用户所在地区和国际性的节日
+    _allHolidays = special_days.getSpecialDays(context)
+        .where((holiday) =>
+            holiday.regions.contains(userRegion) ||
+            holiday.regions.contains('INTL') ||
+            holiday.regions.contains('ALL'))
+        .toList();
 
     setState(() {
       _isLoading = false;

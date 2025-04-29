@@ -678,12 +678,48 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
     elevation: 3.0,
     child: ListTile(
        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-      leading: CircleAvatar(
-        backgroundColor: holiday.getHolidayColor().withValues(alpha: 51), // 修复 withOpacity 废弃问题
-        child: Icon(
-          holiday.typeIcon,
-          color: holiday.getHolidayColor(),
-          size: 24,
+      leading: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: holiday.getHolidayColor().withValues(alpha: 51), // 背景色
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 26), // 0.1 * 255 ≈ 26
+              blurRadius: 2,
+              offset: const Offset(0, 1),
+            ),
+          ],
+        ),
+        child: ClipOval(
+          child: Stack(
+            children: [
+              // 图标
+              Center(
+                child: Icon(
+                  holiday.typeIcon,
+                  color: holiday.getHolidayColor(),
+                  size: 24,
+                ),
+              ),
+              // 半透明蒙版
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.white.withValues(alpha: 77), // 0.3 * 255 ≈ 77
+                        Colors.transparent,
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       title: Text(

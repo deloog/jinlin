@@ -336,39 +336,9 @@ List<SpecialDate> getSpecialDays(BuildContext context) {
         ? '加拿大感恩节是加拿大的法定假日，定于每年10月的第二个星期一。与美国感恩节类似，它是一个感谢丰收和祝福的节日。这一天，加拿大人通常会与家人团聚，享用传统的感恩节大餐，包括火鸡、南瓜派和其他应季食物。许多人也会利用这个长周末进行户外活动，欣赏加拿大美丽的秋色。'
         : 'Canadian Thanksgiving is a statutory holiday in Canada, observed on the second Monday of October each year. Similar to American Thanksgiving, it is a day of giving thanks for the harvest and blessings of the past year. On this day, Canadians typically gather with family for a traditional Thanksgiving dinner, which includes turkey, pumpkin pie, and other seasonal foods. Many people also use the long weekend for outdoor activities, enjoying Canada\'s beautiful fall colors.',
     ),
-    SpecialDate(
-      id: 'FR_BastilleDay',
-      name: isChinese ? '法国国庆日' : 'Bastille Day',
-      type: SpecialDateType.statutory,
-      regions: ['FR'],
-      calculationType: DateCalculationType.fixedGregorian,
-      calculationRule: '07-14', // 7月14日
-      description: isChinese
-        ? '法国国庆日，官方称为法国国庆节（Fête nationale），每年7月14日庆祝。它纪念1789年7月14日攻占巴士底狱，这是法国大革命的转折点，以及1790年7月14日庆祝法国人民团结的联邦节。这一天通过军事游行、烟花、音乐会和舞会来纪念。欧洲最大和最古老的军事游行在7月14日上午在巴黎香榭丽舍大街举行，共和国总统、法国官员和外国客人在场观看。'
-        : 'Bastille Day, officially known as French National Day (Fête nationale), is celebrated on July 14th each year. It commemorates the Storming of the Bastille on July 14, 1789, a turning point of the French Revolution, as well as the Fête de la Fédération which celebrated the unity of the French people on July 14, 1790. The day is marked by military parades, fireworks, concerts, and balls. The largest and oldest military parade in Europe is held on the morning of July 14th on the Champs-Élysées in Paris in front of the President of the Republic, French officials, and foreign guests.',
-    ),
-    SpecialDate(
-      id: 'AU_AustraliaDay',
-      name: isChinese ? '澳大利亚国庆日' : 'Australia Day',
-      type: SpecialDateType.statutory,
-      regions: ['AU'],
-      calculationType: DateCalculationType.fixedGregorian,
-      calculationRule: '01-26', // 1月26日
-      description: isChinese
-        ? '澳大利亚国庆日是澳大利亚的官方国庆节，每年1月26日庆祝。它标志着1788年第一舰队英国船只抵达新南威尔士州杰克逊港，以及亚瑟·菲利普总督在悉尼湾升起大不列颠国旗的周年纪念。这一天是澳大利亚每个州和领地的官方公共假日，庆祝活动包括入籍仪式、颁奖典礼、社区节日、音乐会和烟花表演。然而，这个日期对一些澳大利亚人，特别是澳大利亚原住民来说也是有争议的，他们认为这标志着殖民化和剥夺的开始。'
-        : 'Australia Day is the official national day of Australia, celebrated annually on January 26th. It marks the anniversary of the 1788 arrival of the First Fleet of British ships at Port Jackson, New South Wales, and the raising of the Flag of Great Britain at Sydney Cove by Governor Arthur Phillip. The day is an official public holiday in every state and territory of Australia, and celebrations include citizenship ceremonies, award presentations, community festivals, concerts, and fireworks. However, the date is also controversial for some Australians, particularly Indigenous Australians, who see it as marking the beginning of colonization and dispossession.',
-    ),
-    SpecialDate(
-      id: 'CA_CanadaDay',
-      name: isChinese ? '加拿大国庆日' : 'Canada Day',
-      type: SpecialDateType.statutory,
-      regions: ['CA'],
-      calculationType: DateCalculationType.fixedGregorian,
-      calculationRule: '07-01', // 7月1日
-      description: isChinese
-        ? '加拿大国庆日是加拿大的国庆节，每年7月1日庆祝。它纪念1867年7月1日《英属北美法案》（今称《宪法法案》）的颁布，该法案将加拿大省、新斯科舍省和新不伦瑞克省三个独立殖民地统一为英帝国内称为加拿大的单一自治领。最初称为自治领日，1982年《加拿大法案》通过后更名为加拿大国庆日。这一天通过游行、音乐会、烟花和入籍仪式来纪念。主要庆祝活动在首都渥太华举行，以及在各省首府和全国其他城镇举行。'
-        : 'Canada Day is the national day of Canada, celebrated on July 1st each year. It commemorates the anniversary of the July 1, 1867, enactment of the British North America Act, 1867 (today called the Constitution Act, 1867), which united the three separate colonies of the Province of Canada, Nova Scotia, and New Brunswick into a single Dominion within the British Empire called Canada. Originally called Dominion Day, the holiday was renamed in 1982 when the Canada Act was passed. The day is marked by parades, concerts, fireworks, and citizenship ceremonies. Major celebrations take place in Ottawa, the national capital, as well as in provincial capitals and other cities and towns across the country.',
-    ),
+
+
+
   ];
 }
 
