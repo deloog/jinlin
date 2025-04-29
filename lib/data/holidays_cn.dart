@@ -103,8 +103,8 @@ List<SpecialDate> getChineseHolidays(BuildContext context) {
       type: SpecialDateType.traditional,
       regions: ['CN'],
       calculationType: DateCalculationType.fixedLunar,
-      calculationRule: '12-08L', // LMM-LDD
-      description: '喝腊八粥',
+      calculationRule: '12-08L', // LMM-LDD (农历腊月初八)
+      description: '喝腊八粥，佛教传统节日，也是春节前的重要节气',
     ),
 
     // --- 纪念日 (示例) ---

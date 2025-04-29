@@ -89,6 +89,24 @@ List<SpecialDate> getInternationalHolidays(BuildContext context) {
       description: 'Christian festival celebrating the resurrection of Jesus',
     ),
     SpecialDate(
+      id: 'WEST_GoodFriday',
+      name: 'Good Friday',
+      type: SpecialDateType.traditional,
+      regions: ['WEST', 'ALL'],
+      calculationType: DateCalculationType.relativeTo,
+      calculationRule: 'WEST_Easter,-2', // 复活节前两天
+      description: 'Christian observance commemorating the crucifixion of Jesus',
+    ),
+    SpecialDate(
+      id: 'WEST_StPatricksDay',
+      name: 'St. Patrick\'s Day',
+      type: SpecialDateType.traditional,
+      regions: ['WEST', 'IE', 'US'],
+      calculationType: DateCalculationType.fixedGregorian,
+      calculationRule: '03-17', // MM-DD
+      description: 'Cultural and religious celebration held on 17 March',
+    ),
+    SpecialDate(
       id: 'WEST_Halloween',
       name: 'Halloween',
       type: SpecialDateType.traditional,
@@ -143,6 +161,44 @@ List<SpecialDate> getInternationalHolidays(BuildContext context) {
       calculationType: DateCalculationType.nthWeekdayOfMonth,
       calculationRule: '6,3,0', // 6月第3个周日
       description: 'A celebration honoring fathers',
+    ),
+
+    // --- 国际纪念日 ---
+    SpecialDate(
+      id: 'INTL_WorldHealthDay',
+      name: 'World Health Day',
+      type: SpecialDateType.memorial,
+      regions: ['INTL', 'ALL'],
+      calculationType: DateCalculationType.fixedGregorian,
+      calculationRule: '04-07', // MM-DD
+      description: 'A global health awareness day celebrated every year on April 7',
+    ),
+    SpecialDate(
+      id: 'INTL_WorldOceansDay',
+      name: 'World Oceans Day',
+      type: SpecialDateType.memorial,
+      regions: ['INTL', 'ALL'],
+      calculationType: DateCalculationType.fixedGregorian,
+      calculationRule: '06-08', // MM-DD
+      description: 'A day to celebrate the ocean and take action to protect it',
+    ),
+    SpecialDate(
+      id: 'INTL_InternationalPeaceDay',
+      name: 'International Day of Peace',
+      type: SpecialDateType.memorial,
+      regions: ['INTL', 'ALL'],
+      calculationType: DateCalculationType.fixedGregorian,
+      calculationRule: '09-21', // MM-DD
+      description: 'A day devoted to strengthening the ideals of peace',
+    ),
+    SpecialDate(
+      id: 'INTL_WorldTeachersDay',
+      name: 'World Teachers\' Day',
+      type: SpecialDateType.memorial,
+      regions: ['INTL', 'ALL'],
+      calculationType: DateCalculationType.fixedGregorian,
+      calculationRule: '10-05', // MM-DD
+      description: 'A day celebrating teachers around the world',
     ),
   ];
 }

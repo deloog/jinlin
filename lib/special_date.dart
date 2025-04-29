@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:lunar/lunar.dart'; // 引入 lunar 包用于农历计算
 import 'package:intl/intl.dart'; // 用于日期格式化
 import 'package:intl/date_symbol_data_local.dart'; // 确保中文星期名称可用
@@ -8,9 +9,13 @@ enum SpecialDateType {
   statutory, traditional, solarTerm, memorial, custom, other
 }
 
-// 定义日期计算规则的类型 (保持不变)
+// 定义日期计算规则的类型
 enum DateCalculationType {
-  fixedGregorian, fixedLunar, nthWeekdayOfMonth, solarTermBased
+  fixedGregorian, // 固定公历日期，如 MM-DD
+  fixedLunar,     // 固定农历日期，如 MM-DDL
+  nthWeekdayOfMonth, // 某月第n个星期几，如 MM,N,W
+  solarTermBased, // 基于节气的日期，如 "QingMing"
+  relativeTo      // 相对于另一个特殊日期的日期，如 "HOLIDAY_ID,+/-N"
 }
 
 // 特殊日期数据模型类 (增加了一个工具方法)
@@ -81,11 +86,39 @@ class SpecialDate {
               break;
            case DateCalculationType.solarTermBased:
              // TODO: 实现基于节气的计算 (如清明节)
-             // print("Solar term calculation not implemented yet for $name");
+             // 暂时使用固定日期作为近似值
+             if (calculationRule == 'QingMing') {
+               // 清明节通常在4月4日或5日
+               calculatedDate = DateTime(year, 4, 5);
+             }
+             break;
+           case DateCalculationType.relativeTo:
+             // 相对于另一个特殊日期的日期，格式: "HOLIDAY_ID,+/-N"
+             final parts = calculationRule.split(',');
+             if (parts.length == 2) {
+               final relativeToId = parts[0];
+               final daysOffset = int.parse(parts[1]);
+
+               // 这里需要获取相对参考的节日日期
+               // 注意：这需要一个全局的节日查找机制，暂时使用简化实现
+               DateTime? referenceDate;
+
+               // 简化实现：仅支持几个常见节日作为参考
+               if (relativeToId == 'WEST_Easter') {
+                 // 简化的复活节计算 (4月第一个周日)
+                 DateTime firstOfApril = DateTime(year, 4, 1);
+                 int daysUntilSunday = (7 - firstOfApril.weekday) % 7;
+                 referenceDate = firstOfApril.add(Duration(days: daysUntilSunday));
+               }
+
+               if (referenceDate != null) {
+                 calculatedDate = referenceDate.add(Duration(days: daysOffset));
+               }
+             }
              break;
          }
       } catch (e) {
-          print("Error calculating date for $name ($calculationRule): $e");
+          debugPrint("Error calculating date for $name ($calculationRule): $e");
           calculatedDate = null;
       }
 
