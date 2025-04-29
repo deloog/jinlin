@@ -6,7 +6,7 @@ import '../reminder.dart';
 
 String formatReminderDate(BuildContext context, DateTime? date, ReminderType reminderType) {
   if (date == null) {
-    return AppLocalizations.of(context)!.dateNotSet;
+    return AppLocalizations.of(context).dateNotSet;
   }
 
   final locale = Localizations.localeOf(context);
@@ -29,7 +29,7 @@ String formatReminderDate(BuildContext context, DateTime? date, ReminderType rem
     final lunarYear = lunar.getYearInChinese();
     final lunarMonth = lunar.getMonthInChinese();
     final lunarDay = lunar.getDayInChinese();
-    final lunarDateString = '(农历 $lunarMonth月$lunarDay)'; // 简洁格式
+    final lunarDateString = '(${AppLocalizations.of(context).lunar} $lunarMonth月$lunarDay)'; // 简洁格式
     // 或者 final lunarDateString = '(农历 $lunarYear年$lunarMonth月$lunarDay)';
 
     fullDateString += ' $lunarDateString';

@@ -86,7 +86,7 @@ if (_currentLocale == null) {
     }
     return MaterialApp(
       locale: _currentLocale,
-      title: '鲸灵提醒',
+      title: 'CetaMind Reminder',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -98,7 +98,7 @@ if (_currentLocale == null) {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
-      home: const MyHomePage(title: '鲸灵提醒'),
+      home: const MyHomePage(title: 'CetaMind Reminder'),
       debugShowCheckedModeBanner: false,
     );
   }
@@ -551,17 +551,18 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
   DateTime now = DateTime.now();
   String formattedGregorianDate = holiday.formatUpcomingDate(upcomingDate, now); // 先获取公历和剩余天数
 
-  // --- 新增：计算农历日期 (仅当节日类型是农历时) ---
+  // --- 新增：计算农历日期 (仅当节日类型是农历且是中文环境时) ---
   String? lunarDateString;
-  if (holiday.calculationType == DateCalculationType.fixedLunar) {
+  if (holiday.calculationType == DateCalculationType.fixedLunar &&
+      Localizations.localeOf(context).languageCode == 'zh') {
     try {
       final solar = Solar.fromDate(upcomingDate); // 从公历日期获取 Solar 对象
       final lunar = solar.getLunar(); // 获取对应的 Lunar 对象
       // 格式化农历字符串
-      lunarDateString = '农历 ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}';
+      lunarDateString = '${l10n.lunar} ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}';
     } catch (e) {
-      print("Error formatting lunar date for ${holiday.name}: $e");
       // 如果出错，就不显示农历
+      debugPrint("Error formatting lunar date for ${holiday.name}: $e");
     }
   }
   return Card(
@@ -757,7 +758,7 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
 
     String fullDateString = gregorianDateString; // 默认只显示公历
 
-    // 如果是中文环境，则添加农历
+    // 只在中文环境显示农历信息
     if (locale.languageCode == 'zh') {
       final solar = Solar.fromDate(now); // 使用 lunar 包从公历日期创建 Solar 对象
       final lunar = solar.getLunar(); // 获取对应的 Lunar 对象
@@ -765,12 +766,7 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
       // 格式化农历字符串 (可以自定义)
       // lunar.getMonthInChinese() 获取中文月份 (如 正月, 二月)
       // lunar.getDayInChinese() 获取中文日期 (如 初一, 十五, 廿二)
-      // lunar.getYearInGanZhi() 获取干支年 (如 甲辰)
-      // lunar.getYearShengXiao() 获取生肖年 (如 龙)
-      // lunar.getJieQi() 获取当前节气 (如果有)
-      final lunarDateString = '农历 ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}'; // 基础格式
-      // 可以根据需要添加更多信息:
-      // final lunarDateString = '农历 ${lunar.getYearInGanZhi()}${lunar.getYearShengXiao()}年 ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}';
+      final lunarDateString = '${l10n.lunar} ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}'; // 基础格式
 
       fullDateString += ' $lunarDateString'; // 拼接公历和农历
 
@@ -942,7 +938,7 @@ Future<void> _prepareTimelineItems() async {
       // 再将加载的 Reminder 转换为 TimelineItem
       final reminderTimelineItems = currentReminders.map((reminder) { // 注意这里从 => 变成了 {
     // 在这里添加打印语句
-    print('>>> MainScreen - Creating TimelineItem for "${reminder.title}" with displayDate: ${reminder.dueDate}');
+    debugPrint('>>> MainScreen - Creating TimelineItem for "${reminder.title}" with displayDate: ${reminder.dueDate}');
     // 使用 return 返回 TimelineItem 对象
     return TimelineItem(
         displayDate: reminder.dueDate,
@@ -953,53 +949,59 @@ Future<void> _prepareTimelineItems() async {
       combinedItems.addAll(reminderTimelineItems);
     }
   } catch (e) {
-    print("加载提醒事项失败 (在 _prepareTimelineItems 中): $e");
+    debugPrint("加载提醒事项失败 (在 _prepareTimelineItems 中): $e");
     if (mounted) {
+      final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('加载提醒事项失败')),
+        SnackBar(content: Text(l10n.loadingRemindersError)),
       );
     }
   }
 
-  // --- 计算农历年底日期 ---
+  // --- 计算农历年底日期 (仅在中文环境) ---
   DateTime? endOfLunarYearDateOnly; // 先声明变量
-  try {
-    DateTime now = DateTime.now();
-    final currentSolar = Solar.fromDate(now);
-    final currentLunar = currentSolar.getLunar();
-    final currentLunarYear = currentLunar.getYear();
-    const lastLunarMonth = 12;
-    final daysInLastMonth = LunarMonth.fromYm(currentLunarYear, lastLunarMonth)?.getDayCount() ?? 30;
-    final lastLunarDay = Lunar.fromYmd(currentLunarYear, lastLunarMonth, daysInLastMonth);
 
-    // *** 修正错误 1：手动构造 DateTime ***
-    final solarForLastDay = lastLunarDay.getSolar(); // 先获取 Solar 对象
-    final DateTime endOfCurrentLunarYear = DateTime(
-        solarForLastDay.getYear(),
-        solarForLastDay.getMonth(),
-        solarForLastDay.getDay()
-    );
-    // *** 修正结束 ***
+  // 只在中文环境计算农历年底，并确保 widget 仍然挂载
+  if (mounted && Localizations.localeOf(context).languageCode == 'zh') {
+    try {
+      DateTime now = DateTime.now();
+      final currentSolar = Solar.fromDate(now);
+      final currentLunar = currentSolar.getLunar();
+      final currentLunarYear = currentLunar.getYear();
+      const lastLunarMonth = 12;
+      final daysInLastMonth = LunarMonth.fromYm(currentLunarYear, lastLunarMonth)?.getDayCount() ?? 30;
+      final lastLunarDay = Lunar.fromYmd(currentLunarYear, lastLunarMonth, daysInLastMonth);
 
-    endOfLunarYearDateOnly = DateTime( // 给之前声明的变量赋值
-      endOfCurrentLunarYear.year,
-      endOfCurrentLunarYear.month,
-      endOfCurrentLunarYear.day,
-      23, 59, 59
-    );
-    print('过滤事件，只显示到农历年底: $endOfLunarYearDateOnly');
-  } catch (e) {
-       print("计算农历年底日期时出错: $e");
-       // 如果计算出错，就不进行过滤，或者采取其他策略
-       endOfLunarYearDateOnly = null;
+      // 手动构造 DateTime
+      final solarForLastDay = lastLunarDay.getSolar(); // 先获取 Solar 对象
+      final DateTime endOfCurrentLunarYear = DateTime(
+          solarForLastDay.getYear(),
+          solarForLastDay.getMonth(),
+          solarForLastDay.getDay()
+      );
+
+      endOfLunarYearDateOnly = DateTime( // 给之前声明的变量赋值
+        endOfCurrentLunarYear.year,
+        endOfCurrentLunarYear.month,
+        endOfCurrentLunarYear.day,
+        23, 59, 59
+      );
+      debugPrint('过滤事件，只显示到农历年底: $endOfLunarYearDateOnly');
+    } catch (e) {
+      debugPrint("计算农历年底日期时出错: $e");
+      // 如果计算出错，就不进行过滤，或者采取其他策略
+      endOfLunarYearDateOnly = null;
+    }
   }
   // --- 农历年底日期计算结束 ---
 
 
-  // 2. 计算节日 (使用我们之前创建的 SpecialDate 和 holidays_cn)
+  // 2. 计算节日 (根据语言环境选择不同区域的节日)
   try {
     DateTime now = DateTime.now();
-    List<SpecialDate> regionHolidays = getHolidaysForRegion('CN'); // 来自 holidays_cn.dart
+    // 根据语言选择区域
+    String region = mounted && Localizations.localeOf(context).languageCode == 'zh' ? 'CN' : 'INTL';
+    List<SpecialDate> regionHolidays = getHolidaysForRegion(region); // 来自 holidays_cn.dart
 
     for (var holiday in regionHolidays) {
       DateTime? occurrence = holiday.getUpcomingOccurrence(now);
@@ -1012,7 +1014,7 @@ Future<void> _prepareTimelineItems() async {
       }
     }
   } catch (e) {
-    print("计算节日失败: $e");
+    debugPrint("计算节日失败: $e");
   }
 
   // 3. 过滤掉农历年底之后的事件 (如果成功计算了年底日期)
@@ -1025,7 +1027,7 @@ Future<void> _prepareTimelineItems() async {
         return !item.displayDate!.isAfter(endOfLunarYearDateOnly!);
       }).toList();
   } else {
-      print("警告：未能计算出农历年底日期，未进行日期过滤。");
+      debugPrint("警告：未能计算出农历年底日期，未进行日期过滤。");
   }
 
 
