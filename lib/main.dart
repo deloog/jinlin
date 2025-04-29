@@ -16,6 +16,7 @@ import 'package:lunar/lunar.dart';
 import 'utils/date_formatter.dart';
 import 'package:jinlin_app/data/holidays_cn.dart'; // 中国节日数据
 import 'package:jinlin_app/data/holidays_intl.dart' as intl_holidays; // 国际节日数据
+import 'package:jinlin_app/data/holidays_asia.dart' as asia_holidays; // 亚洲节日数据
 import 'package:jinlin_app/special_date.dart';       // <--- 添加这行
 import 'timeline_item.dart';
 
@@ -1046,12 +1047,21 @@ Future<void> _prepareTimelineItems() async {
     String region;
     List<SpecialDate> regionHolidays;
 
-    if (mounted && Localizations.localeOf(context).languageCode == 'zh') {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    if (mounted && languageCode == 'zh') {
       // 中文环境：使用中国节日
       region = 'CN';
       regionHolidays = getHolidaysForRegion(context, region); // 来自 holidays_cn.dart
+    } else if (mounted && (languageCode == 'ja' || languageCode == 'ko')) {
+      // 日语或韩语环境：使用相应的亚洲节日
+      region = languageCode == 'ja' ? 'JP' : 'KR';
+      regionHolidays = asia_holidays.getHolidaysForRegion(context, region); // 来自 holidays_asia.dart
+    } else if (mounted && languageCode == 'hi') {
+      // 印地语环境：使用印度节日
+      region = 'IN';
+      regionHolidays = asia_holidays.getHolidaysForRegion(context, region); // 来自 holidays_asia.dart
     } else {
-      // 非中文环境：使用国际节日
+      // 其他语言环境：使用国际节日
       region = 'INTL';
       regionHolidays = intl_holidays.getHolidaysForRegion(context, region); // 来自 holidays_intl.dart
     }
