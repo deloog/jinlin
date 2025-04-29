@@ -189,5 +189,32 @@
     "today": "今天",
     "loadingRemindersError": "加载提醒事项失败",
     "cannotOpenReminderDetails": "无法打开提醒详情，数据可能未同步，请刷新重试",
-    "deleteFailed": "删除失败，请重试"
+    "deleteFailed": "删除失败，请重试",
+
+  "holiday_NewYearDay": "元旦",
+  "holiday_ValentinesDay": "情人节",
+  "holiday_EarthDay": "地球日",
+  "holiday_LabourDay": "劳动节",
+  "holiday_ChildrensDay": "儿童节",
+  "holiday_WorldEnvironmentDay": "世界环境日",
+  "holiday_UNDay": "联合国日",
+  "holiday_HumanRightsDay": "世界人权日",
+  "holiday_Easter": "复活节",
+  "holiday_Halloween": "万圣节",
+  "holiday_Thanksgiving": "感恩节",
+  "holiday_Christmas": "圣诞节",
+  "holiday_NewYearsEve": "除夕",
+  "holiday_MothersDay": "母亲节",
+  "holiday_FathersDay": "父亲节",
+
+  "holiday_SpringFestival": "春节",
+  "holiday_ChingMing": "清明节",
+  "holiday_DragonBoatFestival": "端午节",
+  "holiday_MidAutumnFestival": "中秋节",
+  "holiday_NationalDay": "国庆节",
+  "holiday_LanternFestival": "元宵节",
+  "holiday_DoubleSeventhFestival": "七夕节",
+  "holiday_DoubleNinthFestival": "重阳节",
+  "holiday_LabaFestival": "腊八节",
+  "holiday_TreePlantingDay": "植树节"
   }

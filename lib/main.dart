@@ -14,7 +14,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:lunar/lunar.dart';
 import 'utils/date_formatter.dart';
-import 'package:jinlin_app/data/holidays_cn.dart'; // <--- 添加这行
+import 'package:jinlin_app/data/holidays_cn.dart'; // 中国节日数据
+import 'package:jinlin_app/data/holidays_intl.dart' as intl_holidays; // 国际节日数据
 import 'package:jinlin_app/special_date.dart';       // <--- 添加这行
 import 'timeline_item.dart';
 
@@ -999,9 +1000,19 @@ Future<void> _prepareTimelineItems() async {
   // 2. 计算节日 (根据语言环境选择不同区域的节日)
   try {
     DateTime now = DateTime.now();
-    // 根据语言选择区域
-    String region = mounted && Localizations.localeOf(context).languageCode == 'zh' ? 'CN' : 'INTL';
-    List<SpecialDate> regionHolidays = getHolidaysForRegion(region); // 来自 holidays_cn.dart
+    // 根据语言选择区域和节日数据源
+    String region;
+    List<SpecialDate> regionHolidays;
+
+    if (mounted && Localizations.localeOf(context).languageCode == 'zh') {
+      // 中文环境：使用中国节日
+      region = 'CN';
+      regionHolidays = getHolidaysForRegion(context, region); // 来自 holidays_cn.dart
+    } else {
+      // 非中文环境：使用国际节日
+      region = 'INTL';
+      regionHolidays = intl_holidays.getHolidaysForRegion(context, region); // 来自 holidays_intl.dart
+    }
 
     for (var holiday in regionHolidays) {
       DateTime? occurrence = holiday.getUpcomingOccurrence(now);

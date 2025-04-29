@@ -210,5 +210,21 @@
 "today": "Today",
 "loadingRemindersError": "Failed to load reminders",
 "cannotOpenReminderDetails": "Cannot open reminder details, data may not be synced, please refresh and try again",
-"deleteFailed": "Delete failed, please try again"
+"deleteFailed": "Delete failed, please try again",
+
+  "holiday_NewYearDay": "New Year's Day",
+  "holiday_ValentinesDay": "Valentine's Day",
+  "holiday_EarthDay": "Earth Day",
+  "holiday_LabourDay": "Labour Day",
+  "holiday_ChildrensDay": "Children's Day",
+  "holiday_WorldEnvironmentDay": "World Environment Day",
+  "holiday_UNDay": "United Nations Day",
+  "holiday_HumanRightsDay": "Human Rights Day",
+  "holiday_Easter": "Easter",
+  "holiday_Halloween": "Halloween",
+  "holiday_Thanksgiving": "Thanksgiving",
+  "holiday_Christmas": "Christmas",
+  "holiday_NewYearsEve": "New Year's Eve",
+  "holiday_MothersDay": "Mother's Day",
+  "holiday_FathersDay": "Father's Day"
   }
