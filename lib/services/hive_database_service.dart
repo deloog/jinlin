@@ -80,12 +80,38 @@ class HiveDatabaseService {
 
   /// 根据地区获取节日
   static List<HolidayModel> getHolidaysByRegion(String region) {
-    return _holidaysBox.values
-        .where((holiday) =>
-            holiday.regions.contains(region) ||
-            holiday.regions.contains('INTL') ||
-            holiday.regions.contains('ALL'))
-        .toList();
+    // 获取所有节日
+    final allHolidays = _holidaysBox.values.toList();
+
+    // 创建一个集合，用于存储已处理的节日名称
+    final Set<String> processedHolidayNames = {};
+
+    // 创建结果列表
+    final List<HolidayModel> result = [];
+
+    // 首先添加当前地区的节日
+    for (var holiday in allHolidays) {
+      if (holiday.regions.contains(region)) {
+        // 如果节日名称尚未处理，则添加到结果列表
+        if (!processedHolidayNames.contains(holiday.name)) {
+          result.add(holiday);
+          processedHolidayNames.add(holiday.name);
+        }
+      }
+    }
+
+    // 然后添加国际节日
+    for (var holiday in allHolidays) {
+      if (holiday.regions.contains('INTL') || holiday.regions.contains('ALL')) {
+        // 如果节日名称尚未处理，则添加到结果列表
+        if (!processedHolidayNames.contains(holiday.name)) {
+          result.add(holiday);
+          processedHolidayNames.add(holiday.name);
+        }
+      }
+    }
+
+    return result;
   }
 
   /// 更新节日重要性
@@ -128,18 +154,30 @@ class HiveDatabaseService {
   /// 从SpecialDate列表迁移数据
   static Future<void> migrateFromSpecialDates(List<dynamic> specialDates) async {
     final List<HolidayModel> holidays = [];
+    final Set<String> existingIds = _holidaysBox.keys.cast<String>().toSet();
 
     for (var specialDate in specialDates) {
       try {
         final holiday = HolidayModel.fromSpecialDate(specialDate);
-        holidays.add(holiday);
+
+        // 检查节日ID是否已存在
+        if (!existingIds.contains(holiday.id)) {
+          holidays.add(holiday);
+          existingIds.add(holiday.id);
+        } else {
+          debugPrint('节日ID已存在，跳过: ${holiday.id} (${holiday.name})');
+        }
       } catch (e) {
         debugPrint('Error converting SpecialDate to HolidayModel: $e');
       }
     }
 
-    await saveHolidays(holidays);
-    await setMigrationComplete(true);
+    if (holidays.isNotEmpty) {
+      await saveHolidays(holidays);
+      debugPrint('成功迁移 ${holidays.length} 个节日');
+    } else {
+      debugPrint('没有新节日需要迁移');
+    }
   }
 
   /// 清空所有数据

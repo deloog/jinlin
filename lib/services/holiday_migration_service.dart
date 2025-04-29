@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:jinlin_app/data/holidays_cn.dart' as cn_holidays;
 import 'package:jinlin_app/data/holidays_intl.dart' as intl_holidays;
 import 'package:jinlin_app/data/holidays_asia.dart' as asia_holidays;
+import 'package:jinlin_app/data/special_days.dart' as special_days;
 import 'package:jinlin_app/services/hive_database_service.dart';
 
 /// 节日数据迁移服务
-/// 
+///
 /// 用于将硬编码的节日信息导入到Hive数据库中。
 class HolidayMigrationService {
   /// 检查数据迁移是否完成
@@ -22,21 +23,28 @@ class HolidayMigrationService {
 
     debugPrint('开始节日数据迁移...');
 
+    // 在异步操作前保存BuildContext相关数据
+    final cnHolidays = cn_holidays.getChineseHolidays(context);
+    final intlHolidays = intl_holidays.getInternationalHolidays(context);
+    final asiaHolidays = asia_holidays.getAsianHolidays(context);
+    final specialDays = special_days.getSpecialDays(context);
+
     try {
       // 迁移中国节日
       debugPrint('迁移中国节日...');
-      final cnHolidays = cn_holidays.getChineseHolidays(context);
       await HiveDatabaseService.migrateFromSpecialDates(cnHolidays);
 
       // 迁移国际节日
       debugPrint('迁移国际节日...');
-      final intlHolidays = intl_holidays.getInternationalHolidays(context);
       await HiveDatabaseService.migrateFromSpecialDates(intlHolidays);
 
       // 迁移亚洲节日
       debugPrint('迁移亚洲节日...');
-      final asiaHolidays = asia_holidays.getAsianHolidays(context);
       await HiveDatabaseService.migrateFromSpecialDates(asiaHolidays);
+
+      // 迁移特殊纪念日
+      debugPrint('迁移特殊纪念日...');
+      await HiveDatabaseService.migrateFromSpecialDates(specialDays);
 
       // 标记迁移完成
       await HiveDatabaseService.setMigrationComplete(true);
