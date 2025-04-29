@@ -18,6 +18,7 @@ import 'utils/date_formatter.dart';
 import 'package:jinlin_app/data/holidays_cn.dart'; // 中国节日数据
 import 'package:jinlin_app/data/holidays_intl.dart' as intl_holidays; // 国际节日数据
 import 'package:jinlin_app/data/holidays_asia.dart' as asia_holidays; // 亚洲节日数据
+import 'package:jinlin_app/data/special_days.dart' as special_days; // 特殊纪念日数据
 import 'package:jinlin_app/holiday_filter_dialog.dart'; // 节日筛选对话框
 import 'package:jinlin_app/special_date.dart';       // <--- 添加这行
 import 'timeline_item.dart';
@@ -1106,7 +1107,51 @@ Future<void> _prepareTimelineItems() async {
     debugPrint("计算节日失败: $e");
   }
 
-  // 3. 过滤掉农历年底之后的事件 (如果成功计算了年底日期)
+  // 3. 加载特殊纪念日（国际纪念日、职业节日等）
+  try {
+    // 获取当前日期
+    DateTime now = DateTime.now();
+
+    // 根据语言环境选择地区
+    String region;
+    if (mounted && Localizations.localeOf(context).languageCode == 'zh') {
+      region = 'CN'; // 中文环境
+    } else if (mounted && Localizations.localeOf(context).languageCode == 'en') {
+      region = 'US'; // 英文环境
+    } else {
+      region = 'INTL'; // 其他语言环境
+    }
+
+    // 获取特殊纪念日列表
+    List<SpecialDate> specialDays = [];
+    if (mounted) {
+      specialDays = special_days.getSpecialDaysForRegion(context, region);
+    }
+
+    // 智能显示策略：只显示10天内的特殊纪念日
+    for (var specialDay in specialDays) {
+      if (_selectedHolidayTypes.contains(specialDay.type)) {
+        DateTime? occurrence = specialDay.getUpcomingOccurrence(now);
+        if (occurrence != null) {
+          // 计算与当前日期的天数差
+          int daysDifference = occurrence.difference(now).inDays;
+
+          // 只添加10天内的特殊纪念日
+          if (daysDifference >= 0 && daysDifference <= 10) {
+            combinedItems.add(TimelineItem(
+              displayDate: occurrence,
+              itemType: TimelineItemType.holiday,
+              originalObject: specialDay,
+            ));
+          }
+        }
+      }
+    }
+  } catch (e) {
+    debugPrint("加载特殊纪念日失败: $e");
+  }
+
+  // 4. 过滤掉农历年底之后的事件 (如果成功计算了年底日期)
   if (endOfLunarYearDateOnly != null) { // *** 修正错误 2：确保变量在此处可用 ***
       combinedItems = combinedItems.where((item) {
         if (item.displayDate == null) {

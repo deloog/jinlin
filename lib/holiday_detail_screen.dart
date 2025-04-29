@@ -283,8 +283,12 @@ class HolidayDetailScreen extends StatelessWidget {
         return l10n.traditionalHoliday;
       case SpecialDateType.memorial:
         return l10n.memorialDay;
+      case SpecialDateType.solarTerm:
+        return l10n.solarTerm;
       case SpecialDateType.other:
         return l10n.otherHoliday;
+      case SpecialDateType.custom:
+        return l10n.customEvent;
       default:
         return l10n.holiday;
     }

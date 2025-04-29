@@ -260,5 +260,6 @@
   "solarTerm": "节气",
   "applyButton": "应用",
   "cancelButton": "取消",
-  "filterHolidays": "筛选"
+  "filterHolidays": "筛选",
+  "customEvent": "自定义事件"
   }

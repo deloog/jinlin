@@ -270,5 +270,6 @@
   "solarTerm": "Solar Term",
   "applyButton": "Apply",
   "cancelButton": "Cancel",
-  "filterHolidays": "Filter"
+  "filterHolidays": "Filter",
+  "customEvent": "Custom Event"
   }
