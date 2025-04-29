@@ -266,5 +266,11 @@
   "specialDaysRangeTitle": "特殊纪念日显示范围",
   "specialDaysRangeDescription": "选择提前多少天显示特殊纪念日：",
   "specialDaysRangeSubtitle": "提前{days}天显示特殊纪念日",
-  "daysText": "天"
+  "daysText": "天",
+
+  "holidayManagementTitle": "节日管理",
+  "holidayManagementDescription": "管理节日重要性和显示设置",
+  "importanceNormal": "普通",
+  "importanceHigh": "重要",
+  "importanceVeryHigh": "非常重要"
   }

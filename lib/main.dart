@@ -20,8 +20,7 @@ import 'package:jinlin_app/data/holidays_intl.dart' as intl_holidays; // 国际�
 import 'package:jinlin_app/data/holidays_asia.dart' as asia_holidays; // 亚洲节日数据
 import 'package:jinlin_app/data/special_days.dart' as special_days; // 特殊纪念日数据
 import 'package:jinlin_app/holiday_filter_dialog.dart'; // 节日筛选对话框
-import 'package:jinlin_app/special_date.dart';       // <--- 添加这行
-import 'package:jinlin_app/special_date.dart' show ImportanceLevel; // 导入 ImportanceLevel 枚举
+import 'package:jinlin_app/special_date.dart'; // 特殊日期数据模型
 import 'timeline_item.dart';
 
 import 'widgets/page_transitions.dart';
@@ -680,7 +679,7 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
     child: ListTile(
        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
       leading: CircleAvatar(
-        backgroundColor: holiday.getHolidayColor().withOpacity(0.2),
+        backgroundColor: holiday.getHolidayColor().withValues(alpha: 51), // 修复 withOpacity 废弃问题
         child: Icon(
           holiday.typeIcon,
           color: holiday.getHolidayColor(),
@@ -689,12 +688,12 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
       ),
       title: Text(
         holiday.name, // 假设 name 已经是目标语言，或者需要本地化
-        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
       ),
       subtitle: Column( // 改用 Column 垂直排列日期信息
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 4.0), // 加一点间距
+          const SizedBox(height: 4.0), // 加一点间距
           Text(
             formattedGregorianDate, // 显示公历日期和剩余天数
             // --- UI 调整：调整字体大小和颜色 ---
@@ -708,12 +707,19 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
               child: Text(
                 lunarDateString,
                 // --- UI 调整：农历日期用不同样式 ---
-                style: TextStyle(fontSize: 12, color: Colors.blueGrey),
+                style: const TextStyle(fontSize: 12, color: Colors.blueGrey),
                 // --- UI 调整结束 ---
               ),
             ),
         ],
       ), // 使用 special_date.dart 中的格式化方法
+      // 未来可能添加分享按钮
+      // trailing: IconButton(
+      //   icon: Icon(Icons.share),
+      //   onPressed: () {
+      //     // 分享功能
+      //   },
+      // ),
       onTap: () {
         // 导航到节日详情页
         Navigator.push(
@@ -1180,18 +1186,46 @@ Future<void> _prepareTimelineItems() async {
           final myAppState = context.findAncestorStateOfType<_MyAppState>();
           final specialDaysRange = myAppState?._specialDaysRange ?? 10; // 默认为10天
 
-          // 根据重要性级别决定是否显示
+          // 获取用户自定义的节日重要性
+          final prefs = await SharedPreferences.getInstance();
+          final String? importanceStr = prefs.getString('holidayImportance');
+          Map<String, dynamic> holidayImportance = {};
+
+          if (importanceStr != null) {
+            try {
+              // 解析字符串格式 {key1: value1, key2: value2}
+              final String cleanStr = importanceStr.replaceAll('{', '').replaceAll('}', '');
+              final List<String> pairs = cleanStr.split(',');
+
+              for (final pair in pairs) {
+                if (pair.trim().isEmpty) continue;
+                final List<String> keyValue = pair.split(':');
+                if (keyValue.length == 2) {
+                  final String key = keyValue[0].trim();
+                  final int value = int.tryParse(keyValue[1].trim()) ?? 0;
+                  holidayImportance[key] = value;
+                }
+              }
+            } catch (e) {
+              debugPrint("解析节日重要性失败: $e");
+            }
+          }
+
+          // 获取当前节日的重要性
+          final int importance = holidayImportance[specialDay.id] ?? 0;
+
+          // 根据重要性和时间范围决定是否显示
           bool shouldShow = false;
 
-          // 高重要性的特殊纪念日始终显示
-          if (specialDay.importanceLevel == ImportanceLevel.high) {
+          // 非常重要的节日始终显示
+          if (importance == 2) {
             shouldShow = true;
           }
-          // 中等重要性的特殊纪念日在较长时间范围内显示（2倍范围）
-          else if (specialDay.importanceLevel == ImportanceLevel.medium) {
+          // 重要的节日在较长时间范围内显示（2倍范围）
+          else if (importance == 1) {
             shouldShow = daysDifference >= 0 && daysDifference <= specialDaysRange * 2;
           }
-          // 低重要性的特殊纪念日只在指定范围内显示
+          // 普通重要性的节日只在指定范围内显示
           else {
             shouldShow = daysDifference >= 0 && daysDifference <= specialDaysRange;
           }

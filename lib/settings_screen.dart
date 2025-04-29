@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
+import 'holiday_management_screen.dart';
 
 
 class SettingsScreen extends StatefulWidget {
@@ -104,6 +105,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _showSpecialDaysRangePicker(context);
             },
           ),
+
            ListTile(
             leading: const Icon(Icons.notifications_active_outlined),
             title: Text(l10n.settingsNotificationTitle), // TODO: 本地化
@@ -121,13 +123,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
            _buildSectionTitle(context, l10n.settingsSectionData), // TODO: 本地化
            ListTile(
             leading: const Icon(Icons.festival_outlined),
-            title: Text(l10n.settingsAddFestivalTitle), // TODO: 本地化
-            subtitle: Text(l10n.settingsAddFestivalSubtitle), // TODO: 本地化
-             trailing: const Icon(Icons.chevron_right),
+            title: Text(l10n.holidayManagementTitle ?? '节日管理'),
+            subtitle: Text(l10n.holidayManagementDescription ?? '管理节日显示和重要性'),
+            trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO: 导航到添加节日页面
-               ScaffoldMessenger.of(context).showSnackBar(
-                 SnackBar(content: Text(l10n.settingsFeatureNotImplemented(l10n.settingsAddFestivalTitle))),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HolidayManagementScreen(),
+                ),
               );
             },
           ),

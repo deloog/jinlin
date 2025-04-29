@@ -276,5 +276,11 @@
   "specialDaysRangeTitle": "Special Days Display Range",
   "specialDaysRangeDescription": "Choose how many days in advance to display special days:",
   "specialDaysRangeSubtitle": "Show special days {days} days in advance",
-  "daysText": "days"
+  "daysText": "days",
+
+  "holidayManagementTitle": "Holiday Management",
+  "holidayManagementDescription": "Manage holiday importance and display settings",
+  "importanceNormal": "Normal",
+  "importanceHigh": "Important",
+  "importanceVeryHigh": "Very Important"
   }
