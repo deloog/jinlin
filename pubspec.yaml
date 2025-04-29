@@ -33,13 +33,16 @@ dependencies:
   sqflite_common_ffi: ^2.3.2+1 # 用于在非移动平台上使用SQLite
   sqflite_common_ffi_web: ^0.4.2+3 # 用于在Web平台上使用SQLite
   path: ^1.9.0 # 用于处理路径
+  hive: ^2.2.3 # 用于跨平台数据库
+  hive_flutter: ^1.1.0 # Hive的Flutter扩展
+  hive_generator: ^2.0.1 # 用于Hive模型生成
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
-  mockito: ^5.4.6
-  build_runner: ^2.4.15
+  mockito: ^5.4.5
+  build_runner: ^2.4.15 # 用于代码生成
 
 flutter:
   uses-material-design: true

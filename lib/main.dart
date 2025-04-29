@@ -23,6 +23,10 @@ import 'package:jinlin_app/holiday_filter_dialog.dart'; // 节日筛选对话框
 import 'package:jinlin_app/special_date.dart'; // 特殊日期数据模型
 import 'timeline_item.dart';
 import 'package:jinlin_app/services/holiday_storage_service.dart'; // 节日存储服务
+import 'package:jinlin_app/services/hive_database_service.dart'; // Hive数据库服务
+import 'package:jinlin_app/services/holiday_migration_service.dart'; // 节日数据迁移服务
+import 'package:jinlin_app/models/holiday_model.dart' hide DateCalculationType, ImportanceLevel; // 节日数据模型
+import 'package:jinlin_app/adapters/holiday_adapter.dart'; // 节日适配器
 
 import 'widgets/page_transitions.dart';
 
@@ -1186,19 +1190,68 @@ Future<void> _prepareTimelineItems() async {
       specialDaysRange = myAppState?._specialDaysRange ?? 10;
     }
 
+    // 初始化Hive数据库
+    await HiveDatabaseService.initialize();
+
+    // 检查数据库迁移是否完成
+    final migrationComplete = HiveDatabaseService.isMigrationComplete();
+
+    // 如果数据库迁移未完成，则执行迁移
+    if (!migrationComplete && mounted) {
+      try {
+        // 执行数据迁移
+        await HolidayMigrationService.migrateHolidays(context);
+        debugPrint("数据迁移成功完成");
+      } catch (e) {
+        debugPrint("数据迁移失败: $e");
+      }
+    }
+
     // 获取用户自定义的节日重要性
-    final Map<String, int> holidayImportance = await HolidayStorageService.getHolidayImportance();
+    Map<String, int> holidayImportance;
+
+    // 如果数据库迁移已完成，从数据库获取节日重要性
+    if (migrationComplete) {
+      holidayImportance = HiveDatabaseService.getHolidayImportance();
+    } else {
+      // 如果数据库迁移未完成，使用本地存储服务获取节日重要性
+      holidayImportance = await HolidayStorageService.getHolidayImportance();
+    }
 
     // 从数据库获取节日
     List<SpecialDate> specialDays = [];
 
-    // 使用本地存储服务获取节日
+    // 获取用户所在地区
+    final String region;
     if (mounted) {
-      // 获取用户所在地区
-      final String region = HolidayStorageService.getUserRegion(context);
+      final locale = Localizations.localeOf(context);
+      if (locale.languageCode == 'zh') {
+        region = 'CN'; // 中文环境
+      } else if (locale.languageCode == 'ja') {
+        region = 'JP'; // 日语环境
+      } else if (locale.languageCode == 'ko') {
+        region = 'KR'; // 韩语环境
+      } else {
+        region = 'INTL'; // 其他语言环境
+      }
+    } else {
+      region = 'INTL'; // 默认国际节日
+    }
 
+    // 如果数据库迁移已完成，从数据库获取节日
+    if (migrationComplete) {
       // 获取用户所在地区的节日
-      specialDays = HolidayStorageService.getHolidaysForRegion(context, region);
+      final holidayModels = HiveDatabaseService.getHolidaysByRegion(region);
+
+      // 将HolidayModel转换为SpecialDate
+      specialDays = HolidayAdapter.toSpecialDateList(holidayModels);
+      debugPrint("从Hive数据库加载了 ${specialDays.length} 个节日");
+    } else {
+      // 如果数据库迁移未完成，使用本地存储服务获取节日
+      if (mounted) {
+        specialDays = HolidayStorageService.getHolidaysForRegion(context, region);
+        debugPrint("从本地存储服务加载了 ${specialDays.length} 个节日");
+      }
     }
 
     // 智能显示策略：根据重要性和时间范围显示节日
@@ -1210,7 +1263,18 @@ Future<void> _prepareTimelineItems() async {
           int daysDifference = occurrence.difference(now).inDays;
 
           // 获取当前节日的重要性
-          final int importance = holidayImportance[specialDay.id] ?? 0;
+          int importance = 0;
+
+          // 如果数据库迁移已完成，从数据库获取节日重要性
+          if (migrationComplete) {
+            final holidayModel = HiveDatabaseService.getHolidayById(specialDay.id);
+            if (holidayModel != null) {
+              importance = holidayModel.userImportance;
+            }
+          } else {
+            // 如果数据库迁移未完成，使用本地存储服务获取节日重要性
+            importance = holidayImportance[specialDay.id] ?? 0;
+          }
 
           // 根据重要性和时间范围决定是否显示
           bool shouldShow = false;

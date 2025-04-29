@@ -2,6 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:jinlin_app/special_date.dart';
 import 'package:jinlin_app/services/holiday_storage_service.dart';
+import 'package:jinlin_app/services/hive_database_service.dart';
+import 'package:jinlin_app/services/holiday_migration_service.dart';
+import 'package:jinlin_app/models/holiday_model.dart' hide DateCalculationType, ImportanceLevel;
+import 'package:jinlin_app/adapters/holiday_adapter.dart';
 
 class HolidayManagementScreen extends StatefulWidget {
   const HolidayManagementScreen({super.key});
@@ -34,12 +38,54 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
       _isLoading = true;
     });
 
+    // 初始化Hive数据库
+    await HiveDatabaseService.initialize();
+
+    // 检查数据库迁移是否完成
+    final migrationComplete = HiveDatabaseService.isMigrationComplete();
+
+    // 如果数据库迁移未完成，则执行迁移
+    if (!migrationComplete && mounted) {
+      try {
+        // 执行数据迁移
+        await HolidayMigrationService.migrateHolidays(context);
+        debugPrint("数据迁移成功完成");
+      } catch (e) {
+        debugPrint("数据迁移失败: $e");
+      }
+    }
+
     // 获取用户所在地区
-    final String userRegion = HolidayStorageService.getUserRegion(context);
+    final String userRegion;
+    if (mounted) {
+      final locale = Localizations.localeOf(context);
+      if (locale.languageCode == 'zh') {
+        userRegion = 'CN'; // 中文环境
+      } else if (locale.languageCode == 'ja') {
+        userRegion = 'JP'; // 日语环境
+      } else if (locale.languageCode == 'ko') {
+        userRegion = 'KR'; // 韩语环境
+      } else {
+        userRegion = 'INTL'; // 其他语言环境
+      }
+    } else {
+      userRegion = 'INTL'; // 默认国际节日
+    }
 
     // 获取用户所在地区的节日
     if (mounted) {
-      _allHolidays = HolidayStorageService.getHolidaysForRegion(context, userRegion);
+      if (migrationComplete) {
+        // 如果数据库迁移已完成，从数据库获取节日
+        final holidayModels = HiveDatabaseService.getHolidaysByRegion(userRegion);
+
+        // 将HolidayModel转换为SpecialDate
+        _allHolidays = HolidayAdapter.toSpecialDateList(holidayModels);
+        debugPrint("从Hive数据库加载了 ${_allHolidays.length} 个节日");
+      } else {
+        // 如果数据库迁移未完成，使用本地存储服务获取节日
+        _allHolidays = HolidayStorageService.getHolidaysForRegion(context, userRegion);
+        debugPrint("从本地存储服务加载了 ${_allHolidays.length} 个节日");
+      }
     }
 
     if (mounted) {
@@ -52,7 +98,23 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
   // 加载用户自定义节日重要性
   Future<void> _loadHolidayImportance() async {
     try {
-      final importanceMap = await HolidayStorageService.getHolidayImportance();
+      // 初始化Hive数据库
+      await HiveDatabaseService.initialize();
+
+      // 检查数据库迁移是否完成
+      final migrationComplete = HiveDatabaseService.isMigrationComplete();
+
+      Map<String, int> importanceMap;
+
+      // 如果数据库迁移已完成，从数据库获取节日重要性
+      if (migrationComplete) {
+        importanceMap = HiveDatabaseService.getHolidayImportance();
+        debugPrint("从Hive数据库加载了节日重要性");
+      } else {
+        // 如果数据库迁移未完成，使用本地存储服务获取节日重要性
+        importanceMap = await HolidayStorageService.getHolidayImportance();
+        debugPrint("从本地存储服务加载了节日重要性");
+      }
 
       if (mounted) {
         setState(() {
@@ -67,8 +129,24 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
   // 保存用户自定义节日重要性
   Future<void> _saveHolidayImportance() async {
     try {
-      // 保存到本地存储
-      final success = await HolidayStorageService.saveHolidayImportance(_holidayImportance);
+      // 初始化Hive数据库
+      await HiveDatabaseService.initialize();
+
+      // 检查数据库迁移是否完成
+      final migrationComplete = HiveDatabaseService.isMigrationComplete();
+
+      bool success = false;
+
+      // 如果数据库迁移已完成，保存到数据库
+      if (migrationComplete) {
+        await HiveDatabaseService.saveHolidayImportance(_holidayImportance);
+        success = true;
+        debugPrint("节日重要性已保存到Hive数据库");
+      } else {
+        // 如果数据库迁移未完成，保存到本地存储
+        success = await HolidayStorageService.saveHolidayImportance(_holidayImportance);
+        debugPrint("节日重要性已保存到本地存储");
+      }
 
       // 通知主页面刷新特殊纪念日显示
       if (mounted) {
@@ -98,8 +176,25 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
       _holidayImportance[holidayId] = importance;
     });
 
-    // 更新本地存储
-    await HolidayStorageService.updateHolidayImportance(holidayId, importance);
+    try {
+      // 初始化Hive数据库
+      await HiveDatabaseService.initialize();
+
+      // 检查数据库迁移是否完成
+      final migrationComplete = HiveDatabaseService.isMigrationComplete();
+
+      // 如果数据库迁移已完成，更新数据库
+      if (migrationComplete) {
+        await HiveDatabaseService.updateHolidayImportance(holidayId, importance);
+        debugPrint("节日重要性已更新到Hive数据库");
+      } else {
+        // 如果数据库迁移未完成，更新本地存储
+        await HolidayStorageService.updateHolidayImportance(holidayId, importance);
+        debugPrint("节日重要性已更新到本地存储");
+      }
+    } catch (e) {
+      debugPrint("更新节日重要性失败: $e");
+    }
 
     // 保存所有节日重要性
     await _saveHolidayImportance();
