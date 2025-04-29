@@ -258,5 +258,10 @@
   },
   "genericCustom1": "Gathering with family and friends",
   "genericCustom2": "Preparing special foods and decorations",
-  "genericCustom3": "Exchanging gifts or greetings"
+  "genericCustom3": "Exchanging gifts or greetings",
+
+  "holidayTaboos": "Things to Avoid",
+  "genericTaboo1": "Avoid discussing negative topics during the celebration",
+  "genericTaboo2": "Avoid certain foods or activities that may be considered inappropriate",
+  "genericTaboo3": "Respect local customs and traditions"
   }

@@ -791,9 +791,15 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
     final locale = Localizations.localeOf(context); // 获取当前 Locale
     final now = DateTime.now(); // 获取当前时间
 
-    // 使用 intl 格式化公历日期
-    // 你可以根据喜好调整格式，例如 'yyyy年M月d日 EEEE' 会显示星期几
-    final gregorianDateString = DateFormat('yyyy年M月d日', locale.toString()).format(now);
+    // 使用 intl 格式化公历日期，根据语言环境选择不同的格式
+    String gregorianDateString;
+    if (locale.languageCode == 'zh') {
+      // 中文环境使用中文格式
+      gregorianDateString = DateFormat('yyyy年M月d日', locale.toString()).format(now);
+    } else {
+      // 其他语言环境使用通用格式
+      gregorianDateString = DateFormat.yMMMMd(locale.toString()).format(now);
+    }
 
     String fullDateString = gregorianDateString; // 默认只显示公历
 

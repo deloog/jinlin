@@ -248,5 +248,10 @@
   },
   "genericCustom1": "与家人和朋友团聚",
   "genericCustom2": "准备特色食品和装饰",
-  "genericCustom3": "交换礼物或祝福"
+  "genericCustom3": "交换礼物或祝福",
+
+  "holidayTaboos": "节日禁忌",
+  "genericTaboo1": "避免在庆祝活动中讨论负面话题",
+  "genericTaboo2": "避免某些可能被认为不适当的食物或活动",
+  "genericTaboo3": "尊重当地习俗和传统"
   }

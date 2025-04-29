@@ -209,6 +209,43 @@ class HolidayDetailScreen extends StatelessWidget {
                 ),
               ),
             ),
+
+            const SizedBox(height: 24),
+
+            // 节日禁忌标题
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8.0),
+              child: Text(
+                l10n.holidayTaboos,
+                style: theme.textTheme.titleLarge,
+              ),
+            ),
+
+            // 节日禁忌内容
+            Card(
+              elevation: 2,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: _getHolidayTaboos(holiday.id, l10n).map((taboo) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.do_not_disturb, size: 14, color: Colors.red[700]),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(taboo, style: theme.textTheme.bodyMedium),
+                          ),
+                        ],
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -316,6 +353,80 @@ class HolidayDetailScreen extends StatelessWidget {
           l10n.genericCustom1,
           l10n.genericCustom2,
           l10n.genericCustom3,
+        ];
+    }
+  }
+
+  // 根据节日ID获取禁忌列表
+  List<String> _getHolidayTaboos(String holidayId, AppLocalizations l10n) {
+    // 这里可以根据节日ID返回相应的禁忌列表
+
+    switch (holidayId) {
+      case 'CN_SpringFestival':
+        return [
+          '避免打破物品：春节期间打破碗碟等物品被视为不吉利',
+          '避免使用负面词语：如"死"、"破"、"完"等词语被认为会带来厄运',
+          '避免在初一洗头发：民间认为会"洗掉"好运',
+          '避免在初一打扫：被认为会"扫走"财运',
+          '避免借钱给他人：被认为会导致全年都在借钱',
+        ];
+      case 'CN_QingMing':
+        return [
+          '避免穿鲜艳的衣服：扫墓时应穿素色衣服以示尊重',
+          '避免在祭祀时说不吉利的话：如"再见"等',
+          '避免在雨天扫墓：民间认为会影响逝者安宁',
+          '避免空手而归：应带一些土或树叶回家，象征带回好运',
+        ];
+      case 'CN_DragonBoatFestival':
+        return [
+          '避免在水中游泳：民间认为这一天水中的龙会捉人',
+          '避免晒衣服：被认为会招来不幸',
+          '避免午睡：被认为会导致疾病',
+        ];
+      case 'CN_MidAutumnFestival':
+        return [
+          '避免将月饼切成两半：应该掰开分享，切开被认为不吉利',
+          '避免在月下哭泣：被认为会带来厄运',
+          '避免在月亮升起前吃月饼：传统上应等月亮升起后再享用',
+        ];
+      case 'JP_NewYear':
+        return [
+          '避免打扫：日本新年前三天不应打扫，以免"扫走"好运',
+          '避免使用刀具：被认为会"切断"好运',
+          '避免在新年说负面词语：如"死"、"分离"等',
+        ];
+      case 'JP_Obon':
+        return [
+          '避免在盂兰盆节期间举行婚礼：被认为不吉利',
+          '避免在这段时间游泳：民间认为祖先的灵魂可能会将人拉入水中',
+          '避免在祭坛前拍照：被认为不尊重祖先',
+          '避免在送火时回头看：民间认为会带来厄运',
+        ];
+      case 'KR_Chuseok':
+        return [
+          '避免穿鲜艳的衣服：祭祀时应穿素色衣服',
+          '避免空手拜访亲友：应带礼物表示尊重',
+          '避免在祭祀时说不吉利的话',
+        ];
+      case 'IN_Diwali':
+        return [
+          '避免在排灯节当天打扫：被认为会"扫走"财神',
+          '避免在这一天借钱或还钱：被认为会影响财运',
+          '避免穿黑色或白色衣服：这些颜色在印度文化中与丧事相关',
+          '避免在排灯节期间剪头发或指甲：被认为不吉利',
+        ];
+      case 'WEST_Christmas':
+        return [
+          '避免在圣诞节取下装饰：传统上应在1月6日（主显节）之后才取下',
+          '避免送尖锐的礼物：如刀具，被认为会"切断"关系',
+          '避免在圣诞树下放空礼物盒：被认为会带来一年的失望',
+        ];
+      default:
+        // 对于其他节日，返回通用的禁忌描述
+        return [
+          l10n.genericTaboo1,
+          l10n.genericTaboo2,
+          l10n.genericTaboo3,
         ];
     }
   }

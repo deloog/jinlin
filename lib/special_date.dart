@@ -151,25 +151,42 @@ class SpecialDate {
   }
 
   // 辅助方法：格式化即将到来的日期和剩余天数
-  String formatUpcomingDate(DateTime upcomingDate, DateTime currentDate) {
-     // 确保 currentDate 也是日期部分，忽略时间
+  String formatUpcomingDate(DateTime upcomingDate, DateTime currentDate, {String? locale}) {
+    // 确保 currentDate 也是日期部分，忽略时间
     DateTime currentDay = DateTime(currentDate.year, currentDate.month, currentDate.day);
     final difference = upcomingDate.difference(currentDay).inDays;
-    // 确保初始化中文格式
-    initializeDateFormatting('zh_CN', null);
-    final formattedDate = DateFormat('yyyy-MM-dd (E)', 'zh_CN').format(upcomingDate);
+
+    // 根据语言环境选择格式
+    final String actualLocale = locale ?? 'en';
+    final bool isChinese = actualLocale.startsWith('zh');
+
+    // 确保初始化日期格式
+    initializeDateFormatting(actualLocale, null);
+
+    // 根据语言环境选择不同的日期格式
+    final formattedDate = isChinese
+        ? DateFormat('yyyy-MM-dd (E)', 'zh_CN').format(upcomingDate)
+        : DateFormat('MMM d, yyyy (EEE)', actualLocale).format(upcomingDate);
 
     if (difference == 0) {
-      return '$formattedDate (今天)';
+      return isChinese
+          ? '$formattedDate (今天)'
+          : '$formattedDate (Today)';
     } else if (difference == 1) {
-      return '$formattedDate (明天)';
+      return isChinese
+          ? '$formattedDate (明天)'
+          : '$formattedDate (Tomorrow)';
     } else if (difference == 2) {
-      return '$formattedDate (后天)';
+      return isChinese
+          ? '$formattedDate (后天)'
+          : '$formattedDate (Day after tomorrow)';
     } else if (difference > 0) {
-       return '$formattedDate (还有 $difference 天)';
+      return isChinese
+          ? '$formattedDate (还有 $difference 天)'
+          : '$formattedDate ($difference days left)';
     } else {
-       // 一般不应出现这种情况，因为 getUpcomingOccurrence 会返回未来日期
-       return formattedDate;
+      // 一般不应出现这种情况，因为 getUpcomingOccurrence 会返回未来日期
+      return formattedDate;
     }
   }
 
