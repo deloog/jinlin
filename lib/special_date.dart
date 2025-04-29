@@ -18,6 +18,13 @@ enum DateCalculationType {
   relativeTo      // 相对于另一个特殊日期的日期，如 "HOLIDAY_ID,+/-N"
 }
 
+// 定义特殊日期的重要性级别
+enum ImportanceLevel {
+  low,     // 低重要性，只在临近时显示
+  medium,  // 中等重要性，提前较长时间显示
+  high     // 高重要性，始终显示
+}
+
 // 特殊日期数据模型类 (增加了一个工具方法)
 class SpecialDate {
   final String id;
@@ -27,6 +34,7 @@ class SpecialDate {
   final DateCalculationType calculationType;
   final String calculationRule;
   final String? description;
+  final ImportanceLevel importanceLevel;
 
   SpecialDate({
     required this.id,
@@ -36,6 +44,7 @@ class SpecialDate {
     required this.calculationType,
     required this.calculationRule,
     this.description,
+    this.importanceLevel = ImportanceLevel.low, // 默认为低重要性
   });
 
   // 计算从指定日期开始的下一个发生日期 (优化逻辑)

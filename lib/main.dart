@@ -21,6 +21,7 @@ import 'package:jinlin_app/data/holidays_asia.dart' as asia_holidays; // 亚洲�
 import 'package:jinlin_app/data/special_days.dart' as special_days; // 特殊纪念日数据
 import 'package:jinlin_app/holiday_filter_dialog.dart'; // 节日筛选对话框
 import 'package:jinlin_app/special_date.dart';       // <--- 添加这行
+import 'package:jinlin_app/special_date.dart' show ImportanceLevel; // 导入 ImportanceLevel 枚举
 import 'timeline_item.dart';
 
 import 'widgets/page_transitions.dart';
@@ -1179,8 +1180,24 @@ Future<void> _prepareTimelineItems() async {
           final myAppState = context.findAncestorStateOfType<_MyAppState>();
           final specialDaysRange = myAppState?._specialDaysRange ?? 10; // 默认为10天
 
-          // 只添加指定天数范围内的特殊纪念日
-          if (daysDifference >= 0 && daysDifference <= specialDaysRange) {
+          // 根据重要性级别决定是否显示
+          bool shouldShow = false;
+
+          // 高重要性的特殊纪念日始终显示
+          if (specialDay.importanceLevel == ImportanceLevel.high) {
+            shouldShow = true;
+          }
+          // 中等重要性的特殊纪念日在较长时间范围内显示（2倍范围）
+          else if (specialDay.importanceLevel == ImportanceLevel.medium) {
+            shouldShow = daysDifference >= 0 && daysDifference <= specialDaysRange * 2;
+          }
+          // 低重要性的特殊纪念日只在指定范围内显示
+          else {
+            shouldShow = daysDifference >= 0 && daysDifference <= specialDaysRange;
+          }
+
+          // 如果应该显示，则添加到列表中
+          if (shouldShow) {
             combinedItems.add(TimelineItem(
               displayDate: occurrence,
               itemType: TimelineItemType.holiday,
