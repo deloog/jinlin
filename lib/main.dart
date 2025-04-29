@@ -620,13 +620,14 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
     elevation: 3.0,
     child: ListTile(
        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-      leading: Icon(holiday.typeIcon, size: 30,// 使用 special_date.dart 中的图标 getter
-      color: holiday.type == SpecialDateType.statutory
-                 ? Colors.redAccent // 法定用红色
-                 : holiday.type == SpecialDateType.traditional
-                   ? Colors.orangeAccent // 传统用橙色
-                   : Theme.of(context).colorScheme.primary
-                   ),
+      leading: CircleAvatar(
+        backgroundColor: holiday.getHolidayColor().withOpacity(0.2),
+        child: Icon(
+          holiday.typeIcon,
+          color: holiday.getHolidayColor(),
+          size: 24,
+        ),
+      ),
       title: Text(
         holiday.name, // 假设 name 已经是目标语言，或者需要本地化
         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),

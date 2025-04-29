@@ -57,6 +57,12 @@ class HolidayDetailScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(holiday.name),
         backgroundColor: theme.colorScheme.inversePrimary,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Icon(holiday.typeIcon, color: holiday.getHolidayColor()),
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -67,11 +73,41 @@ class HolidayDetailScreen extends StatelessWidget {
             Card(
               elevation: 4,
               margin: const EdgeInsets.only(bottom: 24.0),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  color: holiday.getHolidayColor().withOpacity(0.3),
+                  width: 1.5,
+                ),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // 节日图标和类型
+                    Row(
+                      children: [
+                        CircleAvatar(
+                          backgroundColor: holiday.getHolidayColor().withOpacity(0.2),
+                          child: Icon(
+                            holiday.typeIcon,
+                            color: holiday.getHolidayColor(),
+                            size: 24,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          _getHolidayTypeText(holiday.type, l10n),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: holiday.getHolidayColor(),
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const Divider(height: 24),
                     // 日期信息
                     Row(
                       children: [
@@ -121,20 +157,6 @@ class HolidayDetailScreen extends StatelessWidget {
                     ),
 
                     const Divider(height: 24),
-
-                    // 节日类型
-                    Row(
-                      children: [
-                        Icon(Icons.category, color: theme.colorScheme.secondary),
-                        const SizedBox(width: 8),
-                        Text(
-                          _getHolidayTypeText(holiday.type, l10n),
-                          style: theme.textTheme.bodyLarge,
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 16),
 
                     // 节日区域
                     Row(

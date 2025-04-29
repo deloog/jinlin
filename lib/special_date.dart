@@ -190,21 +190,100 @@ class SpecialDate {
     }
   }
 
-   // 新增：辅助方法，根据类型获取图标 (示例)
+   // 根据节日类型和ID获取图标
    IconData get typeIcon {
+     // 首先检查特定节日的图标
+     final specificIcon = _getSpecificHolidayIcon(id);
+     if (specificIcon != null) {
+       return specificIcon;
+     }
+
+     // 如果没有特定图标，则根据类型返回默认图标
      switch (type) {
        case SpecialDateType.statutory:
-         return Icons.flag_circle; // 法定
+         return Icons.flag_circle; // 法定节日
        case SpecialDateType.traditional:
-         return Icons.cake; // 传统
+         return Icons.cake; // 传统节日
        case SpecialDateType.solarTerm:
          return Icons.wb_sunny; // 节气
        case SpecialDateType.memorial:
-         return Icons.star_border; // 纪念
+         return Icons.star_border; // 纪念日
        case SpecialDateType.custom:
          return Icons.person; // 自定义
        default:
          return Icons.calendar_today;
+     }
+   }
+
+   // 根据节日ID获取特定图标
+   IconData? _getSpecificHolidayIcon(String holidayId) {
+     // 中国节日
+     if (holidayId == 'CN_SpringFestival') return Icons.fireplace; // 春节
+     if (holidayId == 'CN_LanternFestival') return Icons.lightbulb; // 元宵节
+     if (holidayId == 'CN_ChingMing') return Icons.nature_people; // 清明节
+     if (holidayId == 'CN_DragonBoatFestival') return Icons.directions_boat; // 端午节
+     if (holidayId == 'CN_MidAutumnFestival') return Icons.nightlight_round; // 中秋节
+     if (holidayId == 'CN_DoubleSeventhFestival') return Icons.favorite; // 七夕节
+     if (holidayId == 'CN_DoubleNinthFestival') return Icons.terrain; // 重阳节
+     if (holidayId == 'CN_LabaFestival') return Icons.soup_kitchen; // 腊八节
+     if (holidayId == 'CN_NationalDay') return Icons.flag; // 国庆节
+
+     // 西方节日
+     if (holidayId == 'WEST_Christmas') return Icons.card_giftcard; // 圣诞节
+     if (holidayId == 'WEST_Easter') return Icons.egg; // 复活节
+     if (holidayId == 'WEST_Halloween') return Icons.face_retouching_natural; // 万圣节
+     if (holidayId == 'WEST_Thanksgiving') return Icons.dinner_dining; // 感恩节
+     if (holidayId == 'WEST_StPatricksDay') return Icons.grass; // 圣帕特里克节
+
+     // 国际节日
+     if (holidayId == 'INTL_NewYearDay') return Icons.celebration; // 元旦
+     if (holidayId == 'INTL_ValentinesDay') return Icons.favorite_border; // 情人节
+     if (holidayId == 'INTL_EarthDay') return Icons.public; // 地球日
+     if (holidayId == 'WEST_NewYearsEve') return Icons.watch_later; // 除夕
+
+     // 日本节日
+     if (holidayId == 'JP_NewYear') return Icons.temple_buddhist; // 正月
+     if (holidayId == 'JP_SetuBun') return Icons.grain; // 節分
+     if (holidayId == 'JP_Hinamatsuri') return Icons.emoji_people; // ひな祭り
+     if (holidayId == 'JP_GoldenWeek') return Icons.weekend; // 黄金周
+     if (holidayId == 'JP_Tanabata') return Icons.auto_awesome; // 七夕
+     if (holidayId == 'JP_Obon') return Icons.local_fire_department; // お盆
+     if (holidayId == 'JP_Shichigosan') return Icons.child_care; // 七五三
+
+     // 韩国节日
+     if (holidayId == 'KR_Seollal') return Icons.home; // 설날
+     if (holidayId == 'KR_Chuseok') return Icons.agriculture; // 추석
+     if (holidayId == 'KR_BuddhasBirthday') return Icons.brightness_5; // 부처님 오신 날
+
+     // 印度节日
+     if (holidayId == 'IN_Diwali') return Icons.emoji_objects; // दीवाली
+     if (holidayId == 'IN_Holi') return Icons.palette; // होली
+     if (holidayId == 'IN_Dussehra') return Icons.security; // दशहरा
+
+     // 纪念日
+     if (holidayId.contains('MothersDay')) return Icons.pregnant_woman; // 母亲节
+     if (holidayId.contains('FathersDay')) return Icons.face; // 父亲节
+     if (holidayId.contains('TreePlanting')) return Icons.park; // 植树节
+
+     // 没有特定图标，返回null，使用类型默认图标
+     return null;
+   }
+
+   // 获取节日的颜色
+   Color getHolidayColor() {
+     switch (type) {
+       case SpecialDateType.statutory:
+         return Colors.red[700]!; // 法定节日用红色
+       case SpecialDateType.traditional:
+         return Colors.orange[700]!; // 传统节日用橙色
+       case SpecialDateType.solarTerm:
+         return Colors.green[700]!; // 节气用绿色
+       case SpecialDateType.memorial:
+         return Colors.blue[700]!; // 纪念日用蓝色
+       case SpecialDateType.custom:
+         return Colors.purple[700]!; // 自定义用紫色
+       default:
+         return Colors.grey[700]!;
      }
    }
 }
