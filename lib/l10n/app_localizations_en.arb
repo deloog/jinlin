@@ -263,5 +263,12 @@
   "holidayTaboos": "Things to Avoid",
   "genericTaboo1": "Avoid discussing negative topics during the celebration",
   "genericTaboo2": "Avoid certain foods or activities that may be considered inappropriate",
-  "genericTaboo3": "Respect local customs and traditions"
+  "genericTaboo3": "Respect local customs and traditions",
+
+  "holidayFilterTitle": "Filter Holidays",
+  "holidayFilterDescription": "Select which types of holidays to display:",
+  "solarTerm": "Solar Term",
+  "applyButton": "Apply",
+  "cancelButton": "Cancel",
+  "filterHolidays": "Filter"
   }

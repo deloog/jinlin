@@ -18,6 +18,7 @@ import 'utils/date_formatter.dart';
 import 'package:jinlin_app/data/holidays_cn.dart'; // 中国节日数据
 import 'package:jinlin_app/data/holidays_intl.dart' as intl_holidays; // 国际节日数据
 import 'package:jinlin_app/data/holidays_asia.dart' as asia_holidays; // 亚洲节日数据
+import 'package:jinlin_app/holiday_filter_dialog.dart'; // 节日筛选对话框
 import 'package:jinlin_app/special_date.dart';       // <--- 添加这行
 import 'timeline_item.dart';
 
@@ -119,6 +120,14 @@ class _MyHomePageState extends State<MyHomePage> {
   List<Reminder> _reminders = [];
   bool _isLoading = true;
   List<TimelineItem> _sortedTimelineItems = [];
+
+  // 节日筛选状态
+  Set<SpecialDateType> _selectedHolidayTypes = {
+    SpecialDateType.statutory,
+    SpecialDateType.traditional,
+    SpecialDateType.memorial,
+    SpecialDateType.solarTerm,
+  };
 
   @override
   void initState() {
@@ -374,6 +383,15 @@ if (result is Reminder) { // --- 处理单个添加/编辑的情况 ---
          backgroundColor: Theme.of(context).colorScheme.inversePrimary,
          title: Text(l10n.appTitle),
          actions: [
+            // 节日筛选按钮
+            IconButton(
+              icon: const Icon(Icons.filter_list),
+              tooltip: l10n.filterHolidays,
+              onPressed: () {
+                _showHolidayFilterDialog();
+              },
+            ),
+            // 设置按钮
             IconButton(
               icon: const Icon(Icons.settings),
               tooltip: l10n.settingsTooltip,
@@ -1070,14 +1088,18 @@ Future<void> _prepareTimelineItems() async {
       regionHolidays = intl_holidays.getHolidaysForRegion(context, region); // 来自 holidays_intl.dart
     }
 
+    // 根据筛选状态过滤节日
     for (var holiday in regionHolidays) {
-      DateTime? occurrence = holiday.getUpcomingOccurrence(now);
-      if (occurrence != null) {
-        combinedItems.add(TimelineItem(
-          displayDate: occurrence,
-          itemType: TimelineItemType.holiday,
-          originalObject: holiday,
-        ));
+      // 检查节日类型是否在筛选列表中
+      if (_selectedHolidayTypes.contains(holiday.type)) {
+        DateTime? occurrence = holiday.getUpcomingOccurrence(now);
+        if (occurrence != null) {
+          combinedItems.add(TimelineItem(
+            displayDate: occurrence,
+            itemType: TimelineItemType.holiday,
+            originalObject: holiday,
+          ));
+        }
       }
     }
   } catch (e) {
@@ -1127,5 +1149,22 @@ Future<void> _prepareTimelineItems() async {
       case 9: return '九';
       default: return num.toString();
     }
+  }
+
+  // 显示节日筛选对话框
+  void _showHolidayFilterDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => HolidayFilterDialog(
+        selectedTypes: _selectedHolidayTypes,
+        onApply: (selectedTypes) {
+          setState(() {
+            _selectedHolidayTypes = selectedTypes;
+          });
+          // 重新加载节日列表
+          _prepareTimelineItems();
+        },
+      ),
+    );
   }
 } // _MyHomePageState 类结束

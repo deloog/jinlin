@@ -253,5 +253,12 @@
   "holidayTaboos": "节日禁忌",
   "genericTaboo1": "避免在庆祝活动中讨论负面话题",
   "genericTaboo2": "避免某些可能被认为不适当的食物或活动",
-  "genericTaboo3": "尊重当地习俗和传统"
+  "genericTaboo3": "尊重当地习俗和传统",
+
+  "holidayFilterTitle": "筛选节日",
+  "holidayFilterDescription": "选择要显示的节日类型：",
+  "solarTerm": "节气",
+  "applyButton": "应用",
+  "cancelButton": "取消",
+  "filterHolidays": "筛选"
   }
