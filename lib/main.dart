@@ -557,10 +557,52 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
   if (holiday.calculationType == DateCalculationType.fixedLunar &&
       Localizations.localeOf(context).languageCode == 'zh') {
     try {
-      final solar = Solar.fromDate(upcomingDate); // 从公历日期获取 Solar 对象
-      final lunar = solar.getLunar(); // 获取对应的 Lunar 对象
-      // 格式化农历字符串
-      lunarDateString = '${l10n.lunar} ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}';
+      // 对于农历节日，直接从 calculationRule 中获取农历月日
+      final parts = holiday.calculationRule.replaceFirst('L', '').split('-');
+      if (parts.length == 2) {
+        final lMonth = int.parse(parts[0]);
+        final lDay = int.parse(parts[1]);
+
+        // 使用农历月日构建农历字符串
+        String monthInChinese;
+        switch (lMonth) {
+          case 1: monthInChinese = '正'; break;
+          case 2: monthInChinese = '二'; break;
+          case 3: monthInChinese = '三'; break;
+          case 4: monthInChinese = '四'; break;
+          case 5: monthInChinese = '五'; break;
+          case 6: monthInChinese = '六'; break;
+          case 7: monthInChinese = '七'; break;
+          case 8: monthInChinese = '八'; break;
+          case 9: monthInChinese = '九'; break;
+          case 10: monthInChinese = '十'; break;
+          case 11: monthInChinese = '冬'; break;
+          case 12: monthInChinese = '腊'; break;
+          default: monthInChinese = lMonth.toString();
+        }
+
+        String dayInChinese;
+        if (lDay <= 10) {
+          dayInChinese = '初${_convertToChinese(lDay)}';
+        } else if (lDay < 20) {
+          dayInChinese = '十${_convertToChinese(lDay - 10)}';
+        } else if (lDay == 20) {
+          dayInChinese = '二十';
+        } else if (lDay < 30) {
+          dayInChinese = '廿${_convertToChinese(lDay - 20)}';
+        } else if (lDay == 30) {
+          dayInChinese = '三十';
+        } else {
+          dayInChinese = lDay.toString();
+        }
+
+        lunarDateString = '${l10n.lunar} ${monthInChinese}月${dayInChinese}';
+      } else {
+        // 如果解析失败，回退到从公历转换
+        final solar = Solar.fromDate(upcomingDate);
+        final lunar = solar.getLunar();
+        lunarDateString = '${l10n.lunar} ${lunar.getMonthInChinese()}月${lunar.getDayInChinese()}';
+      }
     } catch (e) {
       // 如果出错，就不显示农历
       debugPrint("Error formatting lunar date for ${holiday.name}: $e");
@@ -1055,4 +1097,21 @@ Future<void> _prepareTimelineItems() async {
   }
 }
 // --- 粘贴结束：确认这是 _prepareTimelineItems 方法的结尾 ---
+
+  // 辅助方法：将数字转换为中文数字
+  String _convertToChinese(int num) {
+    switch (num) {
+      case 0: return '〇';
+      case 1: return '一';
+      case 2: return '二';
+      case 3: return '三';
+      case 4: return '四';
+      case 5: return '五';
+      case 6: return '六';
+      case 7: return '七';
+      case 8: return '八';
+      case 9: return '九';
+      default: return num.toString();
+    }
+  }
 } // _MyHomePageState 类结束

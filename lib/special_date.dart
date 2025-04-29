@@ -59,8 +59,21 @@ class SpecialDate {
               if (parts.length == 2) {
                   final lMonth = int.parse(parts[0]);
                   final lDay = int.parse(parts[1]);
+
+                  // 添加调试信息
+                  if (name == '腊八节') {
+                    debugPrint('腊八节计算: 农历 $year 年 $lMonth 月 $lDay 日');
+                  }
+
                   final lunarDate = Lunar.fromYmd(year, lMonth, lDay);
                   final solarDate = lunarDate.getSolar();
+
+                  // 添加调试信息
+                  if (name == '腊八节') {
+                    debugPrint('腊八节转换: 公历 ${solarDate.getYear()} 年 ${solarDate.getMonth()} 月 ${solarDate.getDay()} 日');
+                    debugPrint('腊八节农历: ${lunarDate.getYearInChinese()}年${lunarDate.getMonthInChinese()}月${lunarDate.getDayInChinese()}');
+                  }
+
                   // Lunar库转换有时年份会偏差，强制使用我们指定的年份
                   calculatedDate = DateTime(year, solarDate.getMonth(), solarDate.getDay());
               }
