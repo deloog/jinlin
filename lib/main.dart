@@ -1252,6 +1252,16 @@ Future<void> _prepareTimelineItems() async {
       if (!success) {
         debugPrint("数据库初始化失败，将使用默认设置");
       }
+
+      // 执行节日数据迁移
+      try {
+        if (mounted) {
+          await HolidayMigrationService.migrateHolidays(context);
+          debugPrint("节日数据迁移成功完成");
+        }
+      } catch (e) {
+        debugPrint("节日数据迁移失败: $e");
+      }
     }
 
     // 打印所有节日信息（调试用）

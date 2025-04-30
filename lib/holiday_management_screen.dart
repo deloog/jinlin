@@ -8,6 +8,7 @@ import 'package:jinlin_app/services/localization_service.dart';
 import 'package:jinlin_app/models/holiday_model.dart';
 import 'package:jinlin_app/holiday_edit_screen.dart';
 import 'package:jinlin_app/holiday_create_screen.dart';
+import 'package:jinlin_app/holiday_simple_create_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 // 导入类型别名，以避免命名冲突
@@ -259,7 +260,7 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
       final result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const HolidayCreateScreen(),
+          builder: (context) => const HolidaySimpleCreateScreen(),
         ),
       );
 
