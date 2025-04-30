@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
+import 'package:jinlin_app/services/localization_service.dart';
 
 // 这个文件将由build_runner生成
 // 运行命令: flutter pub run build_runner build
@@ -593,6 +595,134 @@ class HolidayModelExtended extends HiveObject {
     }
 
     return description; // 默认返回主描述（通常是中文）
+  }
+
+  /// 获取指定语言的习俗
+  String? getLocalizedCustoms(String languageCode) {
+    if (customsMultilingual != null && customsMultilingual!.containsKey(languageCode)) {
+      return customsMultilingual![languageCode];
+    }
+    return customs; // 默认返回主习俗（通常是中文）
+  }
+
+  /// 获取指定语言的禁忌
+  String? getLocalizedTaboos(String languageCode) {
+    if (taboosMultilingual != null && taboosMultilingual!.containsKey(languageCode)) {
+      return taboosMultilingual![languageCode];
+    }
+    return taboos; // 默认返回主禁忌（通常是中文）
+  }
+
+  /// 获取指定语言的食物
+  String? getLocalizedFoods(String languageCode) {
+    if (foodsMultilingual != null && foodsMultilingual!.containsKey(languageCode)) {
+      return foodsMultilingual![languageCode];
+    }
+    return foods; // 默认返回主食物（通常是中文）
+  }
+
+  /// 获取指定语言的祝福语
+  String? getLocalizedGreetings(String languageCode) {
+    if (greetingsMultilingual != null && greetingsMultilingual!.containsKey(languageCode)) {
+      return greetingsMultilingual![languageCode];
+    }
+    return greetings; // 默认返回主祝福语（通常是中文）
+  }
+
+  /// 获取指定语言的活动
+  String? getLocalizedActivities(String languageCode) {
+    if (activitiesMultilingual != null && activitiesMultilingual!.containsKey(languageCode)) {
+      return activitiesMultilingual![languageCode];
+    }
+    return activities; // 默认返回主活动（通常是中文）
+  }
+
+  /// 获取指定语言的历史
+  String? getLocalizedHistory(String languageCode) {
+    if (historyMultilingual != null && historyMultilingual!.containsKey(languageCode)) {
+      return historyMultilingual![languageCode];
+    }
+    return history; // 默认返回主历史（通常是中文）
+  }
+
+  /// 获取当前语言环境下的名称
+  String getLocalizedNameByContext(BuildContext context) {
+    final languageCode = LocalizationService.getCurrentLanguageCode(context);
+    return getLocalizedName(languageCode);
+  }
+
+  /// 获取当前语言环境下的描述
+  String? getLocalizedDescriptionByContext(BuildContext context) {
+    final languageCode = LocalizationService.getCurrentLanguageCode(context);
+    return getLocalizedDescription(languageCode);
+  }
+
+  /// 获取当前语言环境下的习俗
+  String? getLocalizedCustomsByContext(BuildContext context) {
+    final languageCode = LocalizationService.getCurrentLanguageCode(context);
+    return getLocalizedCustoms(languageCode);
+  }
+
+  /// 获取当前语言环境下的禁忌
+  String? getLocalizedTaboosByContext(BuildContext context) {
+    final languageCode = LocalizationService.getCurrentLanguageCode(context);
+    return getLocalizedTaboos(languageCode);
+  }
+
+  /// 获取当前语言环境下的食物
+  String? getLocalizedFoodsByContext(BuildContext context) {
+    final languageCode = LocalizationService.getCurrentLanguageCode(context);
+    return getLocalizedFoods(languageCode);
+  }
+
+  /// 获取当前语言环境下的祝福语
+  String? getLocalizedGreetingsByContext(BuildContext context) {
+    final languageCode = LocalizationService.getCurrentLanguageCode(context);
+    return getLocalizedGreetings(languageCode);
+  }
+
+  /// 获取当前语言环境下的活动
+  String? getLocalizedActivitiesByContext(BuildContext context) {
+    final languageCode = LocalizationService.getCurrentLanguageCode(context);
+    return getLocalizedActivities(languageCode);
+  }
+
+  /// 获取当前语言环境下的历史
+  String? getLocalizedHistoryByContext(BuildContext context) {
+    final languageCode = LocalizationService.getCurrentLanguageCode(context);
+    return getLocalizedHistory(languageCode);
+  }
+
+  /// 更新多语言名称
+  void updateLocalizedName(String languageCode, String value) {
+    names ??= {};
+    names![languageCode] = value;
+
+    // 同时更新兼容字段
+    if (languageCode == 'en') {
+      nameEn = value;
+    } else if (languageCode == 'zh') {
+      name = value;
+    }
+
+    lastModified = DateTime.now();
+  }
+
+  /// 更新多语言描述
+  void updateLocalizedDescription(String languageCode, String? value) {
+    if (value == null) return;
+
+    descriptions ??= {};
+    descriptions![languageCode] = value;
+
+    // 同时更新兼容字段
+    if (languageCode == 'en') {
+      descriptionEn = value;
+    } else if (languageCode == 'zh') {
+      description = value;
+    }
+
+    lastModified = DateTime.now();
   }
 
   /// 解析节日类型

@@ -39,6 +39,7 @@ dependencies:
   archive: ^3.4.10 # 用于压缩和解压缩
   crypto: ^3.0.3 # 用于加密和解密
   uuid: ^4.3.3 # 用于生成唯一ID
+  provider: ^6.1.1 # 用于状态管理
   # permission_handler已在上面定义
 
   # Firebase相关依赖

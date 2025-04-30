@@ -5,7 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// 多语言服务类
 ///
-/// 用于处理应用程序中的多语言相关功能
+/// 用于处理应用程序中的多语言相关功能，包括：
+/// 1. 语言切换和保存
+/// 2. 多语言文本获取
+/// 3. 多语言数据模型支持
+/// 4. 区域和语言环境检测
 class LocalizationService {
   // 支持的语言列表
   static const List<Locale> supportedLocales = [
@@ -359,5 +363,124 @@ class LocalizationService {
       default:
         return 'Unknown';
     }
+  }
+
+  /// 从多语言Map中获取本地化文本
+  static String getTextFromMultilingualMap(Map<String, String>? textMap, BuildContext context) {
+    if (textMap == null || textMap.isEmpty) return '';
+
+    final languageCode = getCurrentLanguageCode(context);
+
+    // 尝试获取完全匹配的语言代码
+    if (textMap.containsKey(languageCode)) {
+      return textMap[languageCode]!;
+    }
+
+    // 尝试获取带国家代码的语言
+    final countryCode = getCurrentCountryCode(context);
+    if (countryCode != null) {
+      final fullCode = '${languageCode}_$countryCode';
+      if (textMap.containsKey(fullCode)) {
+        return textMap[fullCode]!;
+      }
+    }
+
+    // 尝试获取英文版本
+    if (textMap.containsKey('en')) {
+      return textMap['en']!;
+    }
+
+    // 尝试获取中文版本
+    if (textMap.containsKey('zh')) {
+      return textMap['zh']!;
+    }
+
+    // 返回第一个可用的文本
+    return textMap.values.first;
+  }
+
+  /// 创建多语言文本Map
+  static Map<String, String> createMultilingualText({
+    required String zhText,
+    required String enText,
+    String? jaText,
+    String? koText,
+    String? frText,
+    String? deText,
+  }) {
+    final Map<String, String> result = {
+      'zh': zhText,
+      'en': enText,
+    };
+
+    if (jaText != null) result['ja'] = jaText;
+    if (koText != null) result['ko'] = koText;
+    if (frText != null) result['fr'] = frText;
+    if (deText != null) result['de'] = deText;
+
+    return result;
+  }
+
+  /// 更新多语言文本Map中的特定语言
+  static Map<String, String> updateMultilingualText(Map<String, String>? original, String languageCode, String text) {
+    final Map<String, String> result = original != null
+        ? Map<String, String>.from(original)
+        : {};
+
+    result[languageCode] = text;
+    return result;
+  }
+
+  /// 合并两个多语言文本Map
+  static Map<String, String> mergeMultilingualText(Map<String, String>? map1, Map<String, String>? map2) {
+    if (map1 == null || map1.isEmpty) return map2 ?? {};
+    if (map2 == null || map2.isEmpty) return map1;
+
+    final Map<String, String> result = Map<String, String>.from(map1);
+    map2.forEach((key, value) {
+      result[key] = value;
+    });
+
+    return result;
+  }
+
+  /// 检查多语言文本Map是否包含指定语言
+  static bool hasLanguage(Map<String, String>? textMap, String languageCode) {
+    if (textMap == null || textMap.isEmpty) return false;
+    return textMap.containsKey(languageCode);
+  }
+
+  /// 获取多语言文本Map中的所有语言代码
+  static List<String> getAvailableLanguages(Map<String, String>? textMap) {
+    if (textMap == null || textMap.isEmpty) return [];
+    return textMap.keys.toList();
+  }
+
+  /// 检查多语言文本Map是否完整（包含所有支持的语言）
+  static bool isMultilingualTextComplete(Map<String, String>? textMap) {
+    if (textMap == null) return false;
+
+    // 检查是否包含所有支持的语言
+    for (final locale in supportedLocales) {
+      if (!textMap.containsKey(locale.languageCode)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /// 获取多语言文本Map的完整度百分比
+  static double getMultilingualCompletionPercentage(Map<String, String>? textMap) {
+    if (textMap == null || textMap.isEmpty) return 0.0;
+
+    int supportedCount = 0;
+    for (final locale in supportedLocales) {
+      if (textMap.containsKey(locale.languageCode)) {
+        supportedCount++;
+      }
+    }
+
+    return supportedCount / supportedLocales.length * 100;
   }
 }

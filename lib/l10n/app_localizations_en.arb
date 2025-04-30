@@ -354,5 +354,19 @@
   "holidayCalculationTypeLabel": "Calculation Type",
   "holidayCalculationRuleLabel": "Calculation Rule",
   "holidayCalculationRuleHint": "Format depends on calculation type",
-  "holidayImportanceLabel": "Importance"
+  "holidayImportanceLabel": "Importance",
+
+  "languageSettings": "Language Settings",
+  "selectLanguage": "Select your preferred language",
+  "languageChangeSuccess": "Language changed successfully",
+  "languageChangeError": "Failed to change language",
+  "languageSettingsNote": "Changing the language will affect all text in the app. Some content may need to reload.",
+
+  "regionChina": "China",
+  "regionUnitedStates": "United States",
+  "regionJapan": "Japan",
+  "regionKorea": "Korea",
+  "regionFrance": "France",
+  "regionGermany": "Germany",
+  "regionInternational": "International"
   }

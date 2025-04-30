@@ -344,5 +344,19 @@
   "holidayCalculationTypeLabel": "计算类型",
   "holidayCalculationRuleLabel": "计算规则",
   "holidayCalculationRuleHint": "格式取决于计算类型",
-  "holidayImportanceLabel": "重要性"
+  "holidayImportanceLabel": "重要性",
+
+  "languageSettings": "语言设置",
+  "selectLanguage": "选择您偏好的语言",
+  "languageChangeSuccess": "语言切换成功",
+  "languageChangeError": "语言切换失败",
+  "languageSettingsNote": "更改语言将影响应用中的所有文本。某些内容可能需要重新加载。",
+
+  "regionChina": "中国",
+  "regionUnitedStates": "美国",
+  "regionJapan": "日本",
+  "regionKorea": "韩国",
+  "regionFrance": "法国",
+  "regionGermany": "德国",
+  "regionInternational": "国际"
   }

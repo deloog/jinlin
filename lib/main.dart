@@ -14,6 +14,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:lunar/lunar.dart';
+import 'package:provider/provider.dart';
 import 'utils/date_formatter.dart';
 
 import 'package:jinlin_app/holiday_filter_dialog.dart'; // 节日筛选对话框
@@ -27,6 +28,8 @@ import 'package:jinlin_app/services/holiday_init_service.dart'; // 节日初始�
 import 'package:jinlin_app/services/auto_sync_service.dart'; // 自动同步服务
 import 'package:jinlin_app/services/database_init_service.dart'; // 数据库初始化服务
 import 'package:jinlin_app/services/data_manager_service.dart'; // 数据管理服务
+import 'package:jinlin_app/services/localization_service.dart'; // 本地化服务
+import 'package:jinlin_app/providers/app_settings_provider.dart'; // 应用设置提供者
 
 import 'package:jinlin_app/models/holiday_model.dart' as holiday_model; // 节日数据模型
 
@@ -75,8 +78,19 @@ Future<void> main() async {
   // final autoSyncService = AutoSyncService();
   // await autoSyncService.initialize();
 
-  // 运行实际应用
-  runApp(const MyApp());
+  // 初始化AppSettingsProvider
+  final appSettingsProvider = AppSettingsProvider();
+  await appSettingsProvider.initialize();
+
+  // 运行实际应用，使用Provider包装
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => appSettingsProvider),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -88,14 +102,12 @@ class MyApp extends StatefulWidget {
   State<MyApp> createState() => _MyAppState();
 }
 class _MyAppState extends State<MyApp> {
-  Locale? _currentLocale; // 用于存储当前选择的语言
   int _specialDaysRange = 10; // 默认显示10天内的特殊纪念日
   final ThemeService _themeService = ThemeService();
 
   @override
   void initState() {
     super.initState();
-    _loadLocale(); // 启动时调用加载函数
     _loadSpecialDaysRange(); // 加载特殊纪念日显示范围
     _initThemeService(); // 初始化主题服务
   }
@@ -106,18 +118,6 @@ class _MyAppState extends State<MyApp> {
     // 强制刷新UI以显示正确的主题模式
     if (mounted) {
       setState(() {});
-    }
-  }
-
-  Future<void> _loadLocale() async {
-    // 强制使用英文，用于测试
-    const initialLocale = Locale('en');
-
-    // 检查 Widget 是否还在树上，防止异步操作回来后报错
-    if (mounted) {
-       setState(() {
-          _currentLocale = initialLocale;
-       });
     }
   }
 
@@ -156,41 +156,25 @@ class _MyAppState extends State<MyApp> {
       }
     }
   }
-  Future<void> changeLocale(Locale newLocale) async {
-    if (_currentLocale == newLocale) return; // 语言没变，不用操作
 
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('languageCode', newLocale.languageCode); // 保存新语言
-
-    // 检查 Widget 是否还在树上
-    if (mounted) {
-       setState(() {
-          _currentLocale = newLocale; // 更新状态，触发界面刷新
-       });
-    }
-  }
   @override
   Widget build(BuildContext context) {
-    if (_currentLocale == null) {
-      // 在语言加载完成前，显示一个加载中的圆圈
-      return const MaterialApp(
-        home: Scaffold(body: Center(child: CircularProgressIndicator())),
-        debugShowCheckedModeBanner: false, // 保留这个比较好
-      );
-    }
+    // 从Provider获取AppSettingsProvider
+    final appSettings = Provider.of<AppSettingsProvider>(context);
+
     return MaterialApp(
-      locale: _currentLocale,
+      locale: appSettings.locale,
       title: 'CetaMind Reminder',
       theme: _themeService.lightTheme,
       darkTheme: _themeService.darkTheme,
-      themeMode: _themeService.themeMode,
+      themeMode: appSettings.themeMode,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: AppLocalizations.supportedLocales,
+      supportedLocales: LocalizationService.supportedLocales,
       home: const MyHomePage(title: 'CetaMind Reminder'),
       debugShowCheckedModeBanner: false,
     );

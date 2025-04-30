@@ -2,7 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'main.dart';
+import 'package:provider/provider.dart';
+// import 'main.dart'; // 不再需要
 import 'holiday_management_screen.dart';
 import 'holiday_sync_screen.dart';
 import 'cloud_sync_screen.dart';
@@ -10,6 +11,8 @@ import 'package:jinlin_app/services/localization_service.dart';
 import 'package:jinlin_app/services/theme_service.dart';
 import 'package:jinlin_app/services/holiday_init_service.dart';
 import 'package:jinlin_app/services/layout_service.dart';
+import 'package:jinlin_app/providers/app_settings_provider.dart';
+import 'package:jinlin_app/screens/settings/language_settings_screen.dart';
 
 
 class SettingsScreen extends StatefulWidget {
@@ -122,7 +125,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
             subtitle: Text(l10n.settingsLanguageSubtitle(Localizations.localeOf(context).toLanguageTag())),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              _showLanguagePicker(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const LanguageSettingsScreen(),
+                ),
+              );
             },
           ),
           // 主题切换选项
@@ -383,55 +391,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
      nicknameController.dispose();
   }
   // --- 方法添加结束 ---
-  void _showLanguagePicker(BuildContext context) {
-    final l10n = AppLocalizations.of(context); // 获取 l10n 用于显示选项
-    // 使用 MyApp.of(context) 查找 _MyAppState
-    final myAppState = MyApp.of(context);
-
-    // 安全检查，确保找到了 _MyAppState
-    if (myAppState == null) {
-       debugPrint("错误：无法从 SettingsScreen 访问 _MyAppState");
-       // 可以显示一个错误提示给用户
-       ScaffoldMessenger.of(context).showSnackBar(
-         SnackBar(content: Text(l10n.cannotChangeLanguageError))
-       );
-       return;
-    }
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return SimpleDialog(
-          title: Text(l10n.settingsLanguageTitle), // 对话框标题
-          children: <Widget>[
-            SimpleDialogOption(
-              onPressed: () {
-                myAppState.changeLocale(const Locale('en')); // 调用 _MyAppState 的方法
-                Navigator.pop(context); // 关闭对话框
-              },
-              child: const Text('English'), // 选项1: 英文
-            ),
-            SimpleDialogOption(
-              onPressed: () {
-                myAppState.changeLocale(const Locale('zh')); // 调用 _MyAppState 的方法
-                Navigator.pop(context); // 关闭对话框
-              },
-              child: const Text('中文'), // 选项2: 中文
-            ),
-            // 你可以根据需要添加更多语言选项...
-            // 例如:
-            // SimpleDialogOption(
-            //   onPressed: () {
-            //     myAppState.changeLocale(const Locale('es')); // 西班牙语
-            //     Navigator.pop(context);
-            //   },
-            //   child: const Text('Español'),
-            // ),
-          ],
-        );
-      },
-    );
-  }
 
   // 显示特殊纪念日显示范围选择器
   Future<void> _showSpecialDaysRangePicker(BuildContext context) async {
@@ -447,12 +406,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text(l10n.specialDaysRangeTitle ?? '特殊纪念日显示范围'),
+              title: Text(l10n.specialDaysRangeTitle),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.specialDaysRangeDescription ?? '选择提前多少天显示特殊纪念日：'),
+                  Text(l10n.specialDaysRangeDescription),
                   const SizedBox(height: 16),
                   Slider(
                     value: tempRange.toDouble(),
@@ -468,7 +427,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                   Center(
                     child: Text(
-                      '${tempRange.toString()} ${l10n.daysText ?? '天'}',
+                      '${tempRange.toString()} ${l10n.daysText}',
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                   ),
@@ -501,10 +460,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         });
 
         // 通知主页面更新特殊纪念日显示范围
-        final myAppState = MyApp.of(context);
-        if (myAppState != null) {
-          myAppState.updateSpecialDaysRange(result);
-        }
+        final appSettings = Provider.of<AppSettingsProvider>(context, listen: false);
+        appSettings.updateSpecialDaysRange(result);
       }
     }
   }
