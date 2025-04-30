@@ -361,6 +361,8 @@
   "languageChangeSuccess": "Language changed successfully",
   "languageChangeError": "Failed to change language",
   "languageSettingsNote": "Changing the language will affect all text in the app. Some content may need to reload.",
+  "followSystemLanguage": "Follow System Language",
+  "followSystemLanguageDescription": "Automatically use the language set in your device settings",
 
   "regionChina": "China",
   "regionUnitedStates": "United States",

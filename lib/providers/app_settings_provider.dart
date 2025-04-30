@@ -10,6 +10,10 @@ class AppSettingsProvider extends ChangeNotifier {
   Locale? _locale;
   Locale? get locale => _locale;
 
+  // 是否跟随系统语言
+  bool _followSystemLanguage = true;
+  bool get followSystemLanguage => _followSystemLanguage;
+
   // 当前主题模式
   ThemeMode _themeMode = ThemeMode.system;
   ThemeMode get themeMode => _themeMode;
@@ -66,9 +70,18 @@ class AppSettingsProvider extends ChangeNotifier {
 
       // 加载语言设置
       final String? languageCode = prefs.getString('languageCode');
-      if (languageCode != null) {
+      final bool followSystemLanguage = prefs.getBool('followSystemLanguage') ?? true; // 默认跟随系统语言
+
+      if (languageCode != null && !followSystemLanguage) {
+        // 如果用户已经设置了语言且不跟随系统语言，则使用用户设置的语言
         _locale = Locale(languageCode);
+      } else if (followSystemLanguage) {
+        // 如果跟随系统语言，则使用系统语言
+        _locale = null; // 设置为null，让系统自动选择语言
       }
+
+      // 保存跟随系统语言的设置
+      _followSystemLanguage = followSystemLanguage;
 
       // 加载主题设置
       final String? themeModeString = prefs.getString('themeMode');
@@ -99,11 +112,14 @@ class AppSettingsProvider extends ChangeNotifier {
     if (_locale == newLocale) return;
 
     _locale = newLocale;
+    // 当手动设置语言时，自动关闭跟随系统语言
+    _followSystemLanguage = false;
     notifyListeners();
 
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('languageCode', newLocale.languageCode);
+      await prefs.setBool('followSystemLanguage', false);
       if (newLocale.countryCode != null) {
         await prefs.setString('countryCode', newLocale.countryCode!);
       } else {
@@ -111,6 +127,41 @@ class AppSettingsProvider extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('保存语言设置失败: $e');
+    }
+  }
+
+  // 更新是否跟随系统语言
+  Future<void> updateFollowSystemLanguage(bool value) async {
+    if (_followSystemLanguage == value) return;
+
+    _followSystemLanguage = value;
+
+    if (value) {
+      // 如果开启跟随系统语言，则清除当前语言设置
+      _locale = null;
+    } else if (_locale == null) {
+      // 如果关闭跟随系统语言，但没有设置过语言，则使用当前系统语言
+      final systemLocale = WidgetsBinding.instance.platformDispatcher.locale;
+      _locale = systemLocale;
+    }
+
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('followSystemLanguage', value);
+
+      if (!value && _locale != null) {
+        // 如果关闭跟随系统语言，则保存当前语言设置
+        await prefs.setString('languageCode', _locale!.languageCode);
+        if (_locale!.countryCode != null) {
+          await prefs.setString('countryCode', _locale!.countryCode!);
+        } else {
+          await prefs.remove('countryCode');
+        }
+      }
+    } catch (e) {
+      debugPrint('保存跟随系统语言设置失败: $e');
     }
   }
 

@@ -351,6 +351,8 @@
   "languageChangeSuccess": "语言切换成功",
   "languageChangeError": "语言切换失败",
   "languageSettingsNote": "更改语言将影响应用中的所有文本。某些内容可能需要重新加载。",
+  "followSystemLanguage": "跟随系统语言",
+  "followSystemLanguageDescription": "自动使用设备系统设置的语言",
 
   "regionChina": "中国",
   "regionUnitedStates": "美国",

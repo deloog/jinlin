@@ -17,10 +17,13 @@ class LanguageSettingsScreen extends StatefulWidget {
 class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
   String? _selectedLanguageCode;
 
+  bool _followSystemLanguage = true;
+
   @override
   void initState() {
     super.initState();
     _loadCurrentLanguage();
+    _loadFollowSystemLanguage();
   }
 
   /// 加载当前语言设置
@@ -29,6 +32,16 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     if (mounted) {
       setState(() {
         _selectedLanguageCode = savedLanguage;
+      });
+    }
+  }
+
+  /// 加载是否跟随系统语言设置
+  Future<void> _loadFollowSystemLanguage() async {
+    final appSettings = Provider.of<AppSettingsProvider>(context, listen: false);
+    if (mounted) {
+      setState(() {
+        _followSystemLanguage = appSettings.followSystemLanguage;
       });
     }
   }
@@ -42,6 +55,7 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
       if (mounted) {
         setState(() {
           _selectedLanguageCode = languageCode;
+          _followSystemLanguage = false; // 手动切换语言时，关闭跟随系统语言
         });
       }
 
@@ -85,6 +99,21 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
           ),
+
+          // 跟随系统语言选项
+          SwitchListTile(
+            title: Text(l10n.followSystemLanguage ?? '跟随系统语言'),
+            subtitle: Text(l10n.followSystemLanguageDescription ?? '自动使用系统设置的语言'),
+            value: _followSystemLanguage,
+            onChanged: (value) {
+              final provider = Provider.of<AppSettingsProvider>(context, listen: false);
+              provider.updateFollowSystemLanguage(value);
+              setState(() {
+                _followSystemLanguage = value;
+              });
+            },
+          ),
+
           const Divider(),
           _buildLanguageOption(
             languageCode: 'zh',
