@@ -6,14 +6,7 @@ import 'package:jinlin_app/services/auto_sync_service.dart';
 import 'package:jinlin_app/user_auth_screen.dart';
 import 'package:jinlin_app/sync_conflict_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-// 模拟用户类
-class _MockUser {
-  final String uid;
-  final String? email;
-  final String? displayName;
-
-  _MockUser({required this.uid, this.email, this.displayName});
-}
+import 'package:firebase_auth/firebase_auth.dart';
 
 class CloudSyncScreen extends StatefulWidget {
   const CloudSyncScreen({super.key});
@@ -80,10 +73,17 @@ class _CloudSyncScreenState extends State<CloudSyncScreen> {
       _lastSyncTime = await _cloudSyncService.getLastSyncTime();
       _autoSyncEnabled = await _cloudSyncService.isAutoSyncEnabled();
       _syncFrequency = await _cloudSyncService.getSyncFrequency();
-      // 使用模拟用户数据
-      _currentUser = _cloudSyncService.isLoggedIn ? _createMockUser() : null;
+      // 获取Firebase当前用户
+      _currentUser = FirebaseAuth.instance.currentUser;
       _conflictCount = await _cloudSyncService.getConflictCount();
-      _lastAutoSyncTime = await _autoSyncService.getLastAutoSyncTime();
+      // 获取最后自动同步时间
+      final lastAutoSyncTime = await _autoSyncService.getLastAutoSyncTime();
+      if (lastAutoSyncTime != null && mounted) {
+        setState(() {
+          // 显示最后自动同步时间
+          _lastSyncTime = '${_lastSyncTime ?? ''} (自动: ${lastAutoSyncTime.toLocal().toString().substring(0, 16)})';
+        });
+      }
     } catch (e) {
       debugPrint('加载数据失败: $e');
     } finally {
@@ -95,15 +95,7 @@ class _CloudSyncScreenState extends State<CloudSyncScreen> {
     }
   }
 
-  // 创建模拟用户
-  dynamic _createMockUser() {
-    // 创建一个模拟的用户对象，包含必要的属性
-    return _MockUser(
-      uid: 'mock_user_id',
-      email: 'user@example.com',
-      displayName: '模拟用户',
-    );
-  }
+
 
   // 导航到登录界面
   Future<void> _navigateToAuthScreen() async {
@@ -117,6 +109,25 @@ class _CloudSyncScreenState extends State<CloudSyncScreen> {
     if (result == true) {
       // 登录成功，重新加载数据
       await _loadData();
+
+      // 显示欢迎消息
+      if (mounted && _currentUser != null) {
+        final user = _currentUser as User;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              LocalizationService.getLocalizedText(
+                context: context,
+                textZh: '欢迎回来，${user.displayName ?? user.email ?? "用户"}',
+                textEn: 'Welcome back, ${user.displayName ?? user.email ?? "User"}',
+                textFr: 'Bienvenue, ${user.displayName ?? user.email ?? "Utilisateur"}',
+                textDe: 'Willkommen zurück, ${user.displayName ?? user.email ?? "Benutzer"}',
+              ),
+            ),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
     }
   }
 
@@ -402,12 +413,12 @@ class _CloudSyncScreenState extends State<CloudSyncScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        _currentUser!.displayName ?? _currentUser!.email ?? 'User',
+                                        (_currentUser as User).displayName ?? (_currentUser as User).email ?? 'User',
                                         style: Theme.of(context).textTheme.titleMedium,
                                       ),
-                                      if (_currentUser!.email != null)
+                                      if ((_currentUser as User).email != null)
                                         Text(
-                                          _currentUser!.email!,
+                                          (_currentUser as User).email!,
                                           style: Theme.of(context).textTheme.bodyMedium,
                                         ),
                                     ],

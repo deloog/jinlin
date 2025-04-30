@@ -15,6 +15,8 @@ import 'package:collection/collection.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:lunar/lunar.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'utils/date_formatter.dart';
 
 import 'package:jinlin_app/holiday_filter_dialog.dart'; // 节日筛选对话框
@@ -37,6 +39,17 @@ import 'widgets/page_transitions.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // 初始化Firebase
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    debugPrint("Firebase初始化成功");
+  } catch (e) {
+    debugPrint("Firebase初始化失败: $e");
+  }
+
   // 初始化中文 locale，必须在 runApp 前
   await initializeDateFormatting('zh_CN', null);
   try {
@@ -74,9 +87,9 @@ Future<void> main() async {
     debugPrint("无法获取有效的BuildContext，数据库初始化失败");
   }
 
-  // 暂时禁用自动同步服务，因为缺少Firebase配置
-  // final autoSyncService = AutoSyncService();
-  // await autoSyncService.initialize();
+  // 启用自动同步服务
+  final autoSyncService = AutoSyncService();
+  await autoSyncService.initialize();
 
   // 初始化AppSettingsProvider
   final appSettingsProvider = AppSettingsProvider();

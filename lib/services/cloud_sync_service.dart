@@ -1,28 +1,19 @@
 // 文件： lib/services/cloud_sync_service.dart
 import 'dart:convert';
-// 暂时注释掉Firebase相关的导入，因为缺少Firebase配置
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_storage/firebase_storage.dart';
-// import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/material.dart';
 import 'package:jinlin_app/models/holiday_model.dart';
 import 'package:jinlin_app/services/hive_database_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 
-/// 模拟用户凭证
-class UserCredential {
-  final String userId;
-  final String email;
-
-  UserCredential({required this.userId, required this.email});
-}
-
 /// 云同步服务
 ///
 /// 用于在不同设备之间同步节日数据
-/// 注意：这是一个模拟实现，不依赖于Firebase
+/// 使用Firebase实现
 class CloudSyncService {
   // 单例模式
   static final CloudSyncService _instance = CloudSyncService._internal();
@@ -31,32 +22,63 @@ class CloudSyncService {
     return _instance;
   }
 
-  CloudSyncService._internal();
+  CloudSyncService._internal() {
+    // 初始化Firebase Auth
+    _auth = FirebaseAuth.instance;
+    _firestore = FirebaseFirestore.instance;
 
-  // 模拟用户
-  bool _isLoggedIn = false;
-  String? _userId;
+    // 监听登录状态变化
+    _auth.authStateChanges().listen((User? user) {
+      _currentUser = user;
+      debugPrint('Firebase Auth状态变化: ${user != null ? "已登录" : "未登录"}');
+    });
+  }
+
+  // Firebase服务
+  late final FirebaseAuth _auth;
+  late final FirebaseFirestore _firestore;
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  // 当前用户
+  User? _currentUser;
 
   // 当前用户ID
-  String? get currentUserId => _userId;
+  String? get currentUserId => _currentUser?.uid;
 
   // 是否已登录
-  bool get isLoggedIn => _isLoggedIn;
+  bool get isLoggedIn => _currentUser != null;
 
   // 登录状态监听器
-  Stream<bool> get authStateChanges => Stream.value(_isLoggedIn);
+  Stream<bool> get authStateChanges =>
+      _auth.authStateChanges().map((user) => user != null);
 
-
+  /// 检查登录状态
+  Future<void> checkLoginStatus() async {
+    _currentUser = _auth.currentUser;
+    if (_currentUser != null) {
+      debugPrint('用户已登录: ${_currentUser!.email}');
+    } else {
+      debugPrint('用户未登录');
+    }
+  }
 
   /// 使用电子邮件和密码注册
   Future<UserCredential> registerWithEmailAndPassword(String email, String password) async {
     try {
-      // 模拟注册过程
-      await Future.delayed(const Duration(milliseconds: 500));
-      _isLoggedIn = true;
-      _userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      return UserCredential(userId: _userId!, email: email);
+      // 创建用户文档
+      if (userCredential.user != null) {
+        await _firestore.collection('users').doc(userCredential.user!.uid).set({
+          'email': email,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+
+      return userCredential;
     } catch (e) {
       debugPrint('注册失败: $e');
       rethrow;
@@ -66,12 +88,10 @@ class CloudSyncService {
   /// 使用电子邮件和密码登录
   Future<UserCredential> signInWithEmailAndPassword(String email, String password) async {
     try {
-      // 模拟登录过程
-      await Future.delayed(const Duration(milliseconds: 500));
-      _isLoggedIn = true;
-      _userId = 'user_${DateTime.now().millisecondsSinceEpoch}';
-
-      return UserCredential(userId: _userId!, email: email);
+      return await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
     } catch (e) {
       debugPrint('登录失败: $e');
       rethrow;
@@ -81,12 +101,24 @@ class CloudSyncService {
   /// 使用Google账号登录
   Future<UserCredential> signInWithGoogle() async {
     try {
-      // 模拟Google登录过程
-      await Future.delayed(const Duration(milliseconds: 800));
-      _isLoggedIn = true;
-      _userId = 'google_user_${DateTime.now().millisecondsSinceEpoch}';
+      // 触发Google登录流程
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
 
-      return UserCredential(userId: _userId!, email: 'google_user@example.com');
+      if (googleUser == null) {
+        throw Exception('Google登录被取消');
+      }
+
+      // 获取认证详情
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // 创建Firebase凭证
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      // 使用凭证登录Firebase
+      return await _auth.signInWithCredential(credential);
     } catch (e) {
       debugPrint('Google登录失败: $e');
       rethrow;
@@ -96,10 +128,8 @@ class CloudSyncService {
   /// 退出登录
   Future<void> signOut() async {
     try {
-      // 模拟退出登录过程
-      await Future.delayed(const Duration(milliseconds: 300));
-      _isLoggedIn = false;
-      _userId = null;
+      await _googleSignIn.signOut(); // 确保Google登录也退出
+      await _auth.signOut();
     } catch (e) {
       debugPrint('退出登录失败: $e');
       rethrow;
@@ -116,18 +146,28 @@ class CloudSyncService {
       // 获取所有节日
       final holidays = HiveDatabaseService.getAllHolidays();
 
-      // 将节日转换为JSON
-      final List<Map<String, dynamic>> holidaysJson = [];
+      // 获取用户文档引用
+      final userDocRef = _firestore.collection('users').doc(_currentUser!.uid);
+
+      // 创建批量写入对象
+      final batch = _firestore.batch();
+
+      // 获取用户的节日集合引用
+      final holidaysCollectionRef = userDocRef.collection('holidays');
+
+      // 批量上传节日数据
       for (final holiday in holidays) {
-        holidaysJson.add(holiday.toJson());
+        final holidayDocRef = holidaysCollectionRef.doc(holiday.id);
+        final holidayData = holiday.toJson();
+
+        // 添加最后修改时间
+        holidayData['lastSyncTime'] = FieldValue.serverTimestamp();
+
+        batch.set(holidayDocRef, holidayData, SetOptions(merge: true));
       }
 
-      // 创建JSON字符串（仅用于调试）
-      final jsonString = jsonEncode(holidaysJson);
-      debugPrint('准备上传的JSON数据: ${jsonString.substring(0, jsonString.length > 100 ? 100 : jsonString.length)}...');
-
-      // 模拟上传到云端
-      await Future.delayed(const Duration(seconds: 1));
+      // 提交批量写入
+      await batch.commit();
 
       // 保存最后同步时间
       await _saveLastSyncTime();
@@ -146,11 +186,17 @@ class CloudSyncService {
     }
 
     try {
-      // 模拟从云端获取数据
-      await Future.delayed(const Duration(seconds: 1));
+      // 获取用户文档引用
+      final userDocRef = _firestore.collection('users').doc(_currentUser!.uid);
 
-      // 模拟没有云端数据的情况
-      if (_userId == null || _userId!.isEmpty) {
+      // 获取用户的节日集合引用
+      final holidaysCollectionRef = userDocRef.collection('holidays');
+
+      // 获取所有节日数据
+      final querySnapshot = await holidaysCollectionRef.get();
+
+      // 如果没有数据，直接返回
+      if (querySnapshot.docs.isEmpty) {
         debugPrint('云端没有节日数据');
         return 0;
       }
@@ -164,9 +210,16 @@ class CloudSyncService {
         for (var holiday in localHolidays) holiday.id: holiday
       };
 
-      // 模拟从云端下载的节日数据
-      // 实际情况下，这些数据应该从云端获取
-      final List<HolidayModel> cloudHolidays = localHolidays.take(3).toList();
+      // 从云端获取的节日数据
+      final List<HolidayModel> cloudHolidays = [];
+
+      // 将Firestore文档转换为HolidayModel对象
+      for (final doc in querySnapshot.docs) {
+        final data = doc.data();
+        // 确保ID与文档ID一致
+        data['id'] = doc.id;
+        cloudHolidays.add(HolidayModel.fromJson(data));
+      }
 
       // 导入节日，处理冲突
       int importCount = 0;
