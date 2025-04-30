@@ -68,16 +68,38 @@ class AppSettingsProvider extends ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
 
+      // 检查是否是首次启动
+      final bool isFirstLaunch = prefs.getBool('isFirstLaunch') ?? true;
+
       // 加载语言设置
       final String? languageCode = prefs.getString('languageCode');
       final bool followSystemLanguage = prefs.getBool('followSystemLanguage') ?? true; // 默认跟随系统语言
 
-      if (languageCode != null && !followSystemLanguage) {
+      if (isFirstLaunch) {
+        // 首次启动，自动检测系统语言
+        _followSystemLanguage = true;
+        _locale = null; // 设置为null，让系统自动选择语言
+
+        // 标记为非首次启动
+        await prefs.setBool('isFirstLaunch', false);
+        await prefs.setBool('followSystemLanguage', true);
+
+        // 获取系统语言，并保存为默认语言（以便将来用户关闭跟随系统语言时使用）
+        final systemLocale = WidgetsBinding.instance.platformDispatcher.locale;
+        await prefs.setString('languageCode', systemLocale.languageCode);
+        if (systemLocale.countryCode != null) {
+          await prefs.setString('countryCode', systemLocale.countryCode!);
+        }
+
+        debugPrint('首次启动，自动检测系统语言: ${systemLocale.languageCode}');
+      } else if (languageCode != null && !followSystemLanguage) {
         // 如果用户已经设置了语言且不跟随系统语言，则使用用户设置的语言
         _locale = Locale(languageCode);
+        debugPrint('使用用户设置的语言: $languageCode');
       } else if (followSystemLanguage) {
         // 如果跟随系统语言，则使用系统语言
         _locale = null; // 设置为null，让系统自动选择语言
+        debugPrint('跟随系统语言');
       }
 
       // 保存跟随系统语言的设置
