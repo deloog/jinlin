@@ -136,7 +136,7 @@
     "loadingRemindersError": "Échec du chargement des rappels",
     "cannotOpenReminderDetails": "Impossible d'ouvrir les détails du rappel, les données peuvent ne pas être synchronisées, veuillez actualiser et réessayer",
     "deleteFailed": "Échec de la suppression, veuillez réessayer",
-    
+
     "holiday_NewYearDay": "Jour de l'An",
     "holiday_ValentinesDay": "Saint-Valentin",
     "holiday_EarthDay": "Jour de la Terre",
@@ -152,7 +152,7 @@
     "holiday_NewYearsEve": "Réveillon du Nouvel An",
     "holiday_MothersDay": "Fête des Mères",
     "holiday_FathersDay": "Fête des Pères",
-    
+
     "holiday_SpringFestival": "Nouvel An chinois",
     "holiday_ChingMing": "Qingming",
     "holiday_DragonBoatFestival": "Fête des bateaux-dragons",
@@ -163,7 +163,7 @@
     "holiday_DoubleNinthFestival": "Double neuf",
     "holiday_LabaFestival": "Festival Laba",
     "holiday_TreePlantingDay": "Journée de plantation d'arbres",
-    
+
     "aboutHoliday": "À propos de ce jour férié",
     "holidayCustoms": "Coutumes du jour férié",
     "statutoryHoliday": "Jour férié légal",
@@ -182,16 +182,16 @@
         }
       }
     },
-    
+
     "genericCustom1": "Réunions avec la famille et les amis",
     "genericCustom2": "Préparation de nourriture et de décorations spéciales",
     "genericCustom3": "Échange de cadeaux et de salutations",
-    
+
     "holidayTaboos": "Choses à éviter",
     "genericTaboo1": "Éviter les sujets négatifs pendant les célébrations",
     "genericTaboo2": "Éviter certains aliments ou activités considérés comme inappropriés",
     "genericTaboo3": "Respecter les coutumes et traditions locales",
-    
+
     "holidayFilterTitle": "Filtrer les jours fériés",
     "holidayFilterDescription": "Sélectionnez les types de jours fériés à afficher :",
     "solarTerm": "Termes solaires",
@@ -199,18 +199,18 @@
     "cancelButton": "Annuler",
     "filterHolidays": "Filtrer",
     "customEvent": "Événement personnalisé",
-    
+
     "specialDaysRangeTitle": "Plage d'affichage des jours spéciaux",
     "specialDaysRangeDescription": "Sélectionnez combien de jours à l'avance afficher les jours spéciaux :",
     "specialDaysRangeSubtitle": "Afficher les jours spéciaux {days} jours à l'avance",
     "daysText": "jours",
-    
+
     "holidayManagementTitle": "Gestion des jours fériés",
     "holidayManagementDescription": "Gérer l'importance et les paramètres d'affichage des jours fériés",
     "importanceNormal": "Normal",
     "importanceHigh": "Important",
     "importanceVeryHigh": "Très important",
-    
+
     "createHolidayTitle": "Créer un nouveau jour férié",
     "editHolidayTitle": "Modifier le jour férié",
     "holidayNameLabel": "Nom du jour férié (obligatoire)",
@@ -237,7 +237,7 @@
         }
       }
     },
-    
+
     "exportHolidaysTitle": "Exporter les données des jours fériés",
     "importHolidaysTitle": "Importer les données des jours fériés",
     "exportSuccess": "Données exportées avec succès",
@@ -282,5 +282,21 @@
           "type": "String"
         }
       }
-    }
+    },
+
+    "languageSettings": "Paramètres de langue",
+    "selectLanguage": "Sélectionnez votre langue préférée",
+    "languageChangeSuccess": "Langue changée avec succès",
+    "languageChangeError": "Échec du changement de langue",
+    "languageSettingsNote": "Changer la langue affectera tout le texte dans l'application. Certains contenus peuvent nécessiter un rechargement.",
+    "followSystemLanguage": "Suivre la langue du système",
+    "followSystemLanguageDescription": "Utiliser automatiquement la langue définie dans les paramètres de votre appareil",
+
+    "regionChina": "Chine",
+    "regionUnitedStates": "États-Unis",
+    "regionJapan": "Japon",
+    "regionKorea": "Corée",
+    "regionFrance": "France",
+    "regionGermany": "Allemagne",
+    "regionInternational": "International"
 }

@@ -136,7 +136,7 @@
     "loadingRemindersError": "리마인더 로드 실패",
     "cannotOpenReminderDetails": "리마인더 세부 정보를 열 수 없습니다. 데이터가 동기화되지 않았을 수 있습니다. 새로고침 후 다시 시도하세요",
     "deleteFailed": "삭제 실패, 다시 시도하세요",
-    
+
     "holiday_NewYearDay": "신정",
     "holiday_ValentinesDay": "발렌타인 데이",
     "holiday_EarthDay": "지구의 날",
@@ -152,7 +152,7 @@
     "holiday_NewYearsEve": "섣달 그믐",
     "holiday_MothersDay": "어머니의 날",
     "holiday_FathersDay": "아버지의 날",
-    
+
     "holiday_SpringFestival": "설날",
     "holiday_ChingMing": "청명절",
     "holiday_DragonBoatFestival": "단오절",
@@ -163,7 +163,7 @@
     "holiday_DoubleNinthFestival": "중양절",
     "holiday_LabaFestival": "라바절",
     "holiday_TreePlantingDay": "식목일",
-    
+
     "aboutHoliday": "이 공휴일에 대하여",
     "holidayCustoms": "공휴일 풍습",
     "statutoryHoliday": "법정 공휴일",
@@ -182,16 +182,16 @@
         }
       }
     },
-    
+
     "genericCustom1": "가족 및 친구들과의 모임",
     "genericCustom2": "특별한 음식과 장식 준비",
     "genericCustom3": "선물이나 인사 교환",
-    
+
     "holidayTaboos": "피해야 할 것들",
     "genericTaboo1": "축하 행사 중 부정적인 주제 논의 피하기",
     "genericTaboo2": "부적절하다고 여겨질 수 있는 특정 음식이나 활동 피하기",
     "genericTaboo3": "현지 관습과 전통 존중하기",
-    
+
     "holidayFilterTitle": "공휴일 필터",
     "holidayFilterDescription": "표시할 공휴일 유형 선택:",
     "solarTerm": "절기",
@@ -199,18 +199,18 @@
     "cancelButton": "취소",
     "filterHolidays": "필터",
     "customEvent": "사용자 정의 이벤트",
-    
+
     "specialDaysRangeTitle": "특별한 기념일 표시 범위",
     "specialDaysRangeDescription": "특별한 기념일을 몇 일 전부터 표시할지 선택하세요:",
     "specialDaysRangeSubtitle": "특별한 기념일을 {days}일 전부터 표시",
     "daysText": "일",
-    
+
     "holidayManagementTitle": "공휴일 관리",
     "holidayManagementDescription": "공휴일 중요도 및 표시 설정 관리",
     "importanceNormal": "보통",
     "importanceHigh": "중요",
     "importanceVeryHigh": "매우 중요",
-    
+
     "createHolidayTitle": "새 공휴일 만들기",
     "editHolidayTitle": "공휴일 편집",
     "holidayNameLabel": "공휴일 이름 (필수)",
@@ -237,7 +237,7 @@
         }
       }
     },
-    
+
     "exportHolidaysTitle": "공휴일 데이터 내보내기",
     "importHolidaysTitle": "공휴일 데이터 가져오기",
     "exportSuccess": "데이터가 성공적으로 내보내졌습니다",
@@ -282,5 +282,21 @@
           "type": "String"
         }
       }
-    }
+    },
+
+    "languageSettings": "언어 설정",
+    "selectLanguage": "선호하는 언어를 선택하세요",
+    "languageChangeSuccess": "언어가 성공적으로 변경되었습니다",
+    "languageChangeError": "언어 변경 실패",
+    "languageSettingsNote": "언어를 변경하면 앱의 모든 텍스트에 영향을 미칩니다. 일부 콘텐츠는 다시 로드해야 할 수 있습니다.",
+    "followSystemLanguage": "시스템 언어 따르기",
+    "followSystemLanguageDescription": "기기 설정에 설정된 언어를 자동으로 사용",
+
+    "regionChina": "중국",
+    "regionUnitedStates": "미국",
+    "regionJapan": "일본",
+    "regionKorea": "한국",
+    "regionFrance": "프랑스",
+    "regionGermany": "독일",
+    "regionInternational": "국제"
 }

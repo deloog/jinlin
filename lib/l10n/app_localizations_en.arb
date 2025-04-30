@@ -370,5 +370,31 @@
   "regionKorea": "Korea",
   "regionFrance": "France",
   "regionGermany": "Germany",
-  "regionInternational": "International"
+  "regionInternational": "International",
+
+  "themeSettings": "Theme Settings",
+  "lightMode": "Light Mode",
+  "darkMode": "Dark Mode",
+  "systemMode": "System Mode",
+  "homeLayout": "Home Layout",
+  "cardStyle": "Card Style",
+  "reminderPriority": "Reminder Priority",
+  "dateOrder": "Date Order",
+  "importanceOrder": "Importance Order",
+  "localDataSync": "Local Data Sync",
+  "importExportHolidayData": "Import/Export holiday data",
+  "resetGlobalHolidays": "Reset Global Holidays",
+  "confirmReset": "Confirm Reset",
+  "resetGlobalHolidaysConfirm": "This will reset all global holiday data to default. Are you sure you want to continue?",
+  "globalHolidayDataReset": "Global holiday data has been reset",
+  "resetFailed": "Reset failed: {error}",
+  "@resetFailed": {
+    "description": "Error message when reset fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Database error"
+      }
+    }
+  }
   }

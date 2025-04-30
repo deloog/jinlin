@@ -360,5 +360,31 @@
   "regionKorea": "韩国",
   "regionFrance": "法国",
   "regionGermany": "德国",
-  "regionInternational": "国际"
+  "regionInternational": "国际",
+
+  "themeSettings": "主题设置",
+  "lightMode": "浅色模式",
+  "darkMode": "深色模式",
+  "systemMode": "跟随系统",
+  "homeLayout": "首页布局",
+  "cardStyle": "卡片样式",
+  "reminderPriority": "提醒优先级",
+  "dateOrder": "按日期排序",
+  "importanceOrder": "按重要性排序",
+  "localDataSync": "本地数据同步",
+  "importExportHolidayData": "导入/导出节日数据",
+  "resetGlobalHolidays": "重置全球节日数据",
+  "confirmReset": "确认重置",
+  "resetGlobalHolidaysConfirm": "这将重置所有全球节日数据到默认状态。您确定要继续吗？",
+  "globalHolidayDataReset": "全球节日数据已重置",
+  "resetFailed": "重置失败: {error}",
+  "@resetFailed": {
+    "description": "重置失败时的错误信息",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "数据库错误"
+      }
+    }
+  }
   }

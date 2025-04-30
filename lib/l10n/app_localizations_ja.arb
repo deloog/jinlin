@@ -136,7 +136,7 @@
     "loadingRemindersError": "リマインダーの読み込みに失敗しました",
     "cannotOpenReminderDetails": "リマインダーの詳細を開けません。データが同期されていない可能性があります。更新して再試行してください",
     "deleteFailed": "削除に失敗しました。もう一度お試しください",
-    
+
     "holiday_NewYearDay": "元日",
     "holiday_ValentinesDay": "バレンタインデー",
     "holiday_EarthDay": "アースデー",
@@ -152,7 +152,7 @@
     "holiday_NewYearsEve": "大晦日",
     "holiday_MothersDay": "母の日",
     "holiday_FathersDay": "父の日",
-    
+
     "holiday_SpringFestival": "春節",
     "holiday_ChingMing": "清明節",
     "holiday_DragonBoatFestival": "端午節",
@@ -163,7 +163,7 @@
     "holiday_DoubleNinthFestival": "重陽節",
     "holiday_LabaFestival": "臘八節",
     "holiday_TreePlantingDay": "植樹祭",
-    
+
     "aboutHoliday": "この祝日について",
     "holidayCustoms": "祝日の習慣",
     "statutoryHoliday": "法定祝日",
@@ -182,16 +182,16 @@
         }
       }
     },
-    
+
     "genericCustom1": "家族や友人との集まり",
     "genericCustom2": "特別な食べ物や装飾の準備",
     "genericCustom3": "贈り物や挨拶の交換",
-    
+
     "holidayTaboos": "避けるべきこと",
     "genericTaboo1": "お祝いの間にネガティブな話題を避ける",
     "genericTaboo2": "不適切と考えられる特定の食べ物や活動を避ける",
     "genericTaboo3": "地元の習慣や伝統を尊重する",
-    
+
     "holidayFilterTitle": "祝日をフィルター",
     "holidayFilterDescription": "表示する祝日の種類を選択してください：",
     "solarTerm": "二十四節気",
@@ -199,18 +199,18 @@
     "cancelButton": "キャンセル",
     "filterHolidays": "フィルター",
     "customEvent": "カスタムイベント",
-    
+
     "specialDaysRangeTitle": "特別な記念日の表示範囲",
     "specialDaysRangeDescription": "特別な記念日を何日前から表示するかを選択してください：",
     "specialDaysRangeSubtitle": "特別な記念日を{days}日前から表示",
     "daysText": "日",
-    
+
     "holidayManagementTitle": "祝日管理",
     "holidayManagementDescription": "祝日の重要度と表示設定を管理する",
     "importanceNormal": "通常",
     "importanceHigh": "重要",
     "importanceVeryHigh": "非常に重要",
-    
+
     "createHolidayTitle": "新しい祝日を作成",
     "editHolidayTitle": "祝日を編集",
     "holidayNameLabel": "祝日名（必須）",
@@ -237,7 +237,7 @@
         }
       }
     },
-    
+
     "exportHolidaysTitle": "祝日データをエクスポート",
     "importHolidaysTitle": "祝日データをインポート",
     "exportSuccess": "データが正常にエクスポートされました",
@@ -282,5 +282,21 @@
           "type": "String"
         }
       }
-    }
+    },
+
+    "languageSettings": "言語設定",
+    "selectLanguage": "希望する言語を選択してください",
+    "languageChangeSuccess": "言語が正常に変更されました",
+    "languageChangeError": "言語の変更に失敗しました",
+    "languageSettingsNote": "言語を変更すると、アプリ内のすべてのテキストに影響します。一部のコンテンツは再読み込みが必要な場合があります。",
+    "followSystemLanguage": "システム言語に従う",
+    "followSystemLanguageDescription": "デバイス設定で設定された言語を自動的に使用する",
+
+    "regionChina": "中国",
+    "regionUnitedStates": "アメリカ合衆国",
+    "regionJapan": "日本",
+    "regionKorea": "韓国",
+    "regionFrance": "フランス",
+    "regionGermany": "ドイツ",
+    "regionInternational": "国際"
 }

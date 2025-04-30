@@ -136,7 +136,7 @@
     "loadingRemindersError": "Fehler beim Laden der Erinnerungen",
     "cannotOpenReminderDetails": "Erinnerungsdetails können nicht geöffnet werden, Daten sind möglicherweise nicht synchronisiert, bitte aktualisieren und erneut versuchen",
     "deleteFailed": "Löschen fehlgeschlagen, bitte versuchen Sie es erneut",
-    
+
     "holiday_NewYearDay": "Neujahr",
     "holiday_ValentinesDay": "Valentinstag",
     "holiday_EarthDay": "Tag der Erde",
@@ -152,7 +152,7 @@
     "holiday_NewYearsEve": "Silvester",
     "holiday_MothersDay": "Muttertag",
     "holiday_FathersDay": "Vatertag",
-    
+
     "holiday_SpringFestival": "Chinesisches Neujahr",
     "holiday_ChingMing": "Qingming-Fest",
     "holiday_DragonBoatFestival": "Drachenbootfest",
@@ -163,7 +163,7 @@
     "holiday_DoubleNinthFestival": "Doppelneunfest",
     "holiday_LabaFestival": "Laba-Fest",
     "holiday_TreePlantingDay": "Baumpflanztag",
-    
+
     "aboutHoliday": "Über diesen Feiertag",
     "holidayCustoms": "Feiertagsbräuche",
     "statutoryHoliday": "Gesetzlicher Feiertag",
@@ -182,16 +182,16 @@
         }
       }
     },
-    
+
     "genericCustom1": "Treffen mit Familie und Freunden",
     "genericCustom2": "Vorbereitung spezieller Speisen und Dekorationen",
     "genericCustom3": "Austausch von Geschenken und Grüßen",
-    
+
     "holidayTaboos": "Zu vermeidende Dinge",
     "genericTaboo1": "Negative Themen während der Feierlichkeiten vermeiden",
     "genericTaboo2": "Bestimmte Speisen oder Aktivitäten vermeiden, die als unangemessen gelten könnten",
     "genericTaboo3": "Lokale Bräuche und Traditionen respektieren",
-    
+
     "holidayFilterTitle": "Feiertage filtern",
     "holidayFilterDescription": "Wählen Sie die anzuzeigenden Feiertagstypen:",
     "solarTerm": "Solartermine",
@@ -199,18 +199,18 @@
     "cancelButton": "Abbrechen",
     "filterHolidays": "Filtern",
     "customEvent": "Benutzerdefiniertes Ereignis",
-    
+
     "specialDaysRangeTitle": "Anzeigebereich für besondere Tage",
     "specialDaysRangeDescription": "Wählen Sie, wie viele Tage im Voraus besondere Tage angezeigt werden sollen:",
     "specialDaysRangeSubtitle": "Besondere Tage {days} Tage im Voraus anzeigen",
     "daysText": "Tage",
-    
+
     "holidayManagementTitle": "Feiertagsverwaltung",
     "holidayManagementDescription": "Wichtigkeit und Anzeigeeinstellungen für Feiertage verwalten",
     "importanceNormal": "Normal",
     "importanceHigh": "Wichtig",
     "importanceVeryHigh": "Sehr wichtig",
-    
+
     "createHolidayTitle": "Neuen Feiertag erstellen",
     "editHolidayTitle": "Feiertag bearbeiten",
     "holidayNameLabel": "Feiertagsname (erforderlich)",
@@ -237,7 +237,7 @@
         }
       }
     },
-    
+
     "exportHolidaysTitle": "Feiertagsdaten exportieren",
     "importHolidaysTitle": "Feiertagsdaten importieren",
     "exportSuccess": "Daten erfolgreich exportiert",
@@ -282,5 +282,21 @@
           "type": "String"
         }
       }
-    }
+    },
+
+    "languageSettings": "Spracheinstellungen",
+    "selectLanguage": "Wählen Sie Ihre bevorzugte Sprache",
+    "languageChangeSuccess": "Sprache erfolgreich geändert",
+    "languageChangeError": "Sprachänderung fehlgeschlagen",
+    "languageSettingsNote": "Das Ändern der Sprache wirkt sich auf den gesamten Text in der App aus. Einige Inhalte müssen möglicherweise neu geladen werden.",
+    "followSystemLanguage": "Systemsprache verwenden",
+    "followSystemLanguageDescription": "Automatisch die in den Geräteeinstellungen festgelegte Sprache verwenden",
+
+    "regionChina": "China",
+    "regionUnitedStates": "Vereinigte Staaten",
+    "regionJapan": "Japan",
+    "regionKorea": "Korea",
+    "regionFrance": "Frankreich",
+    "regionGermany": "Deutschland",
+    "regionInternational": "International"
 }

@@ -136,7 +136,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // 主题切换选项
           ListTile(
             leading: Icon(_themeService.getThemeModeIcon()),
-            title: Text(isChinese ? '主题设置' : 'Theme Settings'),
+            title: Text(l10n.themeSettings),
             subtitle: Text(_themeService.getThemeModeName(context, isChinese)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
@@ -157,7 +157,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // 首页布局设置
           ListTile(
             leading: Icon(_layoutService.getHomeLayoutTypeIcon()),
-            title: Text(isChinese ? '首页布局' : 'Home Layout'),
+            title: Text(l10n.homeLayout),
             subtitle: Text(_layoutService.getHomeLayoutTypeName(context, isChinese)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
@@ -168,7 +168,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // 卡片样式设置
           ListTile(
             leading: Icon(_layoutService.getCardStyleTypeIcon()),
-            title: Text(isChinese ? '卡片样式' : 'Card Style'),
+            title: Text(l10n.cardStyle),
             subtitle: Text(_layoutService.getCardStyleTypeName(context, isChinese)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
@@ -179,7 +179,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // 提醒优先级设置
           ListTile(
             leading: Icon(_layoutService.getReminderPriorityIcon()),
-            title: Text(isChinese ? '提醒优先级' : 'Reminder Priority'),
+            title: Text(l10n.reminderPriority),
             subtitle: Text(_layoutService.getReminderPriorityName(context, isChinese)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
@@ -218,8 +218,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.import_export),
-            title: Text(isChinese ? '本地数据同步' : 'Local Data Sync'),
-            subtitle: Text(isChinese ? '导入/导出节日数据' : 'Import/Export holiday data'),
+            title: Text(l10n.localDataSync),
+            subtitle: Text(l10n.importExportHolidayData),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               Navigator.push(
@@ -246,29 +246,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.refresh),
-            title: Text(isChinese ? '重置全球节日数据' : 'Reset Global Holidays'),
-            subtitle: Text(isChinese ? '恢复默认的全球节日数据' : 'Restore default global holiday data'),
+            title: Text(l10n.resetGlobalHolidays),
+            subtitle: Text(l10n.resetGlobalHolidaysConfirm),
             onTap: () async {
               // 显示确认对话框
               final bool? confirm = await showDialog<bool>(
                 context: context,
                 builder: (context) => AlertDialog(
-                  title: Text(isChinese ? '确认重置' : 'Confirm Reset'),
-                  content: Text(isChinese
-                    ? '这将重置所有全球节日数据到默认状态。您确定要继续吗？'
-                    : 'This will reset all global holiday data to default. Are you sure you want to continue?'),
+                  title: Text(l10n.confirmReset),
+                  content: Text(l10n.resetGlobalHolidaysConfirm),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(false),
-                      child: Text(isChinese ? '取消' : 'Cancel'),
+                      child: Text(l10n.cancelButton),
                     ),
                     ElevatedButton(
                       onPressed: () => Navigator.of(context).pop(true),
-                      child: Text(isChinese ? '重置' : 'Reset'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
                         foregroundColor: Colors.white,
                       ),
+                      child: Text(l10n.resetGlobalHolidays),
                     ),
                   ],
                 ),
@@ -280,19 +278,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   final holidayInitService = HolidayInitService();
                   await holidayInitService.resetGlobalHolidays();
 
-                  if (mounted) {
+                  if (mounted && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(isChinese
-                        ? '全球节日数据已重置'
-                        : 'Global holiday data has been reset')),
+                      SnackBar(content: Text(l10n.globalHolidayDataReset)),
                     );
                   }
                 } catch (e) {
-                  if (mounted) {
+                  if (mounted && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(isChinese
-                        ? '重置失败: $e'
-                        : 'Reset failed: $e')),
+                      SnackBar(content: Text(l10n.resetFailed(e.toString()))),
                     );
                   }
                 }
@@ -301,12 +295,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
 
            // --- 关于 ---
-           _buildSectionTitle(context, l10n.settingsSectionAbout), // TODO: 本地化
+           _buildSectionTitle(context, l10n.settingsSectionAbout),
            ListTile(
             leading: const Icon(Icons.info_outline),
-            title: Text(l10n.settingsAboutAppTitle), // TODO: 本地化
+            title: Text(l10n.settingsAboutAppTitle),
             onTap: () {
-              // TODO: 显示关于信息对话框或页面
+              // 显示关于信息对话框或页面 (待实现)
                ScaffoldMessenger.of(context).showSnackBar(
                  SnackBar(content: Text(l10n.settingsFeatureNotImplemented(l10n.settingsAboutAppTitle))),
               );
@@ -314,9 +308,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
            ListTile(
             leading: const Icon(Icons.privacy_tip_outlined),
-            title: Text(l10n.settingsPrivacyPolicyTitle), // TODO: 本地化
+            title: Text(l10n.settingsPrivacyPolicyTitle),
             onTap: () {
-              // TODO: 打开隐私政策链接
+              // 打开隐私政策链接 (待实现)
                ScaffoldMessenger.of(context).showSnackBar(
                  SnackBar(content: Text(l10n.settingsFeatureNotImplemented(l10n.settingsPrivacyPolicyTitle))),
               );
@@ -344,7 +338,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Future<void> _showNicknameDialog(BuildContext context) async {
     // 注意: 因为这个方法在 State 类内部，可以直接访问 context 和 l10n (如果在 build 中定义了)
     // 但为了清晰，我们在方法开头重新获取 l10n
-    final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context);
     final prefs = await SharedPreferences.getInstance();
     // 创建文本控制器，用当前昵称初始化
     final nicknameController = TextEditingController(text: _currentNickname);
@@ -460,8 +454,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
         });
 
         // 通知主页面更新特殊纪念日显示范围
-        final appSettings = Provider.of<AppSettingsProvider>(context, listen: false);
-        appSettings.updateSpecialDaysRange(result);
+        if (context.mounted) {
+          final appSettings = Provider.of<AppSettingsProvider>(context, listen: false);
+          appSettings.updateSpecialDaysRange(result);
+        }
       }
     }
   }
