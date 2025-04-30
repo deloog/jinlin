@@ -23,7 +23,7 @@ class ReminderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     // 文本样式
     final titleStyle = reminder.isCompleted
         ? TextStyle(
@@ -37,7 +37,7 @@ class ReminderCard extends StatelessWidget {
             fontSize: 16,
             fontWeight: FontWeight.w500,
           );
-    
+
     final descriptionStyle = reminder.isCompleted
         ? TextStyle(
             decoration: TextDecoration.lineThrough,
@@ -48,7 +48,7 @@ class ReminderCard extends StatelessWidget {
             color: theme.textTheme.bodyMedium?.color,
             fontSize: 14,
           );
-    
+
     final dateStyle = reminder.isCompleted
         ? TextStyle(
             decoration: TextDecoration.lineThrough,
@@ -60,7 +60,7 @@ class ReminderCard extends StatelessWidget {
             fontSize: 12,
             fontWeight: FontWeight.w500,
           );
-    
+
     // 卡片颜色
     Color cardColor;
     if (isToday) {
@@ -72,11 +72,11 @@ class ReminderCard extends StatelessWidget {
           ? theme.cardColor.withOpacity(0.8)
           : theme.cardColor;
     }
-    
+
     // 根据提醒类型设置图标和强调色
     IconData typeIcon;
     Color accentColor;
-    
+
     switch (reminder.type) {
       case ReminderType.birthday:
         typeIcon = Icons.cake;
@@ -100,7 +100,7 @@ class ReminderCard extends StatelessWidget {
         accentColor = theme.colorScheme.primary;
         break;
     }
-    
+
     // 构建卡片内容
     Widget cardContent = Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
@@ -119,23 +119,23 @@ class ReminderCard extends StatelessWidget {
               ),
             ),
           ),
-          
-          // 类型图标
+
+          // 类型图标 - 改进版，移除模糊效果
           Container(
             width: 36,
             height: 36,
             margin: const EdgeInsets.only(right: 12.0),
             decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.1),
+              color: accentColor,
               borderRadius: BorderRadius.circular(8.0),
             ),
             child: Icon(
               typeIcon,
-              color: accentColor,
+              color: Colors.white,
               size: 20,
             ),
           ),
-          
+
           // 提醒内容
           Expanded(
             child: Column(
@@ -176,7 +176,7 @@ class ReminderCard extends StatelessWidget {
               ],
             ),
           ),
-          
+
           // 右侧箭头
           Icon(
             Icons.chevron_right,
@@ -185,7 +185,7 @@ class ReminderCard extends StatelessWidget {
         ],
       ),
     );
-    
+
     // 构建卡片
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),

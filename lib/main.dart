@@ -36,6 +36,7 @@ import 'package:jinlin_app/providers/app_settings_provider.dart'; // 应用设�
 import 'package:jinlin_app/models/holiday_model.dart' as holiday_model; // 节日数据模型
 
 import 'widgets/page_transitions.dart';
+import 'widgets/card_icon.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -793,13 +794,9 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
     elevation: 3.0,
     child: ListTile(
        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
-      leading: CircleAvatar(
-        backgroundColor: holiday.getHolidayColor().withValues(alpha: 255), // 使用完全不透明的背景
-        child: Icon(
-          holiday.typeIcon,
-          color: Colors.white, // 使用白色图标以增强对比度
-          size: 24,
-        ),
+      leading: CardIcon(
+        icon: holiday.typeIcon,
+        color: holiday.getHolidayColor(),
       ),
       title: Text(
         holiday.name, // 假设 name 已经是目标语言，或者需要本地化

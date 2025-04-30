@@ -3,6 +3,7 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:jinlin_app/special_date.dart';
 import 'package:intl/intl.dart';
 import 'package:lunar/lunar.dart';
+import 'package:jinlin_app/widgets/card_icon.dart';
 
 class HolidayDetailScreen extends StatelessWidget {
   final SpecialDate holiday;
@@ -61,13 +62,10 @@ class HolidayDetailScreen extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Container(
-              padding: const EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                color: holiday.getHolidayColor(),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(holiday.typeIcon, color: Colors.white, size: 20),
+            child: CardIcon(
+              icon: holiday.typeIcon,
+              color: holiday.getHolidayColor(),
+              size: 36.0,
             ),
           ),
         ],
@@ -96,13 +94,9 @@ class HolidayDetailScreen extends StatelessWidget {
                     // 节日图标和类型
                     Row(
                       children: [
-                        CircleAvatar(
-                          backgroundColor: holiday.getHolidayColor().withValues(alpha: 255), // 使用完全不透明的背景
-                          child: Icon(
-                            holiday.typeIcon,
-                            color: Colors.white, // 使用白色图标以增强对比度
-                            size: 24,
-                          ),
+                        CardIcon(
+                          icon: holiday.typeIcon,
+                          color: holiday.getHolidayColor(),
                         ),
                         const SizedBox(width: 12),
                         Text(

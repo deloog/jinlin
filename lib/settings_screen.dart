@@ -176,6 +176,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
 
+          // 卡片图标形状设置
+          ListTile(
+            leading: Icon(_layoutService.getIconShapeTypeIcon()),
+            title: Text(isChinese ? '图标形状' : 'Icon Shape'),
+            subtitle: Text(_layoutService.getIconShapeTypeName(context, isChinese)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              _showIconShapePicker(context);
+            },
+          ),
+
+          // 卡片图标大小设置
+          ListTile(
+            leading: const Icon(Icons.format_size),
+            title: Text(isChinese ? '图标大小' : 'Icon Size'),
+            subtitle: Text(_layoutService.getIconSizeName(context, isChinese, _layoutService.iconSize)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              _showIconSizePicker(context);
+            },
+          ),
+
+          // 卡片颜色饱和度设置
+          ListTile(
+            leading: const Icon(Icons.color_lens),
+            title: Text(isChinese ? '颜色饱和度' : 'Color Saturation'),
+            subtitle: Text(_layoutService.getColorSaturationName(context, isChinese, _layoutService.colorSaturation)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              _showColorSaturationPicker(context);
+            },
+          ),
+
           // 提醒优先级设置
           ListTile(
             leading: Icon(_layoutService.getReminderPriorityIcon()),
@@ -703,6 +736,237 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         );
       },
+    );
+  }
+
+  // 显示卡片图标形状选择器
+  void _showIconShapePicker(BuildContext context) {
+    final isChinese = LocalizationService.isChineseLocale(context);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text(isChinese ? '图标形状' : 'Icon Shape'),
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () async {
+                await _layoutService.setIconShapeType(IconShapeType.square);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.crop_square),
+                title: Text(isChinese ? '方形图标' : 'Square Icons'),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () async {
+                await _layoutService.setIconShapeType(IconShapeType.circle);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.circle_outlined),
+                title: Text(isChinese ? '圆形图标' : 'Circle Icons'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 显示卡片图标大小选择器
+  void _showIconSizePicker(BuildContext context) {
+    final isChinese = LocalizationService.isChineseLocale(context);
+
+    // 创建一个临时变量，用于存储用户选择的值
+    double tempSize = _layoutService.iconSize;
+
+    // 显示对话框
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(isChinese ? '图标大小' : 'Icon Size'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(isChinese ? '调整卡片图标大小' : 'Adjust card icon size'),
+                  const SizedBox(height: 16),
+                  Slider(
+                    value: tempSize,
+                    min: 24.0,
+                    max: 48.0,
+                    divisions: 6,
+                    label: tempSize.round().toString(),
+                    onChanged: (double value) {
+                      setState(() {
+                        tempSize = value;
+                      });
+                    },
+                  ),
+                  Center(
+                    child: Container(
+                      width: tempSize,
+                      height: tempSize,
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.primary,
+                        borderRadius: BorderRadius.circular(
+                          _layoutService.iconShapeType == IconShapeType.circle ? tempSize / 2 : 8.0,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.star,
+                        color: Colors.white,
+                        size: tempSize * 0.6,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Center(
+                    child: Text(
+                      _layoutService.getIconSizeName(context, isChinese, tempSize),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(isChinese ? '取消' : 'Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await _layoutService.setIconSize(tempSize);
+                    if (mounted) {
+                      setState(() {});
+                    }
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Text(isChinese ? '应用' : 'Apply'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  // 显示卡片颜色饱和度选择器
+  void _showColorSaturationPicker(BuildContext context) {
+    final isChinese = LocalizationService.isChineseLocale(context);
+
+    // 创建一个临时变量，用于存储用户选择的值
+    double tempSaturation = _layoutService.colorSaturation;
+
+    // 显示对话框
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text(isChinese ? '颜色饱和度' : 'Color Saturation'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(isChinese ? '调整卡片颜色饱和度' : 'Adjust card color saturation'),
+                  const SizedBox(height: 16),
+                  Slider(
+                    value: tempSaturation,
+                    min: 0.3,
+                    max: 1.0,
+                    divisions: 7,
+                    label: '${(tempSaturation * 100).round()}%',
+                    onChanged: (double value) {
+                      setState(() {
+                        tempSaturation = value;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildColorSample(context, Colors.red, tempSaturation),
+                      _buildColorSample(context, Colors.green, tempSaturation),
+                      _buildColorSample(context, Colors.blue, tempSaturation),
+                      _buildColorSample(context, Colors.orange, tempSaturation),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Center(
+                    child: Text(
+                      _layoutService.getColorSaturationName(context, isChinese, tempSaturation),
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(isChinese ? '取消' : 'Cancel'),
+                ),
+                ElevatedButton(
+                  onPressed: () async {
+                    await _layoutService.setColorSaturation(tempSaturation);
+                    if (mounted) {
+                      setState(() {});
+                    }
+                    if (context.mounted) {
+                      Navigator.pop(context);
+                    }
+                  },
+                  child: Text(isChinese ? '应用' : 'Apply'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    ).then((_) {
+      if (mounted) {
+        setState(() {});
+      }
+    });
+  }
+
+  // 构建颜色样本
+  Widget _buildColorSample(BuildContext context, Color baseColor, double saturation) {
+    // 调整颜色饱和度
+    final HSLColor hslColor = HSLColor.fromColor(baseColor);
+    final Color adjustedColor = hslColor.withSaturation(saturation).toColor();
+
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: BoxDecoration(
+        color: adjustedColor,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
     );
   }
 }

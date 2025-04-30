@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:lunar/lunar.dart'; // 引入 lunar 包用于农历计算
 import 'package:intl/intl.dart'; // 用于日期格式化
 import 'package:intl/date_symbol_data_local.dart'; // 确保中文星期名称可用
+import 'package:jinlin_app/services/layout_service.dart'; // 布局服务
 
 // 定义特殊日期的类型 (保持不变)
 enum SpecialDateType {
@@ -304,20 +305,38 @@ class SpecialDate {
 
    // 获取节日的颜色
    Color getHolidayColor() {
+     // 获取布局服务
+     final layoutService = LayoutService();
+
+     // 获取颜色饱和度
+     final colorSaturation = layoutService.colorSaturation;
+
+     // 根据节日类型获取基础颜色
+     Color baseColor;
      switch (type) {
        case SpecialDateType.statutory:
-         return Colors.red[700]!; // 法定节日用红色
+         baseColor = Colors.red[700]!; // 法定节日用红色
+         break;
        case SpecialDateType.traditional:
-         return Colors.orange[700]!; // 传统节日用橙色
+         baseColor = Colors.orange[700]!; // 传统节日用橙色
+         break;
        case SpecialDateType.solarTerm:
-         return Colors.green[700]!; // 节气用绿色
+         baseColor = Colors.green[700]!; // 节气用绿色
+         break;
        case SpecialDateType.memorial:
-         return Colors.blue[700]!; // 纪念日用蓝色
+         baseColor = Colors.blue[700]!; // 纪念日用蓝色
+         break;
        case SpecialDateType.custom:
-         return Colors.purple[700]!; // 自定义用紫色
+         baseColor = Colors.purple[700]!; // 自定义用紫色
+         break;
        default:
-         return Colors.grey[700]!;
+         baseColor = Colors.grey[700]!;
+         break;
      }
+
+     // 调整颜色饱和度
+     final HSLColor hslColor = HSLColor.fromColor(baseColor);
+     return hslColor.withSaturation(colorSaturation).toColor();
    }
 
    // 获取计算类型
