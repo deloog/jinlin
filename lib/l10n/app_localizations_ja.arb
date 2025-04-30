@@ -1,0 +1,286 @@
+{
+    "@@locale": "ja",
+    "reminderAppTitle": "リマインダーアプリ",
+    "appTitle": "鯨霊リマインダー",
+    "someOtherKey": "その他のテキスト",
+    "settingsTooltip": "設定",
+    "addReminderTooltip": "リマインダーを追加",
+    "noReminders": "リマインダーはまだありません。追加してみましょう！",
+    "deleteTooltip": "リマインダーを削除",
+    "reminders": "リマインダー",
+    "addReminder": "リマインダーを追加",
+    "noRemindersAdded": "まだリマインダーが追加されていません。",
+    "date": "日付",
+    "time": "時間",
+    "lunarCalendarOnlyChina": "旧暦",
+    "save": "保存",
+    "deleteReminder": "リマインダーを削除",
+    "confirmDeletionTitle": "削除の確認",
+    "confirmDeletionContent": "「{reminderTitle}」を削除してもよろしいですか？",
+    "@confirmDeletionContent": {
+      "description": "リマインダー削除の確認メッセージ",
+      "placeholders": {
+        "reminderTitle": {
+          "type": "String",
+          "example": "会議"
+        }
+      }
+    },
+    "addReminderTitle": "新しいリマインダーを追加",
+    "editReminderTitle": "リマインダーを編集",
+    "reminderContentLabel": "リマインダーの内容またはタイトル",
+    "reminderContentHint": "例：明日午後3時に張さんとの会議",
+    "smartInputTooltip": "タイトルと日付をスマート識別",
+    "micStopTooltip": "停止",
+    "micListenTooltip": "音声入力",
+    "descriptionLabel": "リマインダーの説明（オプション）",
+    "descriptionHint": "詳細、AIによる自動生成が可能",
+    "addDateTimeButton": "日付と時間を追加",
+    "clearDateTimeTooltip": "日付をクリア",
+    "generateDescriptionButton": "AI説明生成",
+    "generatingButton": "生成中...",
+    "saveReminderButton": "リマインダーを保存",
+    "updateReminderButton": "リマインダーを更新",
+    "listeningStatus": "聞いています...",
+    "speechInitStatus": "音声機能を準備中...",
+    "inputTitleFirstInfo": "まずタイトルを入力してください",
+    "smartInputFailedError": "スマート認識に失敗しました: {error}",
+    "@smartInputFailedError": {
+      "description": "スマート認識失敗時のエラーメッセージ",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "inputTitleForDesc": "説明を生成するには、まずタイトルを入力してください",
+    "descGeneratedSuccess": "説明が生成されました",
+    "descGeneratedError": "説明の生成に失敗しました: {error}",
+    "@descGeneratedError": {
+      "description": "AI説明生成失敗時のエラーメッセージ",
+      "placeholders": {
+        "error": {
+          "type": "String",
+          "example": "APIエラー"
+        }
+      }
+    },
+    "reminderDetailTitle": "リマインダーの詳細",
+    "editButtonTooltip": "編集",
+    "deleteButtonTooltip": "削除",
+    "deleteConfirmationTitle": "削除の確認",
+    "deleteConfirmationContent": "このリマインダーを削除してもよろしいですか？この操作は元に戻せません。",
+    "dateNotSet": "日付未設定",
+    "descriptionSectionTitle": "説明:",
+    "aiAssistantSectionTitle": "AIアシスタント",
+    "smartTipsSectionTitle": "スマートヒント",
+    "noDescription": "説明なし",
+    "aiBlessingsPlaceholder": "[AIが生成したメッセージがここに表示されます...]",
+    "aiGiftsPlaceholder": "[AIがおすすめするギフトがここに表示されます...]",
+    "aiTipsPlaceholder": "[イベントの特性に基づくヒントがここに表示されます...]",
+    "swapBlessingsButton": "3つ交換",
+    "cannotChangeLanguageError": "言語の変更に失敗しました。もう一度お試しください",
+    "saveButton": "保存",
+    "cancelButton": "キャンセル",
+    "saveAnywayButton": "とにかく保存",
+    "cancel": "キャンセル",
+    "delete": "削除",
+    "select": "選択",
+    "manualInput": "手動入力",
+    "voiceInput": "音声入力",
+    "naturalLanguageInput": "自然言語入力",
+    "enterReminderDetails": "リマインダーの詳細を入力",
+    "naturalInputHint": "例：明日午後3時に会議",
+    "anniversaryName": "タイトル",
+    "pleaseEnterTitle": "有効なタイトルを入力してください",
+    "detectedDateTime": "検出された日時",
+    "lunar": "旧暦",
+    "recordingInProgress": "録音中...",
+    "processingAudio": "音声を処理中...",
+    "recordingStartFailed": "録音の開始に失敗しました。",
+    "recordingStopFailed": "録音の停止に失敗しました。",
+    "noRecordingPermission": "録音権限がありません",
+    "errorCheckingPermission": "権限の確認中にエラーが発生しました",
+    "detectedEventsTitle": "検出されたイベント",
+    "noTitlePlaceholder": "(タイトルなし)",
+    "noDatePlaceholder": "(日付なし)",
+    "notesTitle": "📌 メモ:",
+    "selectEventsToSave": "保存するイベントを選択してください",
+    "saveSelectedEvents": "選択した{count}項目を保存",
+    "@saveSelectedEvents": {
+      "description": "選択したイベントを保存するボタンのテキスト",
+      "placeholders": {
+        "count": {
+          "type": "int",
+          "example": "3"
+        }
+      }
+    },
+    "noValidEventsSelected": "保存する有効なイベントが選択されていません。",
+    "analyzingText": "テキストを分析中...",
+    "multipleEventsDetected": "{count}件のイベントが検出されました。以下に一覧表示されています。処理するものを選択してください。",
+    "@multipleEventsDetected": {
+      "description": "複数のイベントが検出されたときのメッセージ",
+      "placeholders": {
+        "count": {
+          "type": "int",
+          "example": "3"
+        }
+      }
+    },
+    "singleEventDetected": "1件のイベントが検出されました。以下に一覧表示されています。",
+    "noValidEventsDetected": "有効なリマインダーイベントが検出されませんでした。",
+    "emptyStateMessage": "まだリマインダーや祝日がありません。\n追加してみましょう！",
+    "closeButton": "閉じる",
+    "today": "今日",
+    "loadingRemindersError": "リマインダーの読み込みに失敗しました",
+    "cannotOpenReminderDetails": "リマインダーの詳細を開けません。データが同期されていない可能性があります。更新して再試行してください",
+    "deleteFailed": "削除に失敗しました。もう一度お試しください",
+    
+    "holiday_NewYearDay": "元日",
+    "holiday_ValentinesDay": "バレンタインデー",
+    "holiday_EarthDay": "アースデー",
+    "holiday_LabourDay": "労働の日",
+    "holiday_ChildrensDay": "こどもの日",
+    "holiday_WorldEnvironmentDay": "世界環境デー",
+    "holiday_UNDay": "国連デー",
+    "holiday_HumanRightsDay": "世界人権デー",
+    "holiday_Easter": "イースター",
+    "holiday_Halloween": "ハロウィン",
+    "holiday_Thanksgiving": "感謝祭",
+    "holiday_Christmas": "クリスマス",
+    "holiday_NewYearsEve": "大晦日",
+    "holiday_MothersDay": "母の日",
+    "holiday_FathersDay": "父の日",
+    
+    "holiday_SpringFestival": "春節",
+    "holiday_ChingMing": "清明節",
+    "holiday_DragonBoatFestival": "端午節",
+    "holiday_MidAutumnFestival": "中秋節",
+    "holiday_NationalDay": "建国記念日",
+    "holiday_LanternFestival": "元宵節",
+    "holiday_DoubleSeventhFestival": "七夕",
+    "holiday_DoubleNinthFestival": "重陽節",
+    "holiday_LabaFestival": "臘八節",
+    "holiday_TreePlantingDay": "植樹祭",
+    
+    "aboutHoliday": "この祝日について",
+    "holidayCustoms": "祝日の習慣",
+    "statutoryHoliday": "法定祝日",
+    "traditionalHoliday": "伝統的な祝日",
+    "memorialDay": "記念日",
+    "otherHoliday": "その他の祝日",
+    "holiday": "祝日",
+    "tomorrow": "明日",
+    "daysRemaining": "あと{days}日",
+    "@daysRemaining": {
+      "description": "祝日までの残り日数",
+      "placeholders": {
+        "days": {
+          "type": "int",
+          "example": "5"
+        }
+      }
+    },
+    
+    "genericCustom1": "家族や友人との集まり",
+    "genericCustom2": "特別な食べ物や装飾の準備",
+    "genericCustom3": "贈り物や挨拶の交換",
+    
+    "holidayTaboos": "避けるべきこと",
+    "genericTaboo1": "お祝いの間にネガティブな話題を避ける",
+    "genericTaboo2": "不適切と考えられる特定の食べ物や活動を避ける",
+    "genericTaboo3": "地元の習慣や伝統を尊重する",
+    
+    "holidayFilterTitle": "祝日をフィルター",
+    "holidayFilterDescription": "表示する祝日の種類を選択してください：",
+    "solarTerm": "二十四節気",
+    "applyButton": "適用",
+    "cancelButton": "キャンセル",
+    "filterHolidays": "フィルター",
+    "customEvent": "カスタムイベント",
+    
+    "specialDaysRangeTitle": "特別な記念日の表示範囲",
+    "specialDaysRangeDescription": "特別な記念日を何日前から表示するかを選択してください：",
+    "specialDaysRangeSubtitle": "特別な記念日を{days}日前から表示",
+    "daysText": "日",
+    
+    "holidayManagementTitle": "祝日管理",
+    "holidayManagementDescription": "祝日の重要度と表示設定を管理する",
+    "importanceNormal": "通常",
+    "importanceHigh": "重要",
+    "importanceVeryHigh": "非常に重要",
+    
+    "createHolidayTitle": "新しい祝日を作成",
+    "editHolidayTitle": "祝日を編集",
+    "holidayNameLabel": "祝日名（必須）",
+    "holidayNameEnLabel": "祝日名（英語）",
+    "holidayTypeLabel": "祝日タイプ",
+    "holidayRegionsLabel": "適用地域",
+    "holidayCalculationTypeLabel": "日付計算タイプ",
+    "holidayCalculationRuleLabel": "計算ルール",
+    "holidayDescriptionLabel": "説明",
+    "holidayDescriptionEnLabel": "説明（英語）",
+    "holidayImportanceLabel": "重要度",
+    "holidayIdLabel": "祝日ID",
+    "holidayNameRequired": "祝日名を入力してください",
+    "holidayRegionRequired": "少なくとも1つの地域を選択してください",
+    "holidayCalculationRuleRequired": "計算ルールを入力してください",
+    "holidayCalculationRuleHint": "例：MM-DD（固定グレゴリオ暦）、MM-DDL（固定旧暦）",
+    "holidaySaveSuccess": "祝日情報が保存されました",
+    "holidaySaveError": "祝日情報の保存に失敗しました: {error}",
+    "@holidaySaveError": {
+      "description": "祝日情報の保存に失敗したときのエラーメッセージ",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    
+    "exportHolidaysTitle": "祝日データをエクスポート",
+    "importHolidaysTitle": "祝日データをインポート",
+    "exportSuccess": "データが正常にエクスポートされました",
+    "exportError": "データのエクスポートに失敗しました: {error}",
+    "@exportError": {
+      "description": "データのエクスポートに失敗したときのエラーメッセージ",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "importSuccess": "{count}件の祝日がインポートされました",
+    "@importSuccess": {
+      "description": "データのインポートに成功したときのメッセージ",
+      "placeholders": {
+        "count": {
+          "type": "int"
+        }
+      }
+    },
+    "importError": "データのインポートに失敗しました: {error}",
+    "@importError": {
+      "description": "データのインポートに失敗したときのエラーメッセージ",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "confirmImportTitle": "インポートの確認",
+    "confirmImportMessage": "既存のデータは上書きされます。続行しますか？",
+    "dataSyncTitle": "データ同期",
+    "exportButton": "エクスポート",
+    "importButton": "インポート",
+    "shareButton": "共有",
+    "lastExportTime": "最終エクスポート: {time}",
+    "@lastExportTime": {
+      "description": "最後にデータをエクスポートした時間",
+      "placeholders": {
+        "time": {
+          "type": "String"
+        }
+      }
+    }
+}

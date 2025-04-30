@@ -1,0 +1,286 @@
+{
+    "@@locale": "fr",
+    "reminderAppTitle": "Application de rappel",
+    "appTitle": "Rappel CetaMind",
+    "someOtherKey": "Autre texte",
+    "settingsTooltip": "Paramètres",
+    "addReminderTooltip": "Ajouter un rappel",
+    "noReminders": "Pas encore de rappels, essayez d'en ajouter un !",
+    "deleteTooltip": "Supprimer le rappel",
+    "reminders": "Rappels",
+    "addReminder": "Ajouter un rappel",
+    "noRemindersAdded": "Aucun rappel ajouté pour l'instant.",
+    "date": "Date",
+    "time": "Heure",
+    "lunarCalendarOnlyChina": "Calendrier lunaire",
+    "save": "Enregistrer",
+    "deleteReminder": "Supprimer le rappel",
+    "confirmDeletionTitle": "Confirmer la suppression",
+    "confirmDeletionContent": "Êtes-vous sûr de vouloir supprimer \"{reminderTitle}\" ?",
+    "@confirmDeletionContent": {
+      "description": "Message de confirmation pour la suppression d'un rappel",
+      "placeholders": {
+        "reminderTitle": {
+          "type": "String",
+          "example": "Réunion"
+        }
+      }
+    },
+    "addReminderTitle": "Ajouter un nouveau rappel",
+    "editReminderTitle": "Modifier le rappel",
+    "reminderContentLabel": "Contenu ou titre du rappel",
+    "reminderContentHint": "ex. : Réunion avec M. Zhang demain à 15h",
+    "smartInputTooltip": "Identification intelligente du titre et de la date",
+    "micStopTooltip": "Arrêter",
+    "micListenTooltip": "Entrée vocale",
+    "descriptionLabel": "Description du rappel (Optionnel)",
+    "descriptionHint": "Détails, peut être généré automatiquement par l'IA",
+    "addDateTimeButton": "Ajouter date et heure",
+    "clearDateTimeTooltip": "Effacer la date",
+    "generateDescriptionButton": "Générer une description par IA",
+    "generatingButton": "Génération en cours...",
+    "saveReminderButton": "Enregistrer le rappel",
+    "updateReminderButton": "Mettre à jour le rappel",
+    "listeningStatus": "Écoute en cours...",
+    "speechInitStatus": "Préparation de la fonction vocale...",
+    "inputTitleFirstInfo": "Veuillez d'abord saisir un titre",
+    "smartInputFailedError": "Échec de la reconnaissance intelligente : {error}",
+    "@smartInputFailedError": {
+      "description": "Message d'erreur lors de l'échec de la reconnaissance intelligente",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "inputTitleForDesc": "Veuillez d'abord saisir un titre pour générer une description",
+    "descGeneratedSuccess": "Description générée avec succès",
+    "descGeneratedError": "Échec de la génération de la description : {error}",
+    "@descGeneratedError": {
+      "description": "Message d'erreur lors de l'échec de la génération de description par IA",
+      "placeholders": {
+        "error": {
+          "type": "String",
+          "example": "Erreur API"
+        }
+      }
+    },
+    "reminderDetailTitle": "Détails du rappel",
+    "editButtonTooltip": "Modifier",
+    "deleteButtonTooltip": "Supprimer",
+    "deleteConfirmationTitle": "Confirmation de suppression",
+    "deleteConfirmationContent": "Voulez-vous supprimer ce rappel ? Cette action est irréversible.",
+    "dateNotSet": "Date non définie",
+    "descriptionSectionTitle": "Description :",
+    "aiAssistantSectionTitle": "Assistant IA",
+    "smartTipsSectionTitle": "Conseils intelligents",
+    "noDescription": "Pas de description",
+    "aiBlessingsPlaceholder": "[Les vœux générés par l'IA apparaîtront ici...]",
+    "aiGiftsPlaceholder": "[Les suggestions de cadeaux de l'IA apparaîtront ici...]",
+    "aiTipsPlaceholder": "[Des conseils basés sur les caractéristiques de l'événement apparaîtront ici...]",
+    "swapBlessingsButton": "Échanger 3",
+    "cannotChangeLanguageError": "Échec du changement de langue, veuillez réessayer",
+    "saveButton": "Enregistrer",
+    "cancelButton": "Annuler",
+    "saveAnywayButton": "Enregistrer quand même",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "select": "Sélectionner",
+    "manualInput": "Saisie manuelle",
+    "voiceInput": "Entrée vocale",
+    "naturalLanguageInput": "Entrée en langage naturel",
+    "enterReminderDetails": "Saisir les détails du rappel",
+    "naturalInputHint": "ex. : réunion demain à 15h",
+    "anniversaryName": "Titre",
+    "pleaseEnterTitle": "Veuillez saisir un titre valide",
+    "detectedDateTime": "Date détectée",
+    "lunar": "Lunaire",
+    "recordingInProgress": "Enregistrement en cours...",
+    "processingAudio": "Traitement audio en cours...",
+    "recordingStartFailed": "Échec du démarrage de l'enregistrement.",
+    "recordingStopFailed": "Échec de l'arrêt de l'enregistrement.",
+    "noRecordingPermission": "Pas d'autorisation d'enregistrement",
+    "errorCheckingPermission": "Erreur lors de la vérification des autorisations",
+    "detectedEventsTitle": "Événements détectés",
+    "noTitlePlaceholder": "(Pas de titre)",
+    "noDatePlaceholder": "(Pas de date)",
+    "notesTitle": "📌 Notes :",
+    "selectEventsToSave": "Sélectionnez les événements à enregistrer",
+    "saveSelectedEvents": "Enregistrer {count} éléments sélectionnés",
+    "@saveSelectedEvents": {
+      "description": "Texte du bouton pour enregistrer les événements sélectionnés",
+      "placeholders": {
+        "count": {
+          "type": "int",
+          "example": "3"
+        }
+      }
+    },
+    "noValidEventsSelected": "Aucun événement valide sélectionné pour l'enregistrement.",
+    "analyzingText": "Analyse du texte...",
+    "multipleEventsDetected": "{count} événements détectés, listés ci-dessous. Sélectionnez ceux à traiter.",
+    "@multipleEventsDetected": {
+      "description": "Message lorsque plusieurs événements sont détectés",
+      "placeholders": {
+        "count": {
+          "type": "int",
+          "example": "3"
+        }
+      }
+    },
+    "singleEventDetected": "1 événement détecté, listé ci-dessous.",
+    "noValidEventsDetected": "Aucun événement de rappel valide détecté.",
+    "emptyStateMessage": "Pas encore de rappels ou de jours fériés,\nessayez d'en ajouter un !",
+    "closeButton": "Fermer",
+    "today": "Aujourd'hui",
+    "loadingRemindersError": "Échec du chargement des rappels",
+    "cannotOpenReminderDetails": "Impossible d'ouvrir les détails du rappel, les données peuvent ne pas être synchronisées, veuillez actualiser et réessayer",
+    "deleteFailed": "Échec de la suppression, veuillez réessayer",
+    
+    "holiday_NewYearDay": "Jour de l'An",
+    "holiday_ValentinesDay": "Saint-Valentin",
+    "holiday_EarthDay": "Jour de la Terre",
+    "holiday_LabourDay": "Fête du Travail",
+    "holiday_ChildrensDay": "Journée des enfants",
+    "holiday_WorldEnvironmentDay": "Journée mondiale de l'environnement",
+    "holiday_UNDay": "Journée des Nations Unies",
+    "holiday_HumanRightsDay": "Journée des droits de l'homme",
+    "holiday_Easter": "Pâques",
+    "holiday_Halloween": "Halloween",
+    "holiday_Thanksgiving": "Action de grâce",
+    "holiday_Christmas": "Noël",
+    "holiday_NewYearsEve": "Réveillon du Nouvel An",
+    "holiday_MothersDay": "Fête des Mères",
+    "holiday_FathersDay": "Fête des Pères",
+    
+    "holiday_SpringFestival": "Nouvel An chinois",
+    "holiday_ChingMing": "Qingming",
+    "holiday_DragonBoatFestival": "Fête des bateaux-dragons",
+    "holiday_MidAutumnFestival": "Fête de la mi-automne",
+    "holiday_NationalDay": "Fête nationale",
+    "holiday_LanternFestival": "Fête des lanternes",
+    "holiday_DoubleSeventhFestival": "Qixi",
+    "holiday_DoubleNinthFestival": "Double neuf",
+    "holiday_LabaFestival": "Festival Laba",
+    "holiday_TreePlantingDay": "Journée de plantation d'arbres",
+    
+    "aboutHoliday": "À propos de ce jour férié",
+    "holidayCustoms": "Coutumes du jour férié",
+    "statutoryHoliday": "Jour férié légal",
+    "traditionalHoliday": "Fête traditionnelle",
+    "memorialDay": "Jour commémoratif",
+    "otherHoliday": "Autre jour férié",
+    "holiday": "Jour férié",
+    "tomorrow": "Demain",
+    "daysRemaining": "{days} jours restants",
+    "@daysRemaining": {
+      "description": "Jours restants jusqu'au jour férié",
+      "placeholders": {
+        "days": {
+          "type": "int",
+          "example": "5"
+        }
+      }
+    },
+    
+    "genericCustom1": "Réunions avec la famille et les amis",
+    "genericCustom2": "Préparation de nourriture et de décorations spéciales",
+    "genericCustom3": "Échange de cadeaux et de salutations",
+    
+    "holidayTaboos": "Choses à éviter",
+    "genericTaboo1": "Éviter les sujets négatifs pendant les célébrations",
+    "genericTaboo2": "Éviter certains aliments ou activités considérés comme inappropriés",
+    "genericTaboo3": "Respecter les coutumes et traditions locales",
+    
+    "holidayFilterTitle": "Filtrer les jours fériés",
+    "holidayFilterDescription": "Sélectionnez les types de jours fériés à afficher :",
+    "solarTerm": "Termes solaires",
+    "applyButton": "Appliquer",
+    "cancelButton": "Annuler",
+    "filterHolidays": "Filtrer",
+    "customEvent": "Événement personnalisé",
+    
+    "specialDaysRangeTitle": "Plage d'affichage des jours spéciaux",
+    "specialDaysRangeDescription": "Sélectionnez combien de jours à l'avance afficher les jours spéciaux :",
+    "specialDaysRangeSubtitle": "Afficher les jours spéciaux {days} jours à l'avance",
+    "daysText": "jours",
+    
+    "holidayManagementTitle": "Gestion des jours fériés",
+    "holidayManagementDescription": "Gérer l'importance et les paramètres d'affichage des jours fériés",
+    "importanceNormal": "Normal",
+    "importanceHigh": "Important",
+    "importanceVeryHigh": "Très important",
+    
+    "createHolidayTitle": "Créer un nouveau jour férié",
+    "editHolidayTitle": "Modifier le jour férié",
+    "holidayNameLabel": "Nom du jour férié (obligatoire)",
+    "holidayNameEnLabel": "Nom du jour férié (anglais)",
+    "holidayTypeLabel": "Type de jour férié",
+    "holidayRegionsLabel": "Régions applicables",
+    "holidayCalculationTypeLabel": "Type de calcul de date",
+    "holidayCalculationRuleLabel": "Règle de calcul",
+    "holidayDescriptionLabel": "Description",
+    "holidayDescriptionEnLabel": "Description (anglais)",
+    "holidayImportanceLabel": "Importance",
+    "holidayIdLabel": "ID du jour férié",
+    "holidayNameRequired": "Veuillez saisir le nom du jour férié",
+    "holidayRegionRequired": "Veuillez sélectionner au moins une région",
+    "holidayCalculationRuleRequired": "Veuillez saisir la règle de calcul",
+    "holidayCalculationRuleHint": "ex. : MM-JJ (grégorien fixe), MM-JJL (lunaire fixe)",
+    "holidaySaveSuccess": "Informations sur le jour férié enregistrées",
+    "holidaySaveError": "Échec de l'enregistrement des informations sur le jour férié : {error}",
+    "@holidaySaveError": {
+      "description": "Message d'erreur lors de l'échec de l'enregistrement des informations sur le jour férié",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    
+    "exportHolidaysTitle": "Exporter les données des jours fériés",
+    "importHolidaysTitle": "Importer les données des jours fériés",
+    "exportSuccess": "Données exportées avec succès",
+    "exportError": "Échec de l'exportation des données : {error}",
+    "@exportError": {
+      "description": "Message d'erreur lors de l'échec de l'exportation des données",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "importSuccess": "{count} jours fériés importés",
+    "@importSuccess": {
+      "description": "Message de succès lors de l'importation des données",
+      "placeholders": {
+        "count": {
+          "type": "int"
+        }
+      }
+    },
+    "importError": "Échec de l'importation des données : {error}",
+    "@importError": {
+      "description": "Message d'erreur lors de l'échec de l'importation des données",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "confirmImportTitle": "Confirmer l'importation",
+    "confirmImportMessage": "Les données existantes seront écrasées. Continuer ?",
+    "dataSyncTitle": "Synchronisation des données",
+    "exportButton": "Exporter",
+    "importButton": "Importer",
+    "shareButton": "Partager",
+    "lastExportTime": "Dernière exportation : {time}",
+    "@lastExportTime": {
+      "description": "Heure de la dernière exportation de données",
+      "placeholders": {
+        "time": {
+          "type": "String"
+        }
+      }
+    }
+}

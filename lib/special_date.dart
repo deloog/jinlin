@@ -25,7 +25,9 @@ enum ImportanceLevel {
   high     // 高重要性，始终显示
 }
 
-// 特殊日期数据模型类 (增加了一个工具方法)
+
+
+// 特殊日期数据模型类 (增加了多语言支持)
 class SpecialDate {
   final String id;
   final String name;
@@ -35,6 +37,10 @@ class SpecialDate {
   final String calculationRule;
   final String? description;
   final ImportanceLevel importanceLevel;
+
+  // 多语言支持
+  final String? nameEn;          // 英文名称
+  final String? descriptionEn;   // 英文描述
 
   // 新增字段
   final String? customs;         // 习俗
@@ -54,6 +60,8 @@ class SpecialDate {
     required this.calculationRule,
     this.description,
     this.importanceLevel = ImportanceLevel.low, // 默认为低重要性
+    this.nameEn,                 // 英文名称
+    this.descriptionEn,          // 英文描述
     this.customs,
     this.taboos,
     this.foods,
@@ -309,6 +317,38 @@ class SpecialDate {
          return Colors.purple[700]!; // 自定义用紫色
        default:
          return Colors.grey[700]!;
+     }
+   }
+
+   // 获取计算类型
+   static DateCalculationType getCalculationTypeFromString(String typeStr) {
+     switch (typeStr) {
+       case 'fixedGregorian':
+         return DateCalculationType.fixedGregorian;
+       case 'fixedLunar':
+         return DateCalculationType.fixedLunar;
+       case 'nthWeekdayOfMonth':
+         return DateCalculationType.nthWeekdayOfMonth;
+       case 'solarTermBased':
+         return DateCalculationType.solarTermBased;
+       case 'relativeTo':
+         return DateCalculationType.relativeTo;
+       default:
+         return DateCalculationType.fixedGregorian;
+     }
+   }
+
+   // 获取重要性级别
+   static ImportanceLevel getImportanceLevelFromString(String levelStr) {
+     switch (levelStr) {
+       case 'low':
+         return ImportanceLevel.low;
+       case 'medium':
+         return ImportanceLevel.medium;
+       case 'high':
+         return ImportanceLevel.high;
+       default:
+         return ImportanceLevel.low;
      }
    }
 }

@@ -272,5 +272,77 @@
   "holidayManagementDescription": "管理节日重要性和显示设置",
   "importanceNormal": "普通",
   "importanceHigh": "重要",
-  "importanceVeryHigh": "非常重要"
+  "importanceVeryHigh": "非常重要",
+
+  "exportHolidaysTitle": "导出节日数据",
+  "exportSuccess": "节日数据导出成功",
+  "exportError": "导出错误: {error}",
+  "@exportError": {
+    "description": "导出节日数据失败时的错误信息",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "文件访问错误"
+      }
+    }
+  },
+  "confirmImportTitle": "确认导入",
+  "confirmImportMessage": "这将从文件导入节日数据。具有相同ID的现有节日将被覆盖。是否继续？",
+  "importButton": "导入",
+  "importSuccess": "成功导入 {count} 个节日",
+  "@importSuccess": {
+    "description": "导入节日成功时的消息",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "importError": "导入错误: {error}",
+  "@importError": {
+    "description": "导入节日失败时的错误信息",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "无效的文件格式"
+      }
+    }
+  },
+  "dataSyncTitle": "数据同步",
+  "exportButton": "导出",
+  "importHolidaysTitle": "导入节日数据",
+  "lastExportTime": "上次导出时间: {time}",
+  "@lastExportTime": {
+    "description": "显示节日数据上次导出的时间",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "2023-05-01 14:30"
+      }
+    }
+  },
+
+  "holidayNameRequired": "节日名称不能为空",
+  "holidayRegionRequired": "请至少选择一个地区",
+  "holidayCalculationRuleRequired": "计算规则不能为空",
+  "holidaySaveSuccess": "节日保存成功",
+  "holidaySaveError": "保存节日出错: {error}",
+  "@holidaySaveError": {
+    "description": "保存节日失败时的错误信息",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "数据库错误"
+      }
+    }
+  },
+  "createHolidayTitle": "创建节日",
+  "holidayIdLabel": "节日ID",
+  "holidayTypeLabel": "节日类型",
+  "holidayRegionsLabel": "适用地区",
+  "holidayCalculationTypeLabel": "计算类型",
+  "holidayCalculationRuleLabel": "计算规则",
+  "holidayCalculationRuleHint": "格式取决于计算类型",
+  "holidayImportanceLabel": "重要性"
   }

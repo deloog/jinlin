@@ -22,8 +22,13 @@ import 'timeline_item.dart';
 import 'package:jinlin_app/services/holiday_storage_service.dart'; // 节日存储服务
 import 'package:jinlin_app/services/hive_database_service.dart'; // Hive数据库服务
 import 'package:jinlin_app/services/holiday_migration_service.dart'; // 节日数据迁移服务
+import 'package:jinlin_app/services/theme_service.dart'; // 主题服务
+import 'package:jinlin_app/services/holiday_init_service.dart'; // 节日初始化服务
+import 'package:jinlin_app/services/auto_sync_service.dart'; // 自动同步服务
+import 'package:jinlin_app/services/database_init_service.dart'; // 数据库初始化服务
+import 'package:jinlin_app/services/data_manager_service.dart'; // 数据管理服务
 
-import 'package:jinlin_app/adapters/holiday_adapter.dart'; // 节日适配器
+import 'package:jinlin_app/models/holiday_model.dart' as holiday_model; // 节日数据模型
 
 import 'widgets/page_transitions.dart';
 
@@ -36,8 +41,6 @@ Future<void> main() async {
   } catch (e) {
     debugPrint("无法加载 .env 文件: $e");
   }
-
-  // 暂时不初始化数据库，使用 SharedPreferences 存储节日重要性信息
 
   // 创建一个临时的 BuildContext 用于数据迁移
   final navigatorKey = GlobalKey<NavigatorState>();
@@ -54,7 +57,23 @@ Future<void> main() async {
   // 等待框架渲染第一帧
   await Future.delayed(const Duration(milliseconds: 100));
 
-  // 暂时不执行数据迁移
+  // 使用统一的数据管理服务
+  final dataManager = DataManagerService();
+  final context = navigatorKey.currentContext;
+
+  // 初始化数据库和节日数据
+  if (context != null) {
+    final success = await dataManager.initialize(context);
+    if (!success) {
+      debugPrint("数据库初始化失败，将使用默认设置");
+    }
+  } else {
+    debugPrint("无法获取有效的BuildContext，数据库初始化失败");
+  }
+
+  // 暂时禁用自动同步服务，因为缺少Firebase配置
+  // final autoSyncService = AutoSyncService();
+  // await autoSyncService.initialize();
 
   // 运行实际应用
   runApp(const MyApp());
@@ -71,19 +90,28 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Locale? _currentLocale; // 用于存储当前选择的语言
   int _specialDaysRange = 10; // 默认显示10天内的特殊纪念日
+  final ThemeService _themeService = ThemeService();
 
   @override
   void initState() {
     super.initState();
     _loadLocale(); // 启动时调用加载函数
     _loadSpecialDaysRange(); // 加载特殊纪念日显示范围
+    _initThemeService(); // 初始化主题服务
+  }
+
+  // 初始化主题服务
+  Future<void> _initThemeService() async {
+    await _themeService.initialize();
+    // 强制刷新UI以显示正确的主题模式
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadLocale() async {
-    final prefs = await SharedPreferences.getInstance();
-    final String? languageCode = prefs.getString('languageCode');
-    // 如果没存过，默认用 'en' (英语)
-    final initialLocale = Locale(languageCode ?? 'en');
+    // 强制使用英文，用于测试
+    const initialLocale = Locale('en');
 
     // 检查 Widget 是否还在树上，防止异步操作回来后报错
     if (mounted) {
@@ -143,7 +171,7 @@ class _MyAppState extends State<MyApp> {
   }
   @override
   Widget build(BuildContext context) {
-if (_currentLocale == null) {
+    if (_currentLocale == null) {
       // 在语言加载完成前，显示一个加载中的圆圈
       return const MaterialApp(
         home: Scaffold(body: Center(child: CircularProgressIndicator())),
@@ -153,10 +181,9 @@ if (_currentLocale == null) {
     return MaterialApp(
       locale: _currentLocale,
       title: 'CetaMind Reminder',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      theme: _themeService.lightTheme,
+      darkTheme: _themeService.darkTheme,
+      themeMode: _themeService.themeMode,
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -467,33 +494,74 @@ if (result is Reminder) { // --- 处理单个添加/编辑的情况 ---
                  );
               },
             ),
-            // 临时：添加重置数据库的按钮，方便测试
-            IconButton(
-              icon: const Icon(Icons.refresh),
-              onPressed: () async {
-                // 保存当前语言环境
-                final isChineseLocale = Localizations.localeOf(context).languageCode == 'zh';
-
-                // 重置数据库
-                await HolidayMigrationService.resetDatabase();
-
-                if (mounted) {
-                  // 重新迁移数据
-                  await HolidayMigrationService.migrateHolidays(context);
-
-                  // 打印所有节日信息
-                  HiveDatabaseService.printAllHolidays();
-
-                  // 重新加载节日列表
-                  _prepareTimelineItems();
-
-                  // 显示提示
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('数据库已重置并重新迁移')),
-                  );
+            // 数据库操作按钮
+            PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: '数据库操作',
+              onSelected: (value) async {
+                switch (value) {
+                  case 'reset':
+                    // 重置数据库
+                    final dataManager = DataManagerService();
+                    final success = await dataManager.resetDatabase(context);
+                    if (mounted) {
+                      if (success) {
+                        // 重新加载节日列表
+                        _prepareTimelineItems();
+                        // 显示提示
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('数据库已重置并重新初始化')),
+                          );
+                        }
+                      } else {
+                        // 显示错误提示
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('数据库重置失败')),
+                          );
+                        }
+                      }
+                    }
+                    break;
+                  case 'create_sample':
+                    // 创建示例节假日数据库
+                    await HolidayMigrationService.createSampleHolidays(context);
+                    if (mounted) {
+                      // 重新加载节日列表
+                      _prepareTimelineItems();
+                      // 显示提示
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('示例节假日数据库已创建')),
+                        );
+                      }
+                    }
+                    break;
+                  case 'print':
+                    // 打印所有节日信息
+                    HiveDatabaseService.printAllHolidays();
+                    // 显示提示
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('节日信息已打印到控制台')),
+                    );
+                    break;
                 }
               },
-              tooltip: '重置数据库',
+              itemBuilder: (context) => [
+                PopupMenuItem<String>(
+                  value: 'reset',
+                  child: Text('重置数据库'),
+                ),
+                PopupMenuItem<String>(
+                  value: 'create_sample',
+                  child: Text('创建示例节假日数据库'),
+                ),
+                PopupMenuItem<String>(
+                  value: 'print',
+                  child: Text('打印节日信息'),
+                ),
+              ],
             ),
          ],
           bottom: PreferredSize( // 使用 PreferredSize 指定 AppBar 底部区域的高度
@@ -729,10 +797,10 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
     child: ListTile(
        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 16.0),
       leading: CircleAvatar(
-        backgroundColor: holiday.getHolidayColor().withValues(alpha: 40), // 降低背景透明度
+        backgroundColor: holiday.getHolidayColor().withValues(alpha: 255), // 使用完全不透明的背景
         child: Icon(
           holiday.typeIcon,
-          color: holiday.getHolidayColor(),
+          color: Colors.white, // 使用白色图标以增强对比度
           size: 24,
         ),
       ),
@@ -940,12 +1008,17 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
       }
     }
 
-    return Text(
-      fullDateString,
-      textAlign: TextAlign.center, // 居中显示
-      style: TextStyle(
-        fontSize: 14,
-        color: Theme.of(context).appBarTheme.titleTextStyle?.color ?? Colors.white, // 尝试匹配 AppBar 标题颜色
+    return SizedBox(
+      width: double.infinity, // 使用全宽
+      child: Text(
+        fullDateString,
+        textAlign: TextAlign.center, // 居中显示
+        overflow: TextOverflow.ellipsis, // 文本溢出时显示省略号
+        maxLines: 1, // 限制为单行
+        style: TextStyle(
+          fontSize: 14,
+          color: Theme.of(context).appBarTheme.titleTextStyle?.color ?? Colors.white, // 尝试匹配 AppBar 标题颜色
+        ),
       ),
     );
   }
@@ -1015,7 +1088,7 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
                      onTap: () {
                       final originalIndex = _reminders.indexOf(reminder); // 查找原始索引
                   if (originalIndex == -1) {
-  print("错误: 跳转详情页前无法在列表中找到提醒对象 (合并卡片)。");
+  debugPrint("错误: 跳转详情页前无法在列表中找到提醒对象 (合并卡片)。");
   if (mounted) {
      ScaffoldMessenger.of(context).showSnackBar(
        SnackBar(content: Text(l10n.cannotOpenReminderDetails)),
@@ -1054,7 +1127,7 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
                _prepareTimelineItems();// 尝试重新加载以同步状态
             }
           } else if (result == 'deleted') { // 兼容旧的返回方式 (以防万一)
-             print("从详情页返回 'deleted' 字符串，可能需要刷新");
+             debugPrint("从详情页返回 'deleted' 字符串，可能需要刷新");
              _loadReminders(); // 尝试重新加载
              _prepareTimelineItems();
           }
@@ -1173,25 +1246,25 @@ Future<void> _prepareTimelineItems() async {
       specialDaysRange = myAppState?._specialDaysRange ?? 10;
     }
 
-    // 初始化Hive数据库
-    await HiveDatabaseService.initialize();
+    // 使用统一的数据库初始化服务
+    final dbInitService = DatabaseInitService();
+
+    // 检查数据库是否已初始化
+    final isInitialized = await dbInitService.checkInitializationState();
+
+    if (!isInitialized && mounted) {
+      // 如果数据库未初始化，则执行初始化
+      final success = await dbInitService.initialize(context);
+      if (!success) {
+        debugPrint("数据库初始化失败，将使用默认设置");
+      }
+    }
 
     // 打印所有节日信息（调试用）
     HiveDatabaseService.printAllHolidays();
 
     // 检查数据库迁移是否完成
     final migrationComplete = HiveDatabaseService.isMigrationComplete();
-
-    // 如果数据库迁移未完成，则执行迁移
-    if (!migrationComplete && mounted) {
-      try {
-        // 执行数据迁移
-        await HolidayMigrationService.migrateHolidays(context);
-        debugPrint("数据迁移成功完成");
-      } catch (e) {
-        debugPrint("数据迁移失败: $e");
-      }
-    }
 
     // 获取用户自定义的节日重要性
     Map<String, int> holidayImportance;
@@ -1233,15 +1306,19 @@ Future<void> _prepareTimelineItems() async {
       final holidayModels = HiveDatabaseService.getHolidaysByRegion(region, isChineseLocale: isChineseLocale);
 
       // 将HolidayModel转换为SpecialDate
-      specialDays = HolidayAdapter.toSpecialDateList(holidayModels);
+      specialDays = _convertHolidayModelsToSpecialDates(holidayModels);
       debugPrint("从Hive数据库加载了 ${specialDays.length} 个节日 (语言环境: ${isChineseLocale ? '中文' : '非中文'})");
     } else {
       // 如果数据库迁移未完成，使用本地存储服务获取节日
       if (mounted) {
-        specialDays = HolidayStorageService.getHolidaysForRegion(context, region);
+        final holidayModels = HolidayStorageService.getHolidaysForRegion(context, region);
+        // 直接转换为SpecialDate对象
+        specialDays = _convertHolidayModelsToSpecialDates(holidayModels);
         debugPrint("从本地存储服务加载了 ${specialDays.length} 个节日");
       }
     }
+
+
 
     // 智能显示策略：根据重要性和时间范围显示节日
     for (var specialDay in specialDays) {
@@ -1338,6 +1415,95 @@ Future<void> _prepareTimelineItems() async {
       case 8: return '八';
       case 9: return '九';
       default: return num.toString();
+    }
+  }
+
+  // 将HolidayModel列表转换为SpecialDate列表
+  List<SpecialDate> _convertHolidayModelsToSpecialDates(List<dynamic> models) {
+    final List<SpecialDate> result = [];
+
+    // 获取当前语言环境
+    final isChineseLocale = mounted && Localizations.localeOf(context).languageCode == 'zh';
+
+    for (final model in models) {
+      // 根据语言环境选择正确的名称和描述
+      final name = isChineseLocale || model.nameEn == null || model.nameEn.isEmpty
+          ? model.name
+          : model.nameEn;
+
+      final description = isChineseLocale || model.descriptionEn == null || model.descriptionEn.isEmpty
+          ? model.description
+          : model.descriptionEn;
+
+      // 创建SpecialDate对象
+      final specialDate = SpecialDate(
+        id: model.id,
+        name: name,
+        nameEn: model.nameEn,
+        type: _convertToSpecialDateType(model.type),
+        regions: model.regions,
+        calculationType: _convertToSpecialDateCalculationType(model.calculationType),
+        calculationRule: model.calculationRule,
+        description: description,
+        descriptionEn: model.descriptionEn,
+        importanceLevel: _convertToSpecialImportanceLevel(model.importanceLevel),
+        customs: model.customs,
+        taboos: model.taboos,
+        foods: model.foods,
+        greetings: model.greetings,
+        activities: model.activities,
+        history: model.history,
+        imageUrl: model.imageUrl,
+      );
+
+      result.add(specialDate);
+    }
+
+    return result;
+  }
+
+  // 类型转换辅助方法
+  SpecialDateType _convertToSpecialDateType(dynamic type) {
+    if (type == holiday_model.HolidayType.statutory) {
+      return SpecialDateType.statutory;
+    } else if (type == holiday_model.HolidayType.traditional) {
+      return SpecialDateType.traditional;
+    } else if (type == holiday_model.HolidayType.solarTerm) {
+      return SpecialDateType.solarTerm;
+    } else if (type == holiday_model.HolidayType.memorial) {
+      return SpecialDateType.memorial;
+    } else if (type == holiday_model.HolidayType.custom) {
+      return SpecialDateType.custom;
+    } else {
+      return SpecialDateType.other;
+    }
+  }
+
+  DateCalculationType _convertToSpecialDateCalculationType(
+      holiday_model.DateCalculationType type) {
+    if (type == holiday_model.DateCalculationType.fixedGregorian) {
+      return DateCalculationType.fixedGregorian;
+    } else if (type == holiday_model.DateCalculationType.fixedLunar) {
+      return DateCalculationType.fixedLunar;
+    } else if (type == holiday_model.DateCalculationType.nthWeekdayOfMonth) {
+      return DateCalculationType.nthWeekdayOfMonth;
+    } else if (type == holiday_model.DateCalculationType.solarTermBased) {
+      return DateCalculationType.solarTermBased;
+    } else {
+      return DateCalculationType.relativeTo;
+    }
+  }
+
+  ImportanceLevel _convertToSpecialImportanceLevel(
+      holiday_model.ImportanceLevel level) {
+    if (level == holiday_model.ImportanceLevel.low) {
+      return ImportanceLevel.low;
+    } else if (level == holiday_model.ImportanceLevel.medium) {
+      return ImportanceLevel.medium;
+    } else if (level == holiday_model.ImportanceLevel.high) {
+      return ImportanceLevel.high;
+    } else {
+      return ImportanceLevel.low;
     }
   }
 

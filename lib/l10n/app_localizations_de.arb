@@ -1,0 +1,286 @@
+{
+    "@@locale": "de",
+    "reminderAppTitle": "Erinnerungs-App",
+    "appTitle": "CetaMind Erinnerung",
+    "someOtherKey": "Anderer Text",
+    "settingsTooltip": "Einstellungen",
+    "addReminderTooltip": "Erinnerung hinzufügen",
+    "noReminders": "Noch keine Erinnerungen, fügen Sie eine hinzu!",
+    "deleteTooltip": "Erinnerung löschen",
+    "reminders": "Erinnerungen",
+    "addReminder": "Erinnerung hinzufügen",
+    "noRemindersAdded": "Noch keine Erinnerungen hinzugefügt.",
+    "date": "Datum",
+    "time": "Zeit",
+    "lunarCalendarOnlyChina": "Mondkalender",
+    "save": "Speichern",
+    "deleteReminder": "Erinnerung löschen",
+    "confirmDeletionTitle": "Löschen bestätigen",
+    "confirmDeletionContent": "Möchten Sie \"{reminderTitle}\" wirklich löschen?",
+    "@confirmDeletionContent": {
+      "description": "Bestätigungsnachricht zum Löschen einer Erinnerung",
+      "placeholders": {
+        "reminderTitle": {
+          "type": "String",
+          "example": "Besprechung"
+        }
+      }
+    },
+    "addReminderTitle": "Neue Erinnerung hinzufügen",
+    "editReminderTitle": "Erinnerung bearbeiten",
+    "reminderContentLabel": "Erinnerungsinhalt oder Titel",
+    "reminderContentHint": "z.B. Besprechung mit Herrn Zhang morgen um 15 Uhr",
+    "smartInputTooltip": "Titel und Datum intelligent erkennen",
+    "micStopTooltip": "Stopp",
+    "micListenTooltip": "Spracheingabe",
+    "descriptionLabel": "Erinnerungsbeschreibung (Optional)",
+    "descriptionHint": "Details, kann automatisch durch KI generiert werden",
+    "addDateTimeButton": "Datum & Zeit hinzufügen",
+    "clearDateTimeTooltip": "Datum löschen",
+    "generateDescriptionButton": "KI-Beschreibung generieren",
+    "generatingButton": "Generiere...",
+    "saveReminderButton": "Erinnerung speichern",
+    "updateReminderButton": "Erinnerung aktualisieren",
+    "listeningStatus": "Höre zu...",
+    "speechInitStatus": "Sprachfunktion wird vorbereitet...",
+    "inputTitleFirstInfo": "Bitte geben Sie zuerst einen Titel ein",
+    "smartInputFailedError": "Intelligente Erkennung fehlgeschlagen: {error}",
+    "@smartInputFailedError": {
+      "description": "Fehlermeldung bei fehlgeschlagener intelligenter Erkennung",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "inputTitleForDesc": "Bitte geben Sie zuerst einen Titel ein, um eine Beschreibung zu generieren",
+    "descGeneratedSuccess": "Beschreibung erfolgreich generiert",
+    "descGeneratedError": "Beschreibungsgenerierung fehlgeschlagen: {error}",
+    "@descGeneratedError": {
+      "description": "Fehlermeldung bei fehlgeschlagener KI-Beschreibungsgenerierung",
+      "placeholders": {
+        "error": {
+          "type": "String",
+          "example": "API-Fehler"
+        }
+      }
+    },
+    "reminderDetailTitle": "Erinnerungsdetails",
+    "editButtonTooltip": "Bearbeiten",
+    "deleteButtonTooltip": "Löschen",
+    "deleteConfirmationTitle": "Löschbestätigung",
+    "deleteConfirmationContent": "Möchten Sie diese Erinnerung löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+    "dateNotSet": "Datum nicht festgelegt",
+    "descriptionSectionTitle": "Beschreibung:",
+    "aiAssistantSectionTitle": "KI-Assistent",
+    "smartTipsSectionTitle": "Intelligente Tipps",
+    "noDescription": "Keine Beschreibung",
+    "aiBlessingsPlaceholder": "[Von KI generierte Glückwünsche erscheinen hier...]",
+    "aiGiftsPlaceholder": "[Von KI empfohlene Geschenke erscheinen hier...]",
+    "aiTipsPlaceholder": "[Tipps basierend auf den Ereignismerkmalen erscheinen hier...]",
+    "swapBlessingsButton": "3 austauschen",
+    "cannotChangeLanguageError": "Sprachänderung fehlgeschlagen, bitte versuchen Sie es erneut",
+    "saveButton": "Speichern",
+    "cancelButton": "Abbrechen",
+    "saveAnywayButton": "Trotzdem speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "select": "Auswählen",
+    "manualInput": "Manuelle Eingabe",
+    "voiceInput": "Spracheingabe",
+    "naturalLanguageInput": "Natürliche Spracheingabe",
+    "enterReminderDetails": "Erinnerungsdetails eingeben",
+    "naturalInputHint": "z.B. Besprechung morgen um 15 Uhr",
+    "anniversaryName": "Titel",
+    "pleaseEnterTitle": "Bitte geben Sie einen gültigen Titel ein",
+    "detectedDateTime": "Erkanntes Datum",
+    "lunar": "Lunar",
+    "recordingInProgress": "Aufnahme läuft...",
+    "processingAudio": "Audio wird verarbeitet...",
+    "recordingStartFailed": "Aufnahmestart fehlgeschlagen.",
+    "recordingStopFailed": "Aufnahmestopp fehlgeschlagen.",
+    "noRecordingPermission": "Keine Aufnahmeberechtigung",
+    "errorCheckingPermission": "Fehler beim Überprüfen der Berechtigung",
+    "detectedEventsTitle": "Erkannte Ereignisse",
+    "noTitlePlaceholder": "(Kein Titel)",
+    "noDatePlaceholder": "(Kein Datum)",
+    "notesTitle": "📌 Notizen:",
+    "selectEventsToSave": "Wählen Sie zu speichernde Ereignisse aus",
+    "saveSelectedEvents": "{count} ausgewählte Elemente speichern",
+    "@saveSelectedEvents": {
+      "description": "Schaltflächentext zum Speichern ausgewählter Ereignisse",
+      "placeholders": {
+        "count": {
+          "type": "int",
+          "example": "3"
+        }
+      }
+    },
+    "noValidEventsSelected": "Keine gültigen Ereignisse zum Speichern ausgewählt.",
+    "analyzingText": "Text wird analysiert...",
+    "multipleEventsDetected": "{count} Ereignisse erkannt, unten aufgelistet. Wählen Sie aus, welche verarbeitet werden sollen.",
+    "@multipleEventsDetected": {
+      "description": "Nachricht, wenn mehrere Ereignisse erkannt werden",
+      "placeholders": {
+        "count": {
+          "type": "int",
+          "example": "3"
+        }
+      }
+    },
+    "singleEventDetected": "1 Ereignis erkannt, unten aufgelistet.",
+    "noValidEventsDetected": "Keine gültigen Erinnerungsereignisse erkannt.",
+    "emptyStateMessage": "Noch keine Erinnerungen oder Feiertage,\nfügen Sie eine hinzu!",
+    "closeButton": "Schließen",
+    "today": "Heute",
+    "loadingRemindersError": "Fehler beim Laden der Erinnerungen",
+    "cannotOpenReminderDetails": "Erinnerungsdetails können nicht geöffnet werden, Daten sind möglicherweise nicht synchronisiert, bitte aktualisieren und erneut versuchen",
+    "deleteFailed": "Löschen fehlgeschlagen, bitte versuchen Sie es erneut",
+    
+    "holiday_NewYearDay": "Neujahr",
+    "holiday_ValentinesDay": "Valentinstag",
+    "holiday_EarthDay": "Tag der Erde",
+    "holiday_LabourDay": "Tag der Arbeit",
+    "holiday_ChildrensDay": "Kindertag",
+    "holiday_WorldEnvironmentDay": "Weltumwelttag",
+    "holiday_UNDay": "Tag der Vereinten Nationen",
+    "holiday_HumanRightsDay": "Tag der Menschenrechte",
+    "holiday_Easter": "Ostern",
+    "holiday_Halloween": "Halloween",
+    "holiday_Thanksgiving": "Erntedankfest",
+    "holiday_Christmas": "Weihnachten",
+    "holiday_NewYearsEve": "Silvester",
+    "holiday_MothersDay": "Muttertag",
+    "holiday_FathersDay": "Vatertag",
+    
+    "holiday_SpringFestival": "Chinesisches Neujahr",
+    "holiday_ChingMing": "Qingming-Fest",
+    "holiday_DragonBoatFestival": "Drachenbootfest",
+    "holiday_MidAutumnFestival": "Mittherbstfest",
+    "holiday_NationalDay": "Nationalfeiertag",
+    "holiday_LanternFestival": "Laternenfest",
+    "holiday_DoubleSeventhFestival": "Qixi-Fest",
+    "holiday_DoubleNinthFestival": "Doppelneunfest",
+    "holiday_LabaFestival": "Laba-Fest",
+    "holiday_TreePlantingDay": "Baumpflanztag",
+    
+    "aboutHoliday": "Über diesen Feiertag",
+    "holidayCustoms": "Feiertagsbräuche",
+    "statutoryHoliday": "Gesetzlicher Feiertag",
+    "traditionalHoliday": "Traditioneller Feiertag",
+    "memorialDay": "Gedenktag",
+    "otherHoliday": "Anderer Feiertag",
+    "holiday": "Feiertag",
+    "tomorrow": "Morgen",
+    "daysRemaining": "Noch {days} Tage",
+    "@daysRemaining": {
+      "description": "Verbleibende Tage bis zum Feiertag",
+      "placeholders": {
+        "days": {
+          "type": "int",
+          "example": "5"
+        }
+      }
+    },
+    
+    "genericCustom1": "Treffen mit Familie und Freunden",
+    "genericCustom2": "Vorbereitung spezieller Speisen und Dekorationen",
+    "genericCustom3": "Austausch von Geschenken und Grüßen",
+    
+    "holidayTaboos": "Zu vermeidende Dinge",
+    "genericTaboo1": "Negative Themen während der Feierlichkeiten vermeiden",
+    "genericTaboo2": "Bestimmte Speisen oder Aktivitäten vermeiden, die als unangemessen gelten könnten",
+    "genericTaboo3": "Lokale Bräuche und Traditionen respektieren",
+    
+    "holidayFilterTitle": "Feiertage filtern",
+    "holidayFilterDescription": "Wählen Sie die anzuzeigenden Feiertagstypen:",
+    "solarTerm": "Solartermine",
+    "applyButton": "Anwenden",
+    "cancelButton": "Abbrechen",
+    "filterHolidays": "Filtern",
+    "customEvent": "Benutzerdefiniertes Ereignis",
+    
+    "specialDaysRangeTitle": "Anzeigebereich für besondere Tage",
+    "specialDaysRangeDescription": "Wählen Sie, wie viele Tage im Voraus besondere Tage angezeigt werden sollen:",
+    "specialDaysRangeSubtitle": "Besondere Tage {days} Tage im Voraus anzeigen",
+    "daysText": "Tage",
+    
+    "holidayManagementTitle": "Feiertagsverwaltung",
+    "holidayManagementDescription": "Wichtigkeit und Anzeigeeinstellungen für Feiertage verwalten",
+    "importanceNormal": "Normal",
+    "importanceHigh": "Wichtig",
+    "importanceVeryHigh": "Sehr wichtig",
+    
+    "createHolidayTitle": "Neuen Feiertag erstellen",
+    "editHolidayTitle": "Feiertag bearbeiten",
+    "holidayNameLabel": "Feiertagsname (erforderlich)",
+    "holidayNameEnLabel": "Feiertagsname (Englisch)",
+    "holidayTypeLabel": "Feiertagstyp",
+    "holidayRegionsLabel": "Anwendbare Regionen",
+    "holidayCalculationTypeLabel": "Datumsberechnungstyp",
+    "holidayCalculationRuleLabel": "Berechnungsregel",
+    "holidayDescriptionLabel": "Beschreibung",
+    "holidayDescriptionEnLabel": "Beschreibung (Englisch)",
+    "holidayImportanceLabel": "Wichtigkeit",
+    "holidayIdLabel": "Feiertags-ID",
+    "holidayNameRequired": "Bitte geben Sie den Feiertagsnamen ein",
+    "holidayRegionRequired": "Bitte wählen Sie mindestens eine Region aus",
+    "holidayCalculationRuleRequired": "Bitte geben Sie die Berechnungsregel ein",
+    "holidayCalculationRuleHint": "z.B.: MM-TT (festes gregorianisches) oder MM-TTL (festes Mondkalender)",
+    "holidaySaveSuccess": "Feiertagsinformationen gespeichert",
+    "holidaySaveError": "Fehler beim Speichern der Feiertagsinformationen: {error}",
+    "@holidaySaveError": {
+      "description": "Fehlermeldung beim Speichern von Feiertagsinformationen",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    
+    "exportHolidaysTitle": "Feiertagsdaten exportieren",
+    "importHolidaysTitle": "Feiertagsdaten importieren",
+    "exportSuccess": "Daten erfolgreich exportiert",
+    "exportError": "Fehler beim Exportieren der Daten: {error}",
+    "@exportError": {
+      "description": "Fehlermeldung beim Exportieren von Daten",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "importSuccess": "{count} Feiertage importiert",
+    "@importSuccess": {
+      "description": "Erfolgsmeldung beim Importieren von Daten",
+      "placeholders": {
+        "count": {
+          "type": "int"
+        }
+      }
+    },
+    "importError": "Fehler beim Importieren der Daten: {error}",
+    "@importError": {
+      "description": "Fehlermeldung beim Importieren von Daten",
+      "placeholders": {
+        "error": {
+          "type": "String"
+        }
+      }
+    },
+    "confirmImportTitle": "Import bestätigen",
+    "confirmImportMessage": "Bestehende Daten werden überschrieben. Fortfahren?",
+    "dataSyncTitle": "Datensynchronisation",
+    "exportButton": "Exportieren",
+    "importButton": "Importieren",
+    "shareButton": "Teilen",
+    "lastExportTime": "Letzter Export: {time}",
+    "@lastExportTime": {
+      "description": "Zeit des letzten Datenexports",
+      "placeholders": {
+        "time": {
+          "type": "String"
+        }
+      }
+    }
+}

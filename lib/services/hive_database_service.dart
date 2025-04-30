@@ -3,6 +3,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:jinlin_app/models/holiday_model.dart';
 import 'package:jinlin_app/special_date.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:jinlin_app/services/holiday_cache_service.dart';
 
 /// Hive数据库服务
 ///
@@ -57,21 +58,122 @@ class HiveDatabaseService {
 
   /// 保存节日
   static Future<void> saveHoliday(HolidayModel holiday) async {
-    await _holidaysBox.put(holiday.id, holiday);
+    // 如果没有设置最后修改时间，则设置为当前时间
+    HolidayModel holidayToSave;
+    if (holiday.lastModified == null) {
+      // 创建一个带有当前时间的副本
+      holidayToSave = HolidayModel(
+        id: holiday.id,
+        name: holiday.name,
+        type: holiday.type,
+        regions: holiday.regions,
+        calculationType: holiday.calculationType,
+        calculationRule: holiday.calculationRule,
+        description: holiday.description,
+        importanceLevel: holiday.importanceLevel,
+        customs: holiday.customs,
+        taboos: holiday.taboos,
+        foods: holiday.foods,
+        greetings: holiday.greetings,
+        activities: holiday.activities,
+        history: holiday.history,
+        imageUrl: holiday.imageUrl,
+        userImportance: holiday.userImportance,
+        nameEn: holiday.nameEn,
+        descriptionEn: holiday.descriptionEn,
+        lastModified: DateTime.now(),
+      );
+      await _holidaysBox.put(holidayToSave.id, holidayToSave);
+      debugPrint("保存节日并更新最后修改时间: ${holidayToSave.id} (${holidayToSave.name})");
+    } else {
+      holidayToSave = holiday;
+      await _holidaysBox.put(holidayToSave.id, holidayToSave);
+      debugPrint("保存节日: ${holidayToSave.id} (${holidayToSave.name})");
+    }
+
+    // 更新缓存（而不是清除）
+    final cacheService = HolidayCacheService();
+    cacheService.updateCachedHoliday(holidayToSave);
+    debugPrint("保存节日后更新缓存: ${holidayToSave.id} (${holidayToSave.name})");
   }
 
   /// 批量保存节日
   static Future<void> saveHolidays(List<HolidayModel> holidays) async {
-    final Map<String, HolidayModel> holidaysMap = {
-      for (var holiday in holidays) holiday.id: holiday
-    };
+    final Map<String, HolidayModel> holidaysMap = {};
+    final List<HolidayModel> savedHolidays = [];
+
+    // 检查每个节日是否有最后修改时间，如果没有则设置为当前时间
+    for (var holiday in holidays) {
+      HolidayModel holidayToSave;
+      if (holiday.lastModified == null) {
+        // 创建一个带有当前时间的副本
+        holidayToSave = HolidayModel(
+          id: holiday.id,
+          name: holiday.name,
+          type: holiday.type,
+          regions: holiday.regions,
+          calculationType: holiday.calculationType,
+          calculationRule: holiday.calculationRule,
+          description: holiday.description,
+          importanceLevel: holiday.importanceLevel,
+          customs: holiday.customs,
+          taboos: holiday.taboos,
+          foods: holiday.foods,
+          greetings: holiday.greetings,
+          activities: holiday.activities,
+          history: holiday.history,
+          imageUrl: holiday.imageUrl,
+          userImportance: holiday.userImportance,
+          nameEn: holiday.nameEn,
+          descriptionEn: holiday.descriptionEn,
+          lastModified: DateTime.now(),
+        );
+      } else {
+        holidayToSave = holiday;
+      }
+
+      holidaysMap[holidayToSave.id] = holidayToSave;
+      savedHolidays.add(holidayToSave);
+    }
+
     await _holidaysBox.putAll(holidaysMap);
+
+    // 更新缓存（而不是清除）
+    final cacheService = HolidayCacheService();
+
+    // 如果保存的节日数量超过一定阈值，则清除缓存重新加载
+    // 这样可以避免大量更新时的性能问题
+    if (savedHolidays.length > 10) {
+      cacheService.clearCache();
+      debugPrint("批量保存 ${savedHolidays.length} 个节日后清除缓存（数量超过阈值）");
+    } else {
+      // 逐个更新缓存
+      for (var holiday in savedHolidays) {
+        cacheService.updateCachedHoliday(holiday);
+      }
+      debugPrint("批量保存 ${savedHolidays.length} 个节日后更新缓存");
+    }
   }
 
   /// 获取所有节日
   static List<HolidayModel> getAllHolidays() {
+    // 检查缓存
+    final cacheService = HolidayCacheService();
+    final cachedHolidays = cacheService.getCachedAllHolidays();
+
+    if (cachedHolidays != null) {
+      debugPrint("从缓存中获取 ${cachedHolidays.length} 个节日记录");
+      return cachedHolidays;
+    }
+
+    // 从数据库获取
     final holidays = _holidaysBox.values.toList();
-    debugPrint("数据库中共有 ${holidays.length} 个节日记录");
+    debugPrint("从数据库中获取 ${holidays.length} 个节日记录");
+
+    // 更新缓存
+    cacheService.cacheAllHolidays(holidays);
+    cacheService.isCacheValid = true;
+
     return holidays;
   }
 
@@ -99,13 +201,40 @@ class HiveDatabaseService {
 
   /// 根据ID获取节日
   static HolidayModel? getHolidayById(String id) {
-    return _holidaysBox.get(id);
+    // 检查缓存
+    final cacheService = HolidayCacheService();
+    final cachedHoliday = cacheService.getCachedHolidayById(id);
+
+    if (cachedHoliday != null) {
+      debugPrint("从缓存中获取节日: $id (${cachedHoliday.name})");
+      return cachedHoliday;
+    }
+
+    // 从数据库获取
+    final holiday = _holidaysBox.get(id);
+
+    // 更新缓存
+    if (holiday != null) {
+      cacheService.cacheHolidayById(id, holiday);
+      debugPrint("从数据库中获取节日: $id (${holiday.name})");
+    }
+
+    return holiday;
   }
 
   /// 根据地区获取节日
   static List<HolidayModel> getHolidaysByRegion(String region, {bool isChineseLocale = false}) {
+    // 检查缓存
+    final cacheService = HolidayCacheService();
+    final cachedHolidays = cacheService.getCachedHolidaysByRegion(region);
+
+    if (cachedHolidays != null) {
+      debugPrint("从缓存中获取 ${cachedHolidays.length} 个 $region 地区的节日");
+      return cachedHolidays;
+    }
+
     // 获取所有节日
-    final allHolidays = _holidaysBox.values.toList();
+    final allHolidays = getAllHolidays();
 
     // 创建一个映射，用于存储每个计算规则对应的最佳节日
     // 键是"计算规则"，值是节日模型
@@ -183,6 +312,11 @@ class HiveDatabaseService {
     }
 
     debugPrint("总共获取到 ${result.length} 个节日 (语言环境: ${isChineseLocale ? '中文' : '非中文'})");
+
+    // 更新缓存
+    cacheService.cacheHolidaysByRegion(region, result);
+    cacheService.isCacheValid = true;
+
     return result;
   }
 
@@ -196,19 +330,63 @@ class HiveDatabaseService {
   static Future<void> updateHolidayImportance(String holidayId, int importance) async {
     final holiday = _holidaysBox.get(holidayId);
     if (holiday != null) {
-      holiday.userImportance = importance;
-      await holiday.save();
+      // 创建一个带有更新重要性和最后修改时间的副本
+      final updatedHoliday = HolidayModel(
+        id: holiday.id,
+        name: holiday.name,
+        type: holiday.type,
+        regions: holiday.regions,
+        calculationType: holiday.calculationType,
+        calculationRule: holiday.calculationRule,
+        description: holiday.description,
+        importanceLevel: holiday.importanceLevel,
+        customs: holiday.customs,
+        taboos: holiday.taboos,
+        foods: holiday.foods,
+        greetings: holiday.greetings,
+        activities: holiday.activities,
+        history: holiday.history,
+        imageUrl: holiday.imageUrl,
+        userImportance: importance, // 更新重要性
+        nameEn: holiday.nameEn,
+        descriptionEn: holiday.descriptionEn,
+        lastModified: DateTime.now(), // 更新最后修改时间
+      );
+
+      await _holidaysBox.put(updatedHoliday.id, updatedHoliday);
+
+      // 更新缓存
+      final cacheService = HolidayCacheService();
+      cacheService.updateCachedHolidayImportance(holidayId, importance);
+      cacheService.updateCachedHoliday(updatedHoliday); // 同时更新节日缓存
+      debugPrint("更新节日重要性: ${holiday.id} (${holiday.name}) -> $importance");
     }
   }
 
   /// 获取节日重要性
   static Map<String, int> getHolidayImportance() {
+    // 检查缓存
+    final cacheService = HolidayCacheService();
+    final cachedImportance = cacheService.getCachedHolidayImportance();
+
+    if (cachedImportance != null) {
+      debugPrint("从缓存中获取 ${cachedImportance.length} 个节日重要性设置");
+      return cachedImportance;
+    }
+
+    // 从数据库获取
     final Map<String, int> result = {};
     for (var holiday in _holidaysBox.values) {
       if (holiday.userImportance > 0) {
         result[holiday.id] = holiday.userImportance;
       }
     }
+
+    // 更新缓存
+    cacheService.cacheHolidayImportance(result);
+    cacheService.isCacheValid = true;
+
+    debugPrint("从数据库中获取 ${result.length} 个节日重要性设置");
     return result;
   }
 
@@ -269,5 +447,20 @@ class HiveDatabaseService {
   static Future<void> clearHolidays() async {
     await _holidaysBox.clear();
     debugPrint('节日数据已清空');
+  }
+
+  /// 删除指定ID的节日
+  static Future<void> deleteHoliday(String id) async {
+    if (_holidaysBox.containsKey(id)) {
+      await _holidaysBox.delete(id);
+
+      // 只清除该节日的缓存，而不是清除所有缓存
+      final cacheService = HolidayCacheService();
+      cacheService.invalidateHolidayCache(id);
+
+      debugPrint('节日已删除: $id');
+    } else {
+      debugPrint('节日不存在，无法删除: $id');
+    }
   }
 }

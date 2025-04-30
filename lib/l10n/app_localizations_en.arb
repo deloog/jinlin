@@ -282,5 +282,77 @@
   "holidayManagementDescription": "Manage holiday importance and display settings",
   "importanceNormal": "Normal",
   "importanceHigh": "Important",
-  "importanceVeryHigh": "Very Important"
+  "importanceVeryHigh": "Very Important",
+
+  "exportHolidaysTitle": "Export Holidays",
+  "exportSuccess": "Holidays exported successfully",
+  "exportError": "Export error: {error}",
+  "@exportError": {
+    "description": "Error message when exporting holidays fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "File access error"
+      }
+    }
+  },
+  "confirmImportTitle": "Confirm Import",
+  "confirmImportMessage": "This will import holidays from a file. Existing holidays with the same ID will be overwritten. Continue?",
+  "importButton": "Import",
+  "importSuccess": "Successfully imported {count} holidays",
+  "@importSuccess": {
+    "description": "Success message when importing holidays",
+    "placeholders": {
+      "count": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "importError": "Import error: {error}",
+  "@importError": {
+    "description": "Error message when importing holidays fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Invalid file format"
+      }
+    }
+  },
+  "dataSyncTitle": "Data Synchronization",
+  "exportButton": "Export",
+  "importHolidaysTitle": "Import Holidays",
+  "lastExportTime": "Last export: {time}",
+  "@lastExportTime": {
+    "description": "Shows when holidays were last exported",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "2023-05-01 14:30"
+      }
+    }
+  },
+
+  "holidayNameRequired": "Holiday name is required",
+  "holidayRegionRequired": "Please select at least one region",
+  "holidayCalculationRuleRequired": "Calculation rule is required",
+  "holidaySaveSuccess": "Holiday saved successfully",
+  "holidaySaveError": "Error saving holiday: {error}",
+  "@holidaySaveError": {
+    "description": "Error message when saving a holiday fails",
+    "placeholders": {
+      "error": {
+        "type": "String",
+        "example": "Database error"
+      }
+    }
+  },
+  "createHolidayTitle": "Create Holiday",
+  "holidayIdLabel": "Holiday ID",
+  "holidayTypeLabel": "Holiday Type",
+  "holidayRegionsLabel": "Regions",
+  "holidayCalculationTypeLabel": "Calculation Type",
+  "holidayCalculationRuleLabel": "Calculation Rule",
+  "holidayCalculationRuleHint": "Format depends on calculation type",
+  "holidayImportanceLabel": "Importance"
   }

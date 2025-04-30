@@ -1,22 +1,22 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'holiday_model.dart';
+part of 'holiday_model_extended.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class HolidayModelAdapter extends TypeAdapter<HolidayModel> {
+class HolidayModelExtendedAdapter extends TypeAdapter<HolidayModelExtended> {
   @override
-  final int typeId = 0;
+  final int typeId = 11;
 
   @override
-  HolidayModel read(BinaryReader reader) {
+  HolidayModelExtended read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return HolidayModel(
+    return HolidayModelExtended(
       id: fields[0] as String,
       name: fields[1] as String,
       type: fields[2] as HolidayType,
@@ -36,13 +36,48 @@ class HolidayModelAdapter extends TypeAdapter<HolidayModel> {
       nameEn: fields[16] as String?,
       descriptionEn: fields[17] as String?,
       lastModified: fields[18] as DateTime?,
+      names: (fields[19] as Map?)?.cast<String, String>(),
+      descriptions: (fields[20] as Map?)?.cast<String, String>(),
+      customsMultilingual: (fields[21] as Map?)?.cast<String, String>(),
+      taboosMultilingual: (fields[22] as Map?)?.cast<String, String>(),
+      foodsMultilingual: (fields[23] as Map?)?.cast<String, String>(),
+      greetingsMultilingual: (fields[24] as Map?)?.cast<String, String>(),
+      activitiesMultilingual: (fields[25] as Map?)?.cast<String, String>(),
+      historyMultilingual: (fields[26] as Map?)?.cast<String, String>(),
+      contactId: fields[27] as String?,
+      contactName: fields[28] as String?,
+      contactRelation: fields[29] as String?,
+      contactAvatar: fields[30] as String?,
+      tags: (fields[31] as List?)?.cast<String>(),
+      groupId: fields[32] as String?,
+      aiGeneratedGreetings: (fields[33] as List?)?.cast<String>(),
+      aiGeneratedGiftSuggestions: (fields[34] as List?)
+          ?.map((dynamic e) => (e as Map).cast<String, dynamic>())
+          ?.toList(),
+      aiGeneratedTips: (fields[35] as Map?)?.cast<String, String>(),
+      reminderSettings: (fields[36] as List?)
+          ?.map((dynamic e) => (e as Map).cast<String, dynamic>())
+          ?.toList(),
+      isRepeating: fields[37] as bool,
+      repeatRule: fields[38] as String?,
+      isShared: fields[39] as bool,
+      sharedWith: (fields[40] as List?)?.cast<String>(),
+      sharingPermissions: (fields[41] as Map?)?.cast<String, bool>(),
+      lastSynced: fields[42] as DateTime?,
+      isSyncConflict: fields[43] as bool,
+      showLunarDate: fields[44] as bool,
+      customColor: fields[45] as String?,
+      customIcon: fields[46] as String?,
+      createdAt: fields[47] as DateTime?,
+      isExpired: fields[48] as bool,
+      isHidden: fields[49] as bool,
     );
   }
 
   @override
-  void write(BinaryWriter writer, HolidayModel obj) {
+  void write(BinaryWriter writer, HolidayModelExtended obj) {
     writer
-      ..writeByte(19)
+      ..writeByte(50)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -80,7 +115,69 @@ class HolidayModelAdapter extends TypeAdapter<HolidayModel> {
       ..writeByte(17)
       ..write(obj.descriptionEn)
       ..writeByte(18)
-      ..write(obj.lastModified);
+      ..write(obj.lastModified)
+      ..writeByte(19)
+      ..write(obj.names)
+      ..writeByte(20)
+      ..write(obj.descriptions)
+      ..writeByte(21)
+      ..write(obj.customsMultilingual)
+      ..writeByte(22)
+      ..write(obj.taboosMultilingual)
+      ..writeByte(23)
+      ..write(obj.foodsMultilingual)
+      ..writeByte(24)
+      ..write(obj.greetingsMultilingual)
+      ..writeByte(25)
+      ..write(obj.activitiesMultilingual)
+      ..writeByte(26)
+      ..write(obj.historyMultilingual)
+      ..writeByte(27)
+      ..write(obj.contactId)
+      ..writeByte(28)
+      ..write(obj.contactName)
+      ..writeByte(29)
+      ..write(obj.contactRelation)
+      ..writeByte(30)
+      ..write(obj.contactAvatar)
+      ..writeByte(31)
+      ..write(obj.tags)
+      ..writeByte(32)
+      ..write(obj.groupId)
+      ..writeByte(33)
+      ..write(obj.aiGeneratedGreetings)
+      ..writeByte(34)
+      ..write(obj.aiGeneratedGiftSuggestions)
+      ..writeByte(35)
+      ..write(obj.aiGeneratedTips)
+      ..writeByte(36)
+      ..write(obj.reminderSettings)
+      ..writeByte(37)
+      ..write(obj.isRepeating)
+      ..writeByte(38)
+      ..write(obj.repeatRule)
+      ..writeByte(39)
+      ..write(obj.isShared)
+      ..writeByte(40)
+      ..write(obj.sharedWith)
+      ..writeByte(41)
+      ..write(obj.sharingPermissions)
+      ..writeByte(42)
+      ..write(obj.lastSynced)
+      ..writeByte(43)
+      ..write(obj.isSyncConflict)
+      ..writeByte(44)
+      ..write(obj.showLunarDate)
+      ..writeByte(45)
+      ..write(obj.customColor)
+      ..writeByte(46)
+      ..write(obj.customIcon)
+      ..writeByte(47)
+      ..write(obj.createdAt)
+      ..writeByte(48)
+      ..write(obj.isExpired)
+      ..writeByte(49)
+      ..write(obj.isHidden);
   }
 
   @override
@@ -89,7 +186,7 @@ class HolidayModelAdapter extends TypeAdapter<HolidayModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is HolidayModelAdapter &&
+      other is HolidayModelExtendedAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }
@@ -292,6 +389,55 @@ class ImportanceLevelAdapter extends TypeAdapter<ImportanceLevel> {
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is ImportanceLevelAdapter &&
+          runtimeType == other.runtimeType &&
+          typeId == other.typeId;
+}
+
+class ReminderTypeAdapter extends TypeAdapter<ReminderType> {
+  @override
+  final int typeId = 10;
+
+  @override
+  ReminderType read(BinaryReader reader) {
+    switch (reader.readByte()) {
+      case 0:
+        return ReminderType.notification;
+      case 1:
+        return ReminderType.email;
+      case 2:
+        return ReminderType.sms;
+      case 3:
+        return ReminderType.alarm;
+      default:
+        return ReminderType.notification;
+    }
+  }
+
+  @override
+  void write(BinaryWriter writer, ReminderType obj) {
+    switch (obj) {
+      case ReminderType.notification:
+        writer.writeByte(0);
+        break;
+      case ReminderType.email:
+        writer.writeByte(1);
+        break;
+      case ReminderType.sms:
+        writer.writeByte(2);
+        break;
+      case ReminderType.alarm:
+        writer.writeByte(3);
+        break;
+    }
+  }
+
+  @override
+  int get hashCode => typeId.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ReminderTypeAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

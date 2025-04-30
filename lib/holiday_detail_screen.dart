@@ -61,7 +61,14 @@ class HolidayDetailScreen extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(holiday.typeIcon, color: holiday.getHolidayColor()),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              decoration: BoxDecoration(
+                color: holiday.getHolidayColor(),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(holiday.typeIcon, color: Colors.white, size: 20),
+            ),
           ),
         ],
       ),
@@ -77,7 +84,7 @@ class HolidayDetailScreen extends StatelessWidget {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(
-                  color: holiday.getHolidayColor().withValues(alpha: 77), // 0.3 * 255 ≈ 77
+                  color: holiday.getHolidayColor(),
                   width: 1.5,
                 ),
               ),
@@ -90,10 +97,10 @@ class HolidayDetailScreen extends StatelessWidget {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundColor: holiday.getHolidayColor().withValues(alpha: 51), // 0.2 * 255 ≈ 51
+                          backgroundColor: holiday.getHolidayColor().withValues(alpha: 255), // 使用完全不透明的背景
                           child: Icon(
                             holiday.typeIcon,
-                            color: holiday.getHolidayColor(),
+                            color: Colors.white, // 使用白色图标以增强对比度
                             size: 24,
                           ),
                         ),
@@ -164,9 +171,11 @@ class HolidayDetailScreen extends StatelessWidget {
                       children: [
                         Icon(Icons.public, color: theme.colorScheme.secondary),
                         const SizedBox(width: 8),
-                        Text(
-                          _getRegionsText(holiday.regions, l10n),
-                          style: theme.textTheme.bodyLarge,
+                        Expanded(
+                          child: Text(
+                            _getRegionsText(holiday.regions, l10n),
+                            style: theme.textTheme.bodyLarge,
+                          ),
                         ),
                       ],
                     ),
@@ -190,7 +199,9 @@ class HolidayDetailScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  holiday.description ?? '',
+                  isChinese
+                      ? (holiday.description ?? '')
+                      : (holiday.descriptionEn ?? holiday.description ?? ''),
                   style: theme.textTheme.bodyLarge,
                 ),
               ),

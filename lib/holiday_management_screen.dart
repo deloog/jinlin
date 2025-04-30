@@ -1,11 +1,21 @@
 // 文件： lib/holiday_management_screen.dart
 import 'package:flutter/material.dart';
-import 'package:jinlin_app/special_date.dart';
+import 'package:jinlin_app/special_date.dart' as special_date;
 import 'package:jinlin_app/services/holiday_storage_service.dart';
 import 'package:jinlin_app/services/hive_database_service.dart';
 import 'package:jinlin_app/services/holiday_migration_service.dart';
-import 'package:jinlin_app/models/holiday_model.dart' hide DateCalculationType, ImportanceLevel;
-import 'package:jinlin_app/adapters/holiday_adapter.dart';
+import 'package:jinlin_app/services/localization_service.dart';
+import 'package:jinlin_app/models/holiday_model.dart';
+import 'package:jinlin_app/holiday_edit_screen.dart';
+import 'package:jinlin_app/holiday_create_screen.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+// 导入类型别名，以避免命名冲突
+typedef SpecialDate = special_date.SpecialDate;
+typedef SpecialDateType = special_date.SpecialDateType;
+typedef DateCalculationType = special_date.DateCalculationType;
+typedef ImportanceLevel = special_date.ImportanceLevel;
+
 
 class HolidayManagementScreen extends StatefulWidget {
   const HolidayManagementScreen({super.key});
@@ -74,16 +84,20 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
 
     // 获取用户所在地区的节日
     if (mounted) {
+      // 获取当前语言环境
+      final isChineseLocale = Localizations.localeOf(context).languageCode == 'zh';
+
       if (migrationComplete) {
         // 如果数据库迁移已完成，从数据库获取节日
-        final holidayModels = HiveDatabaseService.getHolidaysByRegion(userRegion);
+        final holidayModels = HiveDatabaseService.getHolidaysByRegion(userRegion, isChineseLocale: isChineseLocale);
 
         // 将HolidayModel转换为SpecialDate
-        _allHolidays = HolidayAdapter.toSpecialDateList(holidayModels);
-        debugPrint("从Hive数据库加载了 ${_allHolidays.length} 个节日");
+        _allHolidays = _convertHolidayModelsToSpecialDates(holidayModels);
+        debugPrint("从Hive数据库加载了 ${_allHolidays.length} 个节日 (语言环境: ${isChineseLocale ? '中文' : '非中文'})");
       } else {
         // 如果数据库迁移未完成，使用本地存储服务获取节日
-        _allHolidays = HolidayStorageService.getHolidaysForRegion(context, userRegion);
+        final holidayModels = HolidayStorageService.getHolidaysForRegion(context, userRegion);
+        _allHolidays = _convertHolidayModelsToSpecialDates(holidayModels);
         debugPrint("从本地存储服务加载了 ${_allHolidays.length} 个节日");
       }
     }
@@ -205,14 +219,74 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
     return _holidayImportance[holidayId] ?? 0; // 默认为0（普通重要性）
   }
 
+  // 导航到节日编辑界面
+  Future<void> _navigateToEditScreen(String holidayId) async {
+    // 初始化Hive数据库
+    await HiveDatabaseService.initialize();
+
+    // 获取节日对象
+    final holidayModel = HiveDatabaseService.getHolidayById(holidayId);
+
+    if (holidayModel == null) {
+      if (mounted) {
+        final isChinese = LocalizationService.isChineseLocale(context);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(isChinese ? '找不到节日信息' : 'Holiday information not found')),
+        );
+      }
+      return;
+    }
+
+    // 导航到编辑界面
+    if (mounted) {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HolidayEditScreen(holiday: holidayModel),
+        ),
+      );
+
+      // 如果编辑成功，重新加载节日列表
+      if (result == true) {
+        await _loadHolidays();
+      }
+    }
+  }
+
+  // 导航到节日创建界面
+  Future<void> _navigateToCreateScreen() async {
+    if (mounted) {
+      final result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HolidayCreateScreen(),
+        ),
+      );
+
+      // 如果创建成功，重新加载节日列表
+      if (result == true) {
+        await _loadHolidays();
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isChinese = Localizations.localeOf(context).languageCode == 'zh';
+    final l10n = AppLocalizations.of(context);
+    final isChinese = LocalizationService.isChineseLocale(context);
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isChinese ? '节日管理' : 'Holiday Management'),
+        title: Text(l10n.holidayManagementTitle),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          // 添加创建按钮
+          IconButton(
+            icon: const Icon(Icons.add),
+            tooltip: isChinese ? '创建新节日' : 'Create New Holiday',
+            onPressed: _navigateToCreateScreen,
+          ),
+        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -221,9 +295,7 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    isChinese
-                      ? '设置节日的重要性，重要的节日将始终显示在时间线上'
-                      : 'Set the importance of holidays. Important holidays will always be displayed on the timeline.',
+                    l10n.holidayManagementDescription,
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                 ),
@@ -271,25 +343,37 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
           ListTile(
             title: Text(holiday.name),
             subtitle: Text(_getImportanceText(_getHolidayImportance(holiday.id), isChinese)),
-            trailing: DropdownButton<int>(
-              value: _getHolidayImportance(holiday.id),
-              onChanged: (int? newValue) async {
-                if (newValue != null) {
-                  await _setHolidayImportance(holiday.id, newValue);
-                }
-              },
-              items: [
-                DropdownMenuItem(
-                  value: 0,
-                  child: Text(isChinese ? '普通' : 'Normal'),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // 编辑按钮
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  tooltip: isChinese ? '编辑' : 'Edit',
+                  onPressed: () => _navigateToEditScreen(holiday.id),
                 ),
-                DropdownMenuItem(
-                  value: 1,
-                  child: Text(isChinese ? '重要' : 'Important'),
-                ),
-                DropdownMenuItem(
-                  value: 2,
-                  child: Text(isChinese ? '非常重要' : 'Very Important'),
+                // 重要性下拉菜单
+                DropdownButton<int>(
+                  value: _getHolidayImportance(holiday.id),
+                  onChanged: (int? newValue) async {
+                    if (newValue != null) {
+                      await _setHolidayImportance(holiday.id, newValue);
+                    }
+                  },
+                  items: [
+                    DropdownMenuItem(
+                      value: 0,
+                      child: Text(isChinese ? '普通' : 'Normal'),
+                    ),
+                    DropdownMenuItem(
+                      value: 1,
+                      child: Text(isChinese ? '重要' : 'Important'),
+                    ),
+                    DropdownMenuItem(
+                      value: 2,
+                      child: Text(isChinese ? '非常重要' : 'Very Important'),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -326,6 +410,95 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
         return isChinese ? '非常重要' : 'Very Important';
       default:
         return isChinese ? '普通' : 'Normal';
+    }
+  }
+
+  // 将HolidayModel列表转换为SpecialDate列表
+  List<SpecialDate> _convertHolidayModelsToSpecialDates(List<dynamic> models) {
+    final List<SpecialDate> result = [];
+
+    // 获取当前语言环境
+    final isChineseLocale = mounted && Localizations.localeOf(context).languageCode == 'zh';
+
+    for (final model in models) {
+      // 根据语言环境选择正确的名称和描述
+      final name = isChineseLocale || model.nameEn == null || model.nameEn.isEmpty
+          ? model.name
+          : model.nameEn;
+
+      final description = isChineseLocale || model.descriptionEn == null || model.descriptionEn.isEmpty
+          ? model.description
+          : model.descriptionEn;
+
+      // 创建SpecialDate对象
+      final specialDate = SpecialDate(
+        id: model.id,
+        name: name,
+        nameEn: model.nameEn,
+        type: _convertToSpecialDateType(model.type),
+        regions: model.regions,
+        calculationType: _convertToSpecialDateCalculationType(model.calculationType),
+        calculationRule: model.calculationRule,
+        description: description,
+        descriptionEn: model.descriptionEn,
+        importanceLevel: _convertToSpecialImportanceLevel(model.importanceLevel),
+        customs: model.customs,
+        taboos: model.taboos,
+        foods: model.foods,
+        greetings: model.greetings,
+        activities: model.activities,
+        history: model.history,
+        imageUrl: model.imageUrl,
+      );
+
+      result.add(specialDate);
+    }
+
+    return result;
+  }
+
+  // 类型转换辅助方法
+  SpecialDateType _convertToSpecialDateType(dynamic type) {
+    if (type == HolidayType.statutory) {
+      return SpecialDateType.statutory;
+    } else if (type == HolidayType.traditional) {
+      return SpecialDateType.traditional;
+    } else if (type == HolidayType.solarTerm) {
+      return SpecialDateType.solarTerm;
+    } else if (type == HolidayType.memorial) {
+      return SpecialDateType.memorial;
+    } else if (type == HolidayType.custom) {
+      return SpecialDateType.custom;
+    } else {
+      return SpecialDateType.other;
+    }
+  }
+
+  DateCalculationType _convertToSpecialDateCalculationType(
+      dynamic type) {
+    if (type == special_date.DateCalculationType.fixedGregorian) {
+      return DateCalculationType.fixedGregorian;
+    } else if (type == special_date.DateCalculationType.fixedLunar) {
+      return DateCalculationType.fixedLunar;
+    } else if (type == special_date.DateCalculationType.nthWeekdayOfMonth) {
+      return DateCalculationType.nthWeekdayOfMonth;
+    } else if (type == special_date.DateCalculationType.solarTermBased) {
+      return DateCalculationType.solarTermBased;
+    } else {
+      return DateCalculationType.relativeTo;
+    }
+  }
+
+  ImportanceLevel _convertToSpecialImportanceLevel(
+      dynamic level) {
+    if (level == special_date.ImportanceLevel.low) {
+      return ImportanceLevel.low;
+    } else if (level == special_date.ImportanceLevel.medium) {
+      return ImportanceLevel.medium;
+    } else if (level == special_date.ImportanceLevel.high) {
+      return ImportanceLevel.high;
+    } else {
+      return ImportanceLevel.low;
     }
   }
 }

@@ -4,6 +4,12 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'main.dart';
 import 'holiday_management_screen.dart';
+import 'holiday_sync_screen.dart';
+import 'cloud_sync_screen.dart';
+import 'package:jinlin_app/services/localization_service.dart';
+import 'package:jinlin_app/services/theme_service.dart';
+import 'package:jinlin_app/services/holiday_init_service.dart';
+import 'package:jinlin_app/services/layout_service.dart';
 
 
 class SettingsScreen extends StatefulWidget {
@@ -18,12 +24,34 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   String _currentNickname = '';
   int _specialDaysRange = 10; // 默认显示10天内的特殊纪念日
+  final ThemeService _themeService = ThemeService();
+  final LayoutService _layoutService = LayoutService();
 
   @override
   void initState() {
     super.initState();
     _loadNickname(); // 加载已保存的昵称
     _loadSpecialDaysRange(); // 加载特殊纪念日显示范围
+    _initThemeService(); // 初始化主题服务
+    _initLayoutService(); // 初始化布局服务
+  }
+
+  // 初始化布局服务
+  Future<void> _initLayoutService() async {
+    await _layoutService.initialize();
+    // 强制刷新UI以显示正确的布局设置
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  // 初始化主题服务
+  Future<void> _initThemeService() async {
+    await _themeService.initialize();
+    // 强制刷新UI以显示正确的主题模式
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Future<void> _loadNickname() async {
@@ -44,8 +72,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
       });
     }
   }
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final isChinese = LocalizationService.isChineseLocale(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.settingsTitle), // TODO: 本地化
@@ -95,6 +125,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _showLanguagePicker(context);
             },
           ),
+          // 主题切换选项
+          ListTile(
+            leading: Icon(_themeService.getThemeModeIcon()),
+            title: Text(isChinese ? '主题设置' : 'Theme Settings'),
+            subtitle: Text(_themeService.getThemeModeName(context, isChinese)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              _showThemePicker(context);
+            },
+          ),
           // 特殊纪念日显示范围设置
           ListTile(
             leading: const Icon(Icons.date_range),
@@ -103,6 +143,39 @@ class _SettingsScreenState extends State<SettingsScreen> {
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               _showSpecialDaysRangePicker(context);
+            },
+          ),
+
+          // 首页布局设置
+          ListTile(
+            leading: Icon(_layoutService.getHomeLayoutTypeIcon()),
+            title: Text(isChinese ? '首页布局' : 'Home Layout'),
+            subtitle: Text(_layoutService.getHomeLayoutTypeName(context, isChinese)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              _showHomeLayoutPicker(context);
+            },
+          ),
+
+          // 卡片样式设置
+          ListTile(
+            leading: Icon(_layoutService.getCardStyleTypeIcon()),
+            title: Text(isChinese ? '卡片样式' : 'Card Style'),
+            subtitle: Text(_layoutService.getCardStyleTypeName(context, isChinese)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              _showCardStylePicker(context);
+            },
+          ),
+
+          // 提醒优先级设置
+          ListTile(
+            leading: Icon(_layoutService.getReminderPriorityIcon()),
+            title: Text(isChinese ? '提醒优先级' : 'Reminder Priority'),
+            subtitle: Text(_layoutService.getReminderPriorityName(context, isChinese)),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              _showReminderPriorityPicker(context);
             },
           ),
 
@@ -137,14 +210,85 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           ListTile(
             leading: const Icon(Icons.import_export),
-            title: Text(l10n.settingsImportExportTitle), // TODO: 本地化
-             subtitle: Text(l10n.settingsImportExportSubtitle), // TODO: 本地化
+            title: Text(isChinese ? '本地数据同步' : 'Local Data Sync'),
+            subtitle: Text(isChinese ? '导入/导出节日数据' : 'Import/Export holiday data'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // TODO: 实现导入/导出逻辑 (需处理权限)
-               ScaffoldMessenger.of(context).showSnackBar(
-                 SnackBar(content: Text(l10n.settingsFeatureNotImplemented(l10n.settingsImportExportTitle))),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const HolidaySyncScreen(),
+                ),
               );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.cloud_sync),
+            title: Text(isChinese ? '云同步' : 'Cloud Sync'),
+            subtitle: Text(isChinese ? '在不同设备间同步数据' : 'Sync data between devices'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CloudSyncScreen(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.refresh),
+            title: Text(isChinese ? '重置全球节日数据' : 'Reset Global Holidays'),
+            subtitle: Text(isChinese ? '恢复默认的全球节日数据' : 'Restore default global holiday data'),
+            onTap: () async {
+              // 显示确认对话框
+              final bool? confirm = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: Text(isChinese ? '确认重置' : 'Confirm Reset'),
+                  content: Text(isChinese
+                    ? '这将重置所有全球节日数据到默认状态。您确定要继续吗？'
+                    : 'This will reset all global holiday data to default. Are you sure you want to continue?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: Text(isChinese ? '取消' : 'Cancel'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: Text(isChinese ? '重置' : 'Reset'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+              );
+
+              // 如果用户确认，执行重置
+              if (confirm == true) {
+                try {
+                  final holidayInitService = HolidayInitService();
+                  await holidayInitService.resetGlobalHolidays();
+
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(isChinese
+                        ? '全球节日数据已重置'
+                        : 'Global holiday data has been reset')),
+                    );
+                  }
+                } catch (e) {
+                  if (mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(isChinese
+                        ? '重置失败: $e'
+                        : 'Reset failed: $e')),
+                    );
+                  }
+                }
+              }
             },
           ),
 
@@ -363,5 +507,249 @@ class _SettingsScreenState extends State<SettingsScreen> {
         }
       }
     }
+  }
+
+  // 显示主题选择器
+  void _showThemePicker(BuildContext context) {
+    final isChinese = LocalizationService.isChineseLocale(context);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text(isChinese ? '主题设置' : 'Theme Settings'),
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () async {
+                await _themeService.setThemeMode(ThemeMode.light);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.wb_sunny),
+                title: Text(isChinese ? '浅色模式' : 'Light Mode'),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () async {
+                await _themeService.setThemeMode(ThemeMode.dark);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.nightlight_round),
+                title: Text(isChinese ? '深色模式' : 'Dark Mode'),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () async {
+                await _themeService.setThemeMode(ThemeMode.system);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.settings_brightness),
+                title: Text(isChinese ? '跟随系统' : 'System Mode'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 显示首页布局选择器
+  void _showHomeLayoutPicker(BuildContext context) {
+    final isChinese = LocalizationService.isChineseLocale(context);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text(isChinese ? '首页布局' : 'Home Layout'),
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () async {
+                await _layoutService.setHomeLayoutType(HomeLayoutType.timeline);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.timeline),
+                title: Text(isChinese ? '时间线视图' : 'Timeline View'),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () async {
+                await _layoutService.setHomeLayoutType(HomeLayoutType.calendar);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.calendar_month),
+                title: Text(isChinese ? '日历视图' : 'Calendar View'),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () async {
+                await _layoutService.setHomeLayoutType(HomeLayoutType.list);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.list),
+                title: Text(isChinese ? '列表视图' : 'List View'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 显示卡片样式选择器
+  void _showCardStylePicker(BuildContext context) {
+    final isChinese = LocalizationService.isChineseLocale(context);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text(isChinese ? '卡片样式' : 'Card Style'),
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () async {
+                await _layoutService.setCardStyleType(CardStyleType.standard);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.crop_square),
+                title: Text(isChinese ? '标准样式' : 'Standard Style'),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () async {
+                await _layoutService.setCardStyleType(CardStyleType.compact);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.crop_7_5),
+                title: Text(isChinese ? '紧凑样式' : 'Compact Style'),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () async {
+                await _layoutService.setCardStyleType(CardStyleType.expanded);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.crop_16_9),
+                title: Text(isChinese ? '展开样式' : 'Expanded Style'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 显示提醒优先级选择器
+  void _showReminderPriorityPicker(BuildContext context) {
+    final isChinese = LocalizationService.isChineseLocale(context);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: Text(isChinese ? '提醒优先级' : 'Reminder Priority'),
+          children: <Widget>[
+            SimpleDialogOption(
+              onPressed: () async {
+                await _layoutService.setReminderPriority(ReminderPriority.dateOrder);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.date_range),
+                title: Text(isChinese ? '按日期排序' : 'Date Order'),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () async {
+                await _layoutService.setReminderPriority(ReminderPriority.importanceFirst);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.priority_high),
+                title: Text(isChinese ? '重要性优先' : 'Importance First'),
+              ),
+            ),
+            SimpleDialogOption(
+              onPressed: () async {
+                await _layoutService.setReminderPriority(ReminderPriority.typeGrouped);
+                if (mounted) {
+                  setState(() {});
+                }
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: ListTile(
+                leading: const Icon(Icons.category),
+                title: Text(isChinese ? '按类型分组' : 'Type Grouped'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

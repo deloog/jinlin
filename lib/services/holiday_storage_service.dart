@@ -1,32 +1,31 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:jinlin_app/special_date.dart';
-import 'package:jinlin_app/data/special_days.dart' as special_days;
+import 'package:jinlin_app/models/holiday_model.dart';
+import 'package:jinlin_app/services/hive_database_service.dart';
 
 /// 节日存储服务
-/// 
+///
 /// 这是一个简单的本地存储服务，用于存储节日信息。
 /// 它使用 SharedPreferences 来存储节日重要性信息。
 /// 在未来，这个服务可以被替换为真正的数据库实现。
 class HolidayStorageService {
   static const String _holidayImportanceKey = 'holidayImportance';
-  
+
   /// 获取节日重要性
   static Future<Map<String, int>> getHolidayImportance() async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final String? importanceStr = prefs.getString(_holidayImportanceKey);
-      
+
       if (importanceStr == null) {
         return {};
       }
-      
+
       try {
         // 解析字符串格式 {key1: value1, key2: value2}
         final String cleanStr = importanceStr.replaceAll('{', '').replaceAll('}', '');
         final List<String> pairs = cleanStr.split(',');
-        
+
         final Map<String, int> importanceMap = {};
         for (final pair in pairs) {
           if (pair.trim().isEmpty) continue;
@@ -37,7 +36,7 @@ class HolidayStorageService {
             importanceMap[key] = value;
           }
         }
-        
+
         return importanceMap;
       } catch (parseError) {
         debugPrint("解析节日重要性字符串失败: $parseError");
@@ -48,7 +47,7 @@ class HolidayStorageService {
       return {};
     }
   }
-  
+
   /// 保存节日重要性
   static Future<bool> saveHolidayImportance(Map<String, int> importance) async {
     try {
@@ -60,7 +59,7 @@ class HolidayStorageService {
       return false;
     }
   }
-  
+
   /// 更新单个节日的重要性
   static Future<bool> updateHolidayImportance(String holidayId, int importanceLevel) async {
     try {
@@ -72,26 +71,19 @@ class HolidayStorageService {
       return false;
     }
   }
-  
+
   /// 获取用户所在地区的节日
-  static List<SpecialDate> getHolidaysForRegion(BuildContext context, String region) {
+  static List<HolidayModel> getHolidaysForRegion(BuildContext context, String region) {
     final isChinese = Localizations.localeOf(context).languageCode == 'zh';
-    
-    // 获取所有节日
-    final allHolidays = special_days.getSpecialDays(context);
-    
-    // 过滤出用户所在地区和国际性的节日
-    return allHolidays.where((holiday) => 
-      holiday.regions.contains(region) || 
-      holiday.regions.contains('INTL') || 
-      holiday.regions.contains('ALL')
-    ).toList();
+
+    // 从数据库获取所有节日
+    return HiveDatabaseService.getHolidaysByRegion(region, isChineseLocale: isChinese);
   }
-  
+
   /// 根据语言环境获取用户所在地区
   static String getUserRegion(BuildContext context) {
     final locale = Localizations.localeOf(context);
-    
+
     if (locale.languageCode == 'zh') {
       return 'CN'; // 中文用户显示中国节日
     } else if (locale.languageCode == 'en') {

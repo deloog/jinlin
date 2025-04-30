@@ -20,7 +20,7 @@ dependencies:
   speech_to_text: ^6.6.1 # 用于语音转文字
   permission_handler: ^11.3.1 # 用于处理权限请求
   flutter_dotenv: ^5.1.0 # 用于加载 .env 文件中的环境变量
-  uuid: ^4.4.0 # 用于生成唯一ID
+  # uuid已在下面定义
   intl: ^0.19.0 # 用于国际化和格式化
   collection: ^1.18.0 # 用于集合操作
   logging: ^1.2.0 # 用于日志记录
@@ -36,13 +36,24 @@ dependencies:
   hive: ^2.2.3 # 用于跨平台数据库
   hive_flutter: ^1.1.0 # Hive的Flutter扩展
   hive_generator: ^2.0.1 # 用于Hive模型生成
+  archive: ^3.4.10 # 用于压缩和解压缩
+  crypto: ^3.0.3 # 用于加密和解密
+  uuid: ^4.3.3 # 用于生成唯一ID
+  # permission_handler已在上面定义
+
+  # Firebase相关依赖
+  firebase_core: ^2.27.1 # Firebase核心功能
+  firebase_auth: ^4.17.9 # Firebase身份验证
+  cloud_firestore: ^4.15.9 # Firebase云数据库
+  firebase_storage: ^11.6.10 # Firebase云存储
+  google_sign_in: ^6.2.1 # Google登录
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^3.0.0
   mockito: ^5.4.5
-  build_runner: ^2.4.15 # 用于代码生成
+  build_runner: ^2.4.14 # 用于代码生成
 
 flutter:
   uses-material-design: true
