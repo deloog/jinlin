@@ -1,0 +1,79 @@
+{
+  "holidays": [
+    {
+      "id": "de_unity_day",
+      "names": {
+        "zh": "德国统一日",
+        "en": "German Unity Day",
+        "de": "Tag der Deutschen Einheit",
+        "fr": "Jour de l'Unité allemande"
+      },
+      "type": "statutory",
+      "regions": ["DE"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "10-03",
+      "descriptions": {
+        "zh": "德国统一日纪念1990年东德和西德重新统一，是德国的国庆节。",
+        "en": "German Unity Day commemorates the reunification of East and West Germany in 1990. It is the national day of Germany.",
+        "de": "Der Tag der Deutschen Einheit erinnert an die Wiedervereinigung von Ost- und Westdeutschland im Jahr 1990. Es ist der Nationalfeiertag Deutschlands."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "官方庆典、音乐会、游行",
+        "en": "Official ceremonies, concerts, parades",
+        "de": "Offizielle Zeremonien, Konzerte, Paraden"
+      }
+    },
+    {
+      "id": "de_oktoberfest",
+      "names": {
+        "zh": "慕尼黑啤酒节",
+        "en": "Oktoberfest",
+        "de": "Oktoberfest"
+      },
+      "type": "traditional",
+      "regions": ["DE"],
+      "calculation_type": "variable_rule",
+      "calculation_rule": "09-3-6",
+      "descriptions": {
+        "zh": "慕尼黑啤酒节是世界上最大的民间节日，每年吸引数百万游客。",
+        "en": "Oktoberfest is the world's largest folk festival, attracting millions of visitors each year.",
+        "de": "Das Oktoberfest ist das größte Volksfest der Welt und zieht jedes Jahr Millionen von Besuchern an."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "喝啤酒、穿传统服装、听民乐",
+        "en": "Drinking beer, wearing traditional costumes, listening to folk music",
+        "de": "Bier trinken, Trachten tragen, Volksmusik hören"
+      },
+      "foods": {
+        "zh": "啤酒、香肠、椒盐脆饼",
+        "en": "Beer, sausages, pretzels",
+        "de": "Bier, Würstchen, Brezeln"
+      }
+    },
+    {
+      "id": "de_st_nicholas_day",
+      "names": {
+        "zh": "圣尼古拉斯节",
+        "en": "St. Nicholas Day",
+        "de": "Nikolaustag"
+      },
+      "type": "traditional",
+      "regions": ["DE"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "12-06",
+      "descriptions": {
+        "zh": "圣尼古拉斯节是德国的传统节日，孩子们会在鞋子里收到礼物。",
+        "en": "St. Nicholas Day is a traditional German holiday when children receive gifts in their shoes.",
+        "de": "Der Nikolaustag ist ein traditioneller deutscher Feiertag, an dem Kinder Geschenke in ihren Schuhen erhalten."
+      },
+      "importance_level": "medium",
+      "customs": {
+        "zh": "放鞋子、收到礼物",
+        "en": "Putting out shoes, receiving gifts",
+        "de": "Schuhe rausstellen, Geschenke erhalten"
+      }
+    }
+  ]
+}

@@ -1,0 +1,116 @@
+{
+  "global_holidays": [
+    {
+      "id": "global_new_year",
+      "names": {
+        "zh": "新年",
+        "en": "New Year's Day",
+        "ja": "元旦",
+        "ko": "신정",
+        "fr": "Jour de l'An",
+        "de": "Neujahr"
+      },
+      "type": "statutory",
+      "regions": ["ALL"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "01-01",
+      "descriptions": {
+        "zh": "新年是世界各地普遍庆祝的节日，标志着新一年的开始。人们通常会举行各种庆祝活动，如烟花表演、家庭聚会等。",
+        "en": "New Year's Day is a global holiday celebrating the beginning of a new calendar year. People typically celebrate with fireworks, parties, and family gatherings."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "放烟花、倒数计时、新年愿望",
+        "en": "Fireworks, countdown, New Year resolutions"
+      },
+      "foods": {
+        "zh": "年夜饭、香槟",
+        "en": "New Year's Eve dinner, champagne"
+      },
+      "greetings": {
+        "zh": "新年快乐！",
+        "en": "Happy New Year!"
+      },
+      "activities": {
+        "zh": "跨年晚会、家庭聚餐",
+        "en": "New Year's Eve party, family gathering"
+      },
+      "history": {
+        "zh": "新年庆祝活动可以追溯到古罗马时期。",
+        "en": "New Year celebrations can be traced back to ancient Roman times."
+      }
+    },
+    {
+      "id": "global_valentines_day",
+      "names": {
+        "zh": "情人节",
+        "en": "Valentine's Day",
+        "ja": "バレンタインデー",
+        "ko": "발렌타인 데이",
+        "fr": "Saint-Valentin",
+        "de": "Valentinstag"
+      },
+      "type": "traditional",
+      "regions": ["ALL"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "02-14",
+      "descriptions": {
+        "zh": "情人节是恋人之间互表爱意的节日，通常会赠送鲜花、巧克力和贺卡。",
+        "en": "Valentine's Day is a holiday when lovers express their affection with greetings and gifts. It is celebrated in many countries around the world."
+      },
+      "importance_level": "medium",
+      "customs": {
+        "zh": "送花、送巧克力、送贺卡",
+        "en": "Giving flowers, chocolates, and cards"
+      }
+    },
+    {
+      "id": "global_labor_day",
+      "names": {
+        "zh": "国际劳动节",
+        "en": "International Labor Day",
+        "ja": "国際労働者の日",
+        "ko": "국제 노동절",
+        "fr": "Fête du Travail",
+        "de": "Tag der Arbeit"
+      },
+      "type": "statutory",
+      "regions": ["ALL"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "05-01",
+      "descriptions": {
+        "zh": "国际劳动节是世界上许多国家的法定假日，旨在庆祝工人阶级的贡献和成就。",
+        "en": "International Labor Day, also known as May Day, is a celebration of laborers and the working classes."
+      },
+      "importance_level": "high"
+    },
+    {
+      "id": "global_christmas",
+      "names": {
+        "zh": "圣诞节",
+        "en": "Christmas",
+        "ja": "クリスマス",
+        "ko": "크리스마스",
+        "fr": "Noël",
+        "de": "Weihnachten"
+      },
+      "type": "statutory",
+      "regions": ["ALL"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "12-25",
+      "descriptions": {
+        "zh": "圣诞节是基督教纪念耶稣诞生的节日，现已成为全球性的文化节日，人们会交换礼物、装饰圣诞树，与家人团聚。",
+        "en": "Christmas is an annual festival commemorating the birth of Jesus Christ. It is widely celebrated around the world, both as a religious and cultural event."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "装饰圣诞树、交换礼物、唱圣诞歌",
+        "en": "Decorating Christmas tree, exchanging gifts, singing carols"
+      },
+      "foods": {
+        "zh": "火鸡、圣诞蛋糕",
+        "en": "Turkey, Christmas cake"
+      }
+    }
+  ]
+}

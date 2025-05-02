@@ -1,0 +1,79 @@
+{
+  "holidays": [
+    {
+      "id": "fr_bastille_day",
+      "names": {
+        "zh": "法国国庆日",
+        "en": "Bastille Day",
+        "fr": "Fête nationale française",
+        "de": "Französischer Nationalfeiertag"
+      },
+      "type": "statutory",
+      "regions": ["FR"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "07-14",
+      "descriptions": {
+        "zh": "法国国庆日纪念1789年巴士底狱的攻陷，象征着法国大革命的开始和法兰西共和国的诞生。",
+        "en": "Bastille Day commemorates the Storming of the Bastille in 1789, which marked the beginning of the French Revolution and the birth of the French Republic.",
+        "fr": "La Fête nationale française commémore la prise de la Bastille en 1789, qui marque le début de la Révolution française et la naissance de la République française."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "阅兵、烟花表演、舞会",
+        "en": "Military parade, fireworks, public dances",
+        "fr": "Défilé militaire, feux d'artifice, bals populaires"
+      }
+    },
+    {
+      "id": "fr_chandeleur",
+      "names": {
+        "zh": "光明节",
+        "en": "Candlemas",
+        "fr": "La Chandeleur"
+      },
+      "type": "traditional",
+      "regions": ["FR"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "02-02",
+      "descriptions": {
+        "zh": "光明节是法国的传统节日，人们会吃可丽饼庆祝。",
+        "en": "Candlemas is a traditional French holiday when people eat crêpes.",
+        "fr": "La Chandeleur est une fête traditionnelle française où l'on mange des crêpes."
+      },
+      "importance_level": "medium",
+      "customs": {
+        "zh": "吃可丽饼、点蜡烛",
+        "en": "Eating crêpes, lighting candles",
+        "fr": "Manger des crêpes, allumer des bougies"
+      },
+      "foods": {
+        "zh": "可丽饼",
+        "en": "Crêpes",
+        "fr": "Crêpes"
+      }
+    },
+    {
+      "id": "fr_labor_day",
+      "names": {
+        "zh": "法国劳动节",
+        "en": "Labor Day",
+        "fr": "Fête du Travail"
+      },
+      "type": "statutory",
+      "regions": ["FR"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "05-01",
+      "descriptions": {
+        "zh": "法国劳动节是法国的法定假日，人们会赠送铃兰花。",
+        "en": "Labor Day is a public holiday in France when people give lily of the valley flowers.",
+        "fr": "La Fête du Travail est un jour férié en France où l'on offre du muguet."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "赠送铃兰花、游行",
+        "en": "Giving lily of the valley, parades",
+        "fr": "Offrir du muguet, défilés"
+      }
+    }
+  ]
+}

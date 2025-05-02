@@ -13,7 +13,7 @@ import 'package:jinlin_app/services/holiday_init_service.dart';
 import 'package:jinlin_app/services/layout_service.dart';
 import 'package:jinlin_app/providers/app_settings_provider.dart';
 import 'package:jinlin_app/screens/settings/language_settings_screen.dart';
-import 'package:jinlin_app/admin/admin_main.dart'; // 管理后台
+import 'package:jinlin_app/admin/admin_dashboard.dart'; // 管理后台仪表盘
 import 'package:jinlin_app/services/database_manager_unified.dart'; // 统一数据库管理服务
 import 'package:jinlin_app/pages/settings/database_performance_page.dart'; // 数据库性能测试页面
 
@@ -248,7 +248,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const AdminApp(),
+                  builder: (context) => Provider<DatabaseManagerUnified>(
+                    create: (_) => DatabaseManagerUnified(),
+                    dispose: (_, db) => db.close(),
+                    child: const AdminDashboard(),
+                  ),
                 ),
               );
             },
