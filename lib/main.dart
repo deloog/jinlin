@@ -357,6 +357,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     if (mounted) {
       final appSettings = Provider.of<AppSettingsProvider>(context, listen: false);
       appSettings.updateLocale(locale);
+
+      // 通知所有需要刷新的页面
+      EventBus.instance.fire(RefreshTimelineEvent());
+      debugPrint('语言已更改为 ${locale.languageCode}，已发送刷新事件');
     }
   }
 
@@ -1613,8 +1617,36 @@ Future<void> _prepareTimelineItems() async {
         debugPrint('当前语言: $currentLanguageCode, 用户地区: $userRegion');
 
         // 获取用户所在地区的节日
-        final holidays = await dbManager.getHolidaysByRegion(userRegion, languageCode: currentLanguageCode);
-        debugPrint('从数据库获取到${holidays.length}个节日');
+        List<models.Holiday> holidays = [];
+
+        // 根据当前语言获取对应地区的节日
+        if (currentLanguageCode == 'ja') {
+          // 日语 - 获取日本节日
+          holidays = await dbManager.getHolidaysByRegion('JP', languageCode: currentLanguageCode);
+          debugPrint('从数据库获取到${holidays.length}个日本节日');
+        } else if (currentLanguageCode == 'ko') {
+          // 韩语 - 获取韩国节日
+          holidays = await dbManager.getHolidaysByRegion('KR', languageCode: currentLanguageCode);
+          debugPrint('从数据库获取到${holidays.length}个韩国节日');
+        } else if (currentLanguageCode == 'fr') {
+          // 法语 - 获取法国节日
+          holidays = await dbManager.getHolidaysByRegion('FR', languageCode: currentLanguageCode);
+          debugPrint('从数据库获取到${holidays.length}个法国节日');
+        } else if (currentLanguageCode == 'de') {
+          // 德语 - 获取德国节日
+          holidays = await dbManager.getHolidaysByRegion('DE', languageCode: currentLanguageCode);
+          debugPrint('从数据库获取到${holidays.length}个德国节日');
+        } else {
+          // 其他语言 - 获取用户所在地区的节日
+          holidays = await dbManager.getHolidaysByRegion(userRegion, languageCode: currentLanguageCode);
+          debugPrint('从数据库获取到${holidays.length}个${userRegion}地区节日');
+        }
+
+        // 如果没有获取到节日数据，尝试获取国际节日
+        if (holidays.isEmpty) {
+          holidays = await dbManager.getHolidaysByRegion('INTL', languageCode: currentLanguageCode);
+          debugPrint('从数据库获取到${holidays.length}个国际节日');
+        }
 
         // 将Holiday转换为SpecialDate
         final specialDays = holidays.map((holiday) {

@@ -298,5 +298,9 @@
     "regionKorea": "韓国",
     "regionFrance": "フランス",
     "regionGermany": "ドイツ",
-    "regionInternational": "国際"
+    "regionInternational": "国際",
+
+    "translationAlmostComplete": "翻訳はほぼ完了しています",
+    "translationPartiallyComplete": "翻訳進行中",
+    "translationInProgress": "翻訳が不完全です"
 }

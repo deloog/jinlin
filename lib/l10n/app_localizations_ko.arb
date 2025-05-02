@@ -298,5 +298,9 @@
     "regionKorea": "한국",
     "regionFrance": "프랑스",
     "regionGermany": "독일",
-    "regionInternational": "국제"
+    "regionInternational": "국제",
+
+    "translationAlmostComplete": "번역이 거의 완료되었습니다",
+    "translationPartiallyComplete": "번역 진행 중",
+    "translationInProgress": "번역이 불완전합니다"
 }
