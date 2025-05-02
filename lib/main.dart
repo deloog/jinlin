@@ -8,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'dart:convert';
+import 'dart:io'; // 导入IO包，用于文件操作
 import 'reminder.dart';
 import 'add_reminder_screen.dart'; // 确保导入了 AddReminderScreen
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -32,6 +33,7 @@ import 'package:jinlin_app/services/localization_service.dart' as localization; 
 import 'package:jinlin_app/providers/app_settings_provider.dart'; // 应用设置提供者
 import 'package:jinlin_app/services/database_manager_unified.dart'; // 统一数据库管理服务
 import 'package:jinlin_app/models/unified/holiday.dart' as models; // 统一的节日模型
+import 'package:jinlin_app/services/error_handling_service.dart'; // 错误处理服务
 
 import 'widgets/page_transitions.dart';
 import 'widgets/card_icon.dart';
@@ -39,28 +41,68 @@ import 'widgets/card_icon.dart';
 // 创建一个全局的 NavigatorKey，用于在没有 context 的情况下访问 Navigator
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+// 全局错误日志文件
+File? _errorLogFile;
+
+// 初始化错误日志文件
+void _initErrorLogFile() {
+  try {
+    // 检查是否在Web平台上运行
+    if (kIsWeb) {
+      debugPrint('在Web平台上运行，跳过文件日志初始化');
+      return;
+    }
+
+    final appDir = Directory.current;
+    _errorLogFile = File('${appDir.path}/jinlin_app_error_log.txt');
+    _logErrorToFile('=== 错误日志初始化 ${DateTime.now()} ===');
+  } catch (e) {
+    debugPrint('错误日志初始化失败: $e');
+  }
+}
+
+// 记录错误到文件
+void _logErrorToFile(String message) {
+  try {
+    // 检查是否在Web平台上运行
+    if (kIsWeb) {
+      // 在Web平台上，只使用控制台输出
+      debugPrint('[ERROR] $message');
+      return;
+    }
+
+    _errorLogFile?.writeAsStringSync('${DateTime.now()}: $message\n', mode: FileMode.append);
+  } catch (e) {
+    // 忽略日志写入错误
+    debugPrint('写入错误日志失败: $e');
+  }
+}
+
 // 全局错误处理函数
 void _handleError(Object error, StackTrace stack) {
   debugPrint('=== 捕获到全局错误 ===');
   debugPrint('错误: $error');
   debugPrint('堆栈: $stack');
+
+  // 确保错误日志文件已初始化
+  if (_errorLogFile == null) {
+    _initErrorLogFile();
+  }
+
+  // 记录错误到文件
+  _logErrorToFile('=== 捕获到全局错误 ===');
+  _logErrorToFile('错误: $error');
+  _logErrorToFile('堆栈: $stack');
+
   // 这里可以添加错误上报逻辑
 }
 
 Future<void> main() async {
-  // 设置全局错误处理
-  FlutterError.onError = (FlutterErrorDetails details) {
-    debugPrint('=== 捕获到Flutter错误 ===');
-    debugPrint('错误: ${details.exception}');
-    debugPrint('堆栈: ${details.stack}');
-    // 这里可以添加错误上报逻辑
-  };
+  // 初始化错误日志文件
+  _initErrorLogFile();
 
-  // 捕获未处理的异步错误
-  PlatformDispatcher.instance.onError = (error, stack) {
-    _handleError(error, stack);
-    return true; // 返回true表示错误已处理
-  };
+  // 初始化错误处理服务
+  errorHandlingService.initialize();
 
   try {
     debugPrint('=== 应用启动 ===');
@@ -68,6 +110,45 @@ Future<void> main() async {
 
     WidgetsFlutterBinding.ensureInitialized();
     debugPrint('Flutter绑定初始化完成');
+
+    // 添加文件日志记录
+    try {
+      // 检查是否在Web平台上运行
+      if (kIsWeb) {
+        debugPrint('=== 应用启动 ${DateTime.now()} ===');
+        debugPrint('平台: ${defaultTargetPlatform.name}');
+        debugPrint('在Web平台上运行，跳过文件日志初始化');
+        debugPrint('应用版本: 1.0.0');
+        debugPrint('设备信息: ${defaultTargetPlatform.name}');
+      } else {
+        // 获取应用文档目录
+        final appDir = Directory.current;
+        final logFile = File('${appDir.path}/jinlin_app_log.txt');
+
+        // 写入启动日志
+        logFile.writeAsStringSync(
+          '=== 应用启动 ${DateTime.now()} ===\n平台: ${defaultTargetPlatform.name}\n',
+          mode: FileMode.append,
+        );
+
+        // 创建自定义日志函数
+        void logToFile(String message) {
+          try {
+            logFile.writeAsStringSync('${DateTime.now()}: $message\n', mode: FileMode.append);
+          } catch (e) {
+            // 忽略日志写入错误
+          }
+        }
+
+        // 记录一些基本信息
+        logToFile('日志系统初始化成功');
+        logToFile('应用版本: 1.0.0');
+        logToFile('设备信息: ${defaultTargetPlatform.name}');
+      }
+    } catch (e, stack) {
+      debugPrint('日志系统初始化失败: $e');
+      debugPrint('堆栈: $stack');
+    }
 
     // 初始化Firebase
     try {
@@ -114,41 +195,67 @@ Future<void> main() async {
   // 等待框架渲染第一帧
   await Future.delayed(const Duration(milliseconds: 100));
 
-  // 使用统一的数据库管理服务
-  final dbManager = DatabaseManagerUnified();
+  try {
+    debugPrint("开始初始化数据库和服务...");
 
-  // 初始化数据库和节日数据
-  // 不使用 BuildContext 初始化数据库，避免跨异步间隙使用 BuildContext
-  final success = await dbManager.initialize(null);
-  if (!success) {
-    debugPrint("数据库初始化失败，将使用默认设置");
+    // 初始化AppSettingsProvider
+    final appSettingsProvider = AppSettingsProvider();
+    await appSettingsProvider.initialize();
+    debugPrint("AppSettingsProvider初始化成功");
+
+    // 初始化DatabaseManagerUnified
+    final dbManager = DatabaseManagerUnified();
+    try {
+      await dbManager.initialize(null);
+      debugPrint("DatabaseManagerUnified初始化成功");
+    } catch (e) {
+      debugPrint("DatabaseManagerUnified初始化失败: $e");
+      // 继续执行，不要因为数据库初始化失败而中断整个流程
+    }
+
+    // 运行实际应用，使用Provider包装
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => appSettingsProvider),
+          Provider<DatabaseManagerUnified>(
+            create: (_) => DatabaseManagerUnified(),
+            dispose: (_, db) => db.close(),
+          ),
+        ],
+        child: const MyApp(),
+      ),
+    );
+
+    debugPrint("应用程序启动成功");
+  } catch (e, stack) {
+    debugPrint("初始化过程中出错: $e");
+    debugPrint("堆栈: $stack");
+    _logErrorToFile("初始化过程中出错: $e");
+    _logErrorToFile("堆栈: $stack");
+
+    // 如果初始化失败，运行一个简单的应用程序
+    runApp(MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text('应用程序初始化失败'),
+              Text('错误: $e'),
+              ElevatedButton(
+                onPressed: () {
+                  // 重新启动应用程序
+                  main();
+                },
+                child: const Text('重试'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ));
   }
-
-  // 启用自动同步服务
-  final autoSyncService = AutoSyncService();
-  await autoSyncService.initialize();
-
-  // 初始化AppSettingsProvider
-  final appSettingsProvider = AppSettingsProvider();
-  await appSettingsProvider.initialize();
-
-  // 创建增强版数据库管理器
-  final dbManagerEnhanced = DatabaseManagerEnhanced();
-  await dbManagerEnhanced.initialize(null); // 不使用 BuildContext 初始化
-
-  // 运行实际应用，使用Provider包装
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => appSettingsProvider),
-        // 添加数据库管理服务提供者
-        Provider<DatabaseManagerUnified>.value(value: dbManager),
-        // 添加增强版数据库管理服务提供者
-        ChangeNotifierProvider<DatabaseManagerEnhanced>.value(value: dbManagerEnhanced),
-      ],
-      child: const MyApp(),
-    ),
-  );
 }
 
 class MyApp extends StatefulWidget {
@@ -168,15 +275,81 @@ class MyApp extends StatefulWidget {
   @override
   State<MyApp> createState() => _MyAppState();
 }
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   int _specialDaysRange = 10; // 默认显示10天内的特殊纪念日
   final ThemeService _themeService = ThemeService();
+
+  // 日志文件
+  File? _logFile;
+
+  // 记录日志到文件
+  void _logToFile(String message) {
+    try {
+      // 检查是否在Web平台上运行
+      if (kIsWeb) {
+        // 在Web平台上，只使用控制台输出
+        debugPrint('[UI] $message');
+        return;
+      }
+
+      _logFile?.writeAsStringSync('${DateTime.now()}: $message\n', mode: FileMode.append);
+    } catch (e) {
+      // 忽略日志写入错误
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+
+    // 添加观察者以监听应用生命周期变化
+    WidgetsBinding.instance.addObserver(this);
+
+    // 初始化日志文件
+    try {
+      // 检查是否在Web平台上运行
+      if (kIsWeb) {
+        debugPrint('=== UI初始化 ${DateTime.now()} ===');
+        debugPrint('在Web平台上运行，跳过UI日志文件初始化');
+      } else {
+        final appDir = Directory.current;
+        _logFile = File('${appDir.path}/jinlin_app_ui_log.txt');
+        _logToFile('=== UI初始化 ${DateTime.now()} ===');
+      }
+    } catch (e) {
+      debugPrint('UI日志初始化失败: $e');
+    }
+
     _loadSpecialDaysRange(); // 加载特殊纪念日显示范围
     _initThemeService(); // 初始化主题服务
+
+    // 设置错误处理
+    FlutterError.onError = (FlutterErrorDetails details) {
+      _logToFile('UI错误: ${details.exception}');
+      _logToFile('堆栈: ${details.stack}');
+      FlutterError.presentError(details); // 仍然显示错误
+    };
+  }
+
+  @override
+  void dispose() {
+    // 移除观察者
+    WidgetsBinding.instance.removeObserver(this);
+    _logToFile('=== UI销毁 ${DateTime.now()} ===');
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // 记录应用生命周期变化
+    _logToFile('应用生命周期状态变化: $state');
+
+    // 如果应用进入后台，确保日志写入
+    if (state == AppLifecycleState.paused) {
+      _logToFile('应用进入后台');
+    } else if (state == AppLifecycleState.resumed) {
+      _logToFile('应用回到前台');
+    }
   }
 
   // 更新应用程序语言
@@ -238,7 +411,7 @@ class _MyAppState extends State<MyApp> {
 
     return MaterialApp(
       locale: appSettings.locale,
-      navigatorKey: navigatorKey, // 使用全局定义的 navigatorKey
+      navigatorKey: errorHandlingService.navigatorKey, // 使用错误处理服务的 navigatorKey
       title: 'CetaMind Reminder',
       theme: _themeService.lightTheme,
       darkTheme: _themeService.darkTheme,
@@ -252,6 +425,32 @@ class _MyAppState extends State<MyApp> {
       supportedLocales: localization.LocalizationService.supportedLocales,
       home: const MyHomePage(title: 'CetaMind Reminder'),
       debugShowCheckedModeBanner: false,
+      // 添加错误构建器，用于处理路由错误
+      builder: (context, child) {
+        // 添加错误边界
+        ErrorWidget.builder = (FlutterErrorDetails details) {
+          return Material(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.error, color: Colors.red, size: 60),
+                  const SizedBox(height: 16),
+                  Text('应用程序遇到了问题', style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text('返回'),
+                  ),
+                ],
+              ),
+            ),
+          );
+        };
+        return child ?? const SizedBox.shrink();
+      },
     );
   }
 }
@@ -264,13 +463,52 @@ class MyHomePage extends StatefulWidget {
 }
 
 // _MyHomePageState 类开始
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with WidgetsBindingObserver {
   List<Reminder> _reminders = [];
   bool _isLoading = true;
   List<TimelineItem> _sortedTimelineItems = [];
 
   // 事件订阅
   late StreamSubscription _eventSubscription;
+
+  // 日志文件
+  File? _logFile;
+
+  // 记录日志到文件
+  void _logToFile(String message) {
+    try {
+      // 检查是否在Web平台上运行
+      if (kIsWeb) {
+        // 在Web平台上，只使用控制台输出
+        debugPrint('[首页] $message');
+        return;
+      }
+
+      _logFile?.writeAsStringSync('${DateTime.now()}: $message\n', mode: FileMode.append);
+    } catch (e) {
+      // 忽略日志写入错误
+    }
+  }
+
+  // 记录错误到全局错误日志文件
+  void _logErrorToFile(String message) {
+    try {
+      // 检查是否在Web平台上运行
+      if (kIsWeb) {
+        // 在Web平台上，只使用控制台输出
+        debugPrint('[ERROR][首页] $message');
+        return;
+      }
+
+      if (_errorLogFile == null) {
+        _initErrorLogFile();
+      }
+      _errorLogFile?.writeAsStringSync('${DateTime.now()}: [首页] $message\n', mode: FileMode.append);
+    } catch (e) {
+      // 忽略日志写入错误
+      debugPrint('写入错误日志失败: $e');
+    }
+  }
 
   // 节日筛选状态
   Set<special_date.SpecialDateType> _selectedHolidayTypes = {
@@ -283,12 +521,30 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    // 初始化状态，但不调用依赖于 context 的方法
+
+    // 添加观察者以监听应用生命周期变化
+    WidgetsBinding.instance.addObserver(this);
+
+    // 初始化日志文件
+    try {
+      // 检查是否在Web平台上运行
+      if (kIsWeb) {
+        debugPrint('=== 首页初始化 ${DateTime.now()} ===');
+        debugPrint('在Web平台上运行，跳过首页日志文件初始化');
+      } else {
+        final appDir = Directory.current;
+        _logFile = File('${appDir.path}/jinlin_app_home_log.txt');
+        _logToFile('=== 首页初始化 ${DateTime.now()} ===');
+      }
+    } catch (e) {
+      debugPrint('首页日志初始化失败: $e');
+    }
 
     // 监听刷新时间线事件
     _eventSubscription = EventBus.instance.on.listen((event) {
       if (event is RefreshTimelineEvent) {
         // 收到刷新事件，重新加载时间线
+        _logToFile('收到刷新时间线事件');
         _prepareTimelineItems();
       }
     });
@@ -301,7 +557,17 @@ class _MyHomePageState extends State<MyHomePage> {
   void dispose() {
     // 取消事件订阅
     _eventSubscription.cancel();
+
+    // 移除观察者
+    WidgetsBinding.instance.removeObserver(this);
+    _logToFile('=== 首页销毁 ${DateTime.now()} ===');
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // 记录应用生命周期变化
+    _logToFile('首页生命周期状态变化: $state');
   }
 
   // 标记是否已经加载过数据
@@ -320,22 +586,36 @@ class _MyHomePageState extends State<MyHomePage> {
   // 从 SharedPreferences 加载提醒列表
   Future<void> _loadReminders() async {
     if (!mounted) return;
+    _logToFile('开始加载提醒列表');
     setState(() { _isLoading = true; });
     try {
       final prefs = await SharedPreferences.getInstance();
       final String? remindersString = prefs.getString('reminders');
       if (remindersString != null) {
+        _logToFile('从SharedPreferences加载到提醒数据，长度: ${remindersString.length}');
         final List<dynamic> reminderJson = jsonDecode(remindersString);
+        _logToFile('JSON解码成功，项目数量: ${reminderJson.length}');
+
         final loadedReminders = reminderJson
             .map((json) => Reminder.fromJson(json))
             .whereType<Reminder>() // 确保转换成功
             .toList();
+        _logToFile('成功转换为Reminder对象，数量: ${loadedReminders.length}');
+
         if (mounted) {
           setState(() { _reminders = loadedReminders; });
+          _logToFile('已更新状态，设置_reminders');
         }
+      } else {
+        _logToFile('SharedPreferences中没有找到提醒数据');
       }
-    } catch (e) {
+    } catch (e, stack) {
       debugPrint("加载提醒事项失败: $e");
+      _logToFile("加载提醒事项失败: $e");
+      _logToFile("堆栈: $stack");
+      _logErrorToFile("加载提醒事项失败: $e");
+      _logErrorToFile("堆栈: $stack");
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('加载提醒事项失败')),
@@ -344,18 +624,27 @@ class _MyHomePageState extends State<MyHomePage> {
     } finally {
       if (mounted) {
           setState(() { _isLoading = false; });
+          _logToFile('加载完成，设置_isLoading = false');
       }
     }
   } // _loadReminders 结束
 
   // 保存提醒列表到 SharedPreferences
   Future<void> _saveReminders() async {
+    _logToFile('开始保存提醒列表，数量: ${_reminders.length}');
     try {
       final prefs = await SharedPreferences.getInstance();
       final String remindersString = jsonEncode(_reminders.map((r) => r.toJson()).toList());
+      _logToFile('JSON编码成功，数据长度: ${remindersString.length}');
       await prefs.setString('reminders', remindersString);
-    } catch (e) {
+      _logToFile('提醒列表保存成功');
+    } catch (e, stack) {
       debugPrint("保存提醒事项失败: $e");
+      _logToFile("保存提醒事项失败: $e");
+      _logToFile("堆栈: $stack");
+      _logErrorToFile("保存提醒事项失败: $e");
+      _logErrorToFile("堆栈: $stack");
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('保存提醒事项失败')),
@@ -384,12 +673,20 @@ class _MyHomePageState extends State<MyHomePage> {
 
 // 您可能需要一个像这样的辅助方法来直接保存列表
 Future<void> _saveRemindersDirectly(List<Reminder> remindersToSave) async {
+   _logToFile('开始直接保存提醒列表，数量: ${remindersToSave.length}');
    try {
      final prefs = await SharedPreferences.getInstance();
      final String remindersString = jsonEncode(remindersToSave.map((r) => r.toJson()).toList());
+     _logToFile('JSON编码成功，数据长度: ${remindersString.length}');
      await prefs.setString('reminders', remindersString);
-   } catch (e) {
+     _logToFile('提醒列表直接保存成功');
+   } catch (e, stack) {
      debugPrint("直接保存提醒事项失败: $e");
+     _logToFile("直接保存提醒事项失败: $e");
+     _logToFile("堆栈: $stack");
+     _logErrorToFile("直接保存提醒事项失败: $e");
+     _logErrorToFile("堆栈: $stack");
+
      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('保存提醒事项失败')),
@@ -1160,11 +1457,26 @@ Widget _buildHolidayCard(BuildContext context, special_date.SpecialDate holiday,
 // --- 粘贴开始：用这段完整代码替换你原来的 _prepareTimelineItems 方法 ---
 Future<void> _prepareTimelineItems() async {
   debugPrint('=== 开始准备时间线项目 ===');
+  _logToFile('=== 开始准备时间线项目 ===');
 
-  // 如果 widget 不再显示，则不执行后续操作
-  if (!mounted) {
-    debugPrint('组件已卸载，取消准备时间线');
-    return;
+  try {
+    // 如果 widget 不再显示，则不执行后续操作
+    if (!mounted) {
+      debugPrint('组件已卸载，取消准备时间线');
+      _logToFile('组件已卸载，取消准备时间线');
+      return;
+    }
+
+    // 记录当前状态
+    _logToFile('当前提醒数量: ${_reminders.length}');
+    _logToFile('当前时间线项目数量: ${_sortedTimelineItems.length}');
+    _logToFile('当前加载状态: $_isLoading');
+    _logToFile('当前选中的节日类型: ${_selectedHolidayTypes.map((t) => t.toString()).join(', ')}');
+  } catch (e, stack) {
+    _logToFile('准备时间线初始检查出错: $e');
+    _logToFile('堆栈: $stack');
+    _logErrorToFile('准备时间线初始检查出错: $e');
+    _logErrorToFile('堆栈: $stack');
   }
 
   // 准备一个临时的列表来存放最终结果
@@ -1180,17 +1492,26 @@ Future<void> _prepareTimelineItems() async {
       _sortedTimelineItems = [];
     });
     debugPrint('已设置加载状态，清空旧数据');
+    _logToFile('已设置加载状态，清空旧数据');
     debugPrint('已初始化临时列表');
+    _logToFile('已初始化临时列表');
   } catch (e, stack) {
     debugPrint('=== 准备时间线初始化阶段出错 ===');
     debugPrint('错误: $e');
     debugPrint('堆栈: $stack');
+    _logToFile('=== 准备时间线初始化阶段出错 ===');
+    _logToFile('错误: $e');
+    _logToFile('堆栈: $stack');
+    _logErrorToFile('=== 准备时间线初始化阶段出错 ===');
+    _logErrorToFile('错误: $e');
+    _logErrorToFile('堆栈: $stack');
 
     // 确保不会因为初始化错误而阻止后续操作
     if (mounted) {
       setState(() {
         _isLoading = false;
       });
+      _logToFile('由于初始化错误，已设置加载状态为false');
     }
     return;
   }
@@ -1198,6 +1519,7 @@ Future<void> _prepareTimelineItems() async {
   // 1. 加载提醒事项
   try {
     debugPrint('开始加载提醒事项...');
+    _logToFile('开始加载提醒事项...');
     final prefs = await SharedPreferences.getInstance();
     final String? remindersString = prefs.getString('reminders');
 
