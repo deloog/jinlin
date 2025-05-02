@@ -5,6 +5,9 @@ import 'package:jinlin_app/models/sync/sync_conflict.dart';
 import 'package:jinlin_app/models/sync/sync_operation_type.dart';
 import 'package:jinlin_app/models/sync/sync_status_enum.dart';
 import 'package:jinlin_app/providers/sync_provider.dart';
+import 'package:jinlin_app/generated/l10n.dart';
+import 'package:jinlin_app/widgets/common/custom_app_bar.dart';
+import 'package:jinlin_app/widgets/common/custom_card.dart';
 
 /// 同步管理页面
 class SyncManagementScreen extends StatelessWidget {
@@ -187,7 +190,7 @@ class SyncManagementScreen extends StatelessWidget {
           width: 40.0,
           height: 40.0,
           decoration: BoxDecoration(
-            color: color.withOpacity(0.2),
+            color: color.withAlpha(50),
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -707,7 +710,7 @@ class SyncManagementScreen extends StatelessWidget {
                           : Icon(Icons.warning, color: Colors.orange),
                       onTap: () {
                         if (!conflict.isResolved) {
-                          _showConflictResolutionDialog(context, syncProvider, conflict);
+                          _showConflictResolutionDetailDialog(context, syncProvider, conflict);
                         }
                       },
                     );
@@ -730,7 +733,7 @@ class SyncManagementScreen extends StatelessWidget {
   }
 
   /// 显示冲突解决对话框
-  Future<void> _showConflictResolutionDialog(
+  Future<void> _showConflictResolutionDetailDialog(
     BuildContext context,
     SyncProvider syncProvider,
     SyncConflict conflict,
