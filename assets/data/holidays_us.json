@@ -1,0 +1,122 @@
+{
+  "holidays": [
+    {
+      "id": "us_independence_day",
+      "names": {
+        "zh": "美国独立日",
+        "en": "Independence Day",
+        "fr": "Jour de l'Indépendance",
+        "de": "Unabhängigkeitstag"
+      },
+      "type": "statutory",
+      "regions": ["US"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "07-04",
+      "descriptions": {
+        "zh": "美国独立日纪念1776年7月4日《独立宣言》的签署，标志着美国独立。",
+        "en": "Independence Day commemorates the adoption of the Declaration of Independence on July 4, 1776, marking the United States' independence."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "烟花表演、游行、烧烤",
+        "en": "Fireworks, parades, barbecues"
+      },
+      "foods": {
+        "zh": "烧烤、热狗、苹果派",
+        "en": "Barbecue, hot dogs, apple pie"
+      }
+    },
+    {
+      "id": "us_thanksgiving",
+      "names": {
+        "zh": "感恩节",
+        "en": "Thanksgiving",
+        "fr": "Action de grâce",
+        "de": "Erntedankfest"
+      },
+      "type": "statutory",
+      "regions": ["US"],
+      "calculation_type": "variable_rule",
+      "calculation_rule": "11-4-4",
+      "descriptions": {
+        "zh": "感恩节是美国人民表达对丰收和生活感恩的节日，通常在11月第四个星期四庆祝。",
+        "en": "Thanksgiving is a holiday celebrated in the United States on the fourth Thursday of November, expressing gratitude for the harvest and blessings of the past year."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "家庭聚餐、感恩祈祷、看橄榄球比赛",
+        "en": "Family dinners, giving thanks, watching football"
+      },
+      "foods": {
+        "zh": "火鸡、南瓜派、蔓越莓酱",
+        "en": "Turkey, pumpkin pie, cranberry sauce"
+      }
+    },
+    {
+      "id": "us_memorial_day",
+      "names": {
+        "zh": "阵亡将士纪念日",
+        "en": "Memorial Day",
+        "fr": "Jour du Souvenir",
+        "de": "Gedenktag"
+      },
+      "type": "statutory",
+      "regions": ["US"],
+      "calculation_type": "variable_rule",
+      "calculation_rule": "05-5-1",
+      "descriptions": {
+        "zh": "阵亡将士纪念日是美国为纪念在军事服役中牺牲的军人而设立的联邦假日，在5月最后一个星期一庆祝。",
+        "en": "Memorial Day is a federal holiday in the United States for honoring and mourning the military personnel who died while serving in the United States Armed Forces."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "墓地献花、游行、升旗",
+        "en": "Visiting cemeteries, parades, flag raising"
+      }
+    },
+    {
+      "id": "us_labor_day",
+      "names": {
+        "zh": "劳动节",
+        "en": "Labor Day",
+        "fr": "Fête du Travail",
+        "de": "Tag der Arbeit"
+      },
+      "type": "statutory",
+      "regions": ["US"],
+      "calculation_type": "variable_rule",
+      "calculation_rule": "09-1-1",
+      "descriptions": {
+        "zh": "劳动节是美国为纪念劳工运动和工人贡献而设立的联邦假日，在9月第一个星期一庆祝。",
+        "en": "Labor Day is a federal holiday in the United States celebrated on the first Monday in September to honor and recognize the American labor movement."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "游行、烧烤、户外活动",
+        "en": "Parades, barbecues, outdoor activities"
+      }
+    },
+    {
+      "id": "us_mlk_day",
+      "names": {
+        "zh": "马丁·路德·金纪念日",
+        "en": "Martin Luther King Jr. Day",
+        "fr": "Jour de Martin Luther King",
+        "de": "Martin Luther King Tag"
+      },
+      "type": "statutory",
+      "regions": ["US"],
+      "calculation_type": "variable_rule",
+      "calculation_rule": "01-3-1",
+      "descriptions": {
+        "zh": "马丁·路德·金纪念日是美国为纪念民权领袖马丁·路德·金而设立的联邦假日，在1月第三个星期一庆祝。",
+        "en": "Martin Luther King Jr. Day is a federal holiday in the United States marking the birthday of Martin Luther King Jr., observed on the third Monday of January each year."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "纪念活动、志愿服务、演讲",
+        "en": "Commemorative events, volunteer service, speeches"
+      }
+    }
+  ]
+}

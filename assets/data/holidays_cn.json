@@ -1,0 +1,132 @@
+{
+  "holidays": [
+    {
+      "id": "cn_spring_festival",
+      "names": {
+        "zh": "春节",
+        "en": "Spring Festival",
+        "ja": "春節",
+        "ko": "춘절",
+        "fr": "Fête du Printemps",
+        "de": "Frühlingsfest"
+      },
+      "type": "statutory",
+      "regions": ["CN"],
+      "calculation_type": "fixed_lunar",
+      "calculation_rule": "L01-01",
+      "descriptions": {
+        "zh": "春节是中国最重要的传统节日，标志着农历新年的开始。人们会团聚、吃团圆饭、贴春联、放鞭炮等。",
+        "en": "Spring Festival is the most important traditional holiday in China, marking the beginning of the lunar new year. People gather for reunion dinners, hang spring couplets, and set off firecrackers."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "贴春联、放鞭炮、吃团圆饭、发红包",
+        "en": "Hanging spring couplets, setting off firecrackers, having reunion dinners, giving red envelopes"
+      },
+      "foods": {
+        "zh": "饺子、年糕、鱼",
+        "en": "Dumplings, rice cakes, fish"
+      }
+    },
+    {
+      "id": "cn_lantern_festival",
+      "names": {
+        "zh": "元宵节",
+        "en": "Lantern Festival",
+        "ja": "元宵節",
+        "ko": "원소절"
+      },
+      "type": "traditional",
+      "regions": ["CN"],
+      "calculation_type": "fixed_lunar",
+      "calculation_rule": "L01-15",
+      "descriptions": {
+        "zh": "元宵节是春节后的第一个重要节日，人们会赏花灯、猜灯谜、吃元宵。",
+        "en": "The Lantern Festival is the first major festival after the Spring Festival. People enjoy lantern displays, solve lantern riddles, and eat sweet rice balls."
+      },
+      "importance_level": "medium",
+      "customs": {
+        "zh": "赏花灯、猜灯谜、舞龙舞狮",
+        "en": "Viewing lanterns, solving riddles, dragon and lion dances"
+      },
+      "foods": {
+        "zh": "元宵、汤圆",
+        "en": "Sweet rice balls (Yuanxiao or Tangyuan)"
+      }
+    },
+    {
+      "id": "cn_qingming_festival",
+      "names": {
+        "zh": "清明节",
+        "en": "Qingming Festival",
+        "ja": "清明節",
+        "ko": "청명절"
+      },
+      "type": "statutory",
+      "regions": ["CN"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "04-05",
+      "descriptions": {
+        "zh": "清明节是中国传统的祭祀节日，人们会扫墓祭祖、踏青郊游。",
+        "en": "Qingming Festival is a traditional Chinese festival for ancestor worship. People visit graves, pay respects to ancestors, and enjoy spring outings."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "扫墓、踏青、放风筝",
+        "en": "Tomb sweeping, spring outings, flying kites"
+      }
+    },
+    {
+      "id": "cn_dragon_boat_festival",
+      "names": {
+        "zh": "端午节",
+        "en": "Dragon Boat Festival",
+        "ja": "端午節",
+        "ko": "단오절"
+      },
+      "type": "statutory",
+      "regions": ["CN"],
+      "calculation_type": "fixed_lunar",
+      "calculation_rule": "L05-05",
+      "descriptions": {
+        "zh": "端午节是为纪念爱国诗人屈原而设立的节日，人们会赛龙舟、吃粽子、挂艾草。",
+        "en": "Dragon Boat Festival commemorates the patriotic poet Qu Yuan. People race dragon boats, eat sticky rice dumplings, and hang mugwort."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "赛龙舟、挂艾草、戴香囊",
+        "en": "Dragon boat racing, hanging mugwort, wearing fragrant pouches"
+      },
+      "foods": {
+        "zh": "粽子、咸鸭蛋",
+        "en": "Zongzi (sticky rice dumplings), salted duck eggs"
+      }
+    },
+    {
+      "id": "cn_mid_autumn_festival",
+      "names": {
+        "zh": "中秋节",
+        "en": "Mid-Autumn Festival",
+        "ja": "中秋節",
+        "ko": "추석"
+      },
+      "type": "statutory",
+      "regions": ["CN"],
+      "calculation_type": "fixed_lunar",
+      "calculation_rule": "L08-15",
+      "descriptions": {
+        "zh": "中秋节是中国传统的团圆节日，人们会赏月、吃月饼、团聚。",
+        "en": "Mid-Autumn Festival is a traditional Chinese festival for family reunions. People admire the full moon, eat mooncakes, and gather with family."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "赏月、吃月饼、赏花灯",
+        "en": "Moon viewing, eating mooncakes, admiring lanterns"
+      },
+      "foods": {
+        "zh": "月饼、柚子",
+        "en": "Mooncakes, pomelos"
+      }
+    }
+  ]
+}

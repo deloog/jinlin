@@ -16,7 +16,7 @@ class HolidayEditScreen extends StatefulWidget {
 class _HolidayEditScreenState extends State<HolidayEditScreen> {
   final _formKey = GlobalKey<FormState>();
   final DatabaseManagerUnified _dbManager = DatabaseManagerUnified();
-  
+
   // 表单字段
   late String _id;
   final Map<String, String> _names = {};
@@ -35,7 +35,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
 
   // 支持的语言
   final List<String> _supportedLanguages = ['zh', 'en', 'ja', 'ko', 'fr', 'de'];
-  
+
   // 支持的地区
   final List<String> _availableRegions = ['ALL', 'CN', 'US', 'JP', 'KR', 'FR', 'DE'];
 
@@ -80,9 +80,9 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
     if (!_formKey.currentState!.validate()) {
       return;
     }
-    
+
     _formKey.currentState!.save();
-    
+
     try {
       final holiday = Holiday(
         id: _id,
@@ -101,10 +101,10 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
         isSystemHoliday: _isSystemHoliday,
         userImportance: 0,
       );
-      
+
       await _dbManager.initialize(null);
       await _dbManager.saveHoliday(holiday);
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('节日保存成功')),
@@ -113,7 +113,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
       }
     } catch (e) {
       debugPrint('保存节日失败: $e');
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('保存节日失败: $e')),
@@ -150,7 +150,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                     children: [
                       const Text('基本信息', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 16),
-                      
+
                       // ID
                       TextFormField(
                         initialValue: _id,
@@ -170,7 +170,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // 系统节日
                       SwitchListTile(
                         title: const Text('系统节日'),
@@ -182,7 +182,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                           });
                         },
                       ),
-                      
+
                       // 节日类型
                       DropdownButtonFormField<HolidayType>(
                         decoration: const InputDecoration(
@@ -203,7 +203,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // 重要性级别
                       DropdownButtonFormField<ImportanceLevel>(
                         decoration: const InputDecoration(
@@ -224,7 +224,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // 日期计算类型
                       DropdownButtonFormField<DateCalculationType>(
                         decoration: const InputDecoration(
@@ -245,7 +245,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      
+
                       // 计算规则
                       TextFormField(
                         initialValue: _calculationRule,
@@ -269,7 +269,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // 地区设置
               Card(
                 child: Padding(
@@ -279,7 +279,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                     children: [
                       const Text('地区设置', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 16),
-                      
+
                       // 地区选择
                       Wrap(
                         spacing: 8.0,
@@ -306,7 +306,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // 多语言名称
               Card(
                 child: Padding(
@@ -316,7 +316,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                     children: [
                       const Text('多语言名称', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 16),
-                      
+
                       // 各语言名称输入
                       ..._supportedLanguages.map((lang) {
                         return Padding(
@@ -348,7 +348,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              
+
               // 多语言描述
               Card(
                 child: Padding(
@@ -358,7 +358,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                     children: [
                       const Text('多语言描述', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 16),
-                      
+
                       // 各语言描述输入
                       ..._supportedLanguages.map((lang) {
                         return Padding(
@@ -406,6 +406,12 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
         return '行业节日';
       case HolidayType.international:
         return '国际节日';
+      case HolidayType.solarTerm:
+        return '节气';
+      case HolidayType.custom:
+        return '自定义';
+      case HolidayType.cultural:
+        return '文化节日';
       case HolidayType.other:
         return '其他';
     }
@@ -432,7 +438,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
         return '固定农历日期';
       case DateCalculationType.variableRule:
         return '可变规则';
-      case DateCalculationType.customRule:
+      case DateCalculationType.custom:
         return '自定义规则';
     }
   }
@@ -446,7 +452,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
         return '格式：LMM-DD，例如：L01-01 表示农历正月初一';
       case DateCalculationType.variableRule:
         return '格式：MM-W-D，例如：11-4-4 表示11月第4个星期四';
-      case DateCalculationType.customRule:
+      case DateCalculationType.custom:
         return '自定义规则，请参考文档';
     }
   }

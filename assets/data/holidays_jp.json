@@ -1,0 +1,83 @@
+{
+  "holidays": [
+    {
+      "id": "jp_new_year",
+      "names": {
+        "zh": "日本新年",
+        "en": "Japanese New Year",
+        "ja": "正月",
+        "ko": "일본 설날",
+        "fr": "Nouvel An Japonais",
+        "de": "Japanisches Neujahr"
+      },
+      "type": "statutory",
+      "regions": ["JP"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "01-01",
+      "descriptions": {
+        "zh": "日本新年是日本最重要的节日，人们会拜访神社、吃特殊的新年食物、与家人团聚。",
+        "en": "Japanese New Year is the most important holiday in Japan. People visit shrines, eat special New Year foods, and gather with family.",
+        "ja": "正月は日本で最も重要な祝日です。人々は神社を訪れ、おせち料理を食べ、家族と集まります。"
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "初诣、吃御节料理、发压岁钱",
+        "en": "Hatsumode (first shrine visit), eating osechi ryori, giving otoshidama (money gifts)",
+        "ja": "初詣、おせち料理を食べる、お年玉をあげる"
+      },
+      "foods": {
+        "zh": "御节料理、年糕汤",
+        "en": "Osechi ryori, ozoni (mochi soup)",
+        "ja": "おせち料理、お雑煮"
+      }
+    },
+    {
+      "id": "jp_golden_week",
+      "names": {
+        "zh": "黄金周",
+        "en": "Golden Week",
+        "ja": "ゴールデンウィーク",
+        "ko": "골든 위크"
+      },
+      "type": "statutory",
+      "regions": ["JP"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "04-29",
+      "descriptions": {
+        "zh": "黄金周是日本的一系列连续假日，从4月29日开始，包括昭和日、宪法纪念日、绿色日和儿童节。",
+        "en": "Golden Week is a series of consecutive holidays in Japan, starting from April 29, including Showa Day, Constitution Memorial Day, Greenery Day, and Children's Day.",
+        "ja": "ゴールデンウィークは4月29日から始まる連休で、昭和の日、憲法記念日、みどりの日、こどもの日を含みます。"
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "旅行、看电影、购物",
+        "en": "Traveling, watching movies, shopping",
+        "ja": "旅行、映画鑑賞、ショッピング"
+      }
+    },
+    {
+      "id": "jp_obon",
+      "names": {
+        "zh": "盂兰盆节",
+        "en": "Obon Festival",
+        "ja": "お盆",
+        "ko": "오봉"
+      },
+      "type": "traditional",
+      "regions": ["JP"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "08-13",
+      "descriptions": {
+        "zh": "盂兰盆节是日本的传统节日，人们相信祖先的灵魂会在这段时间回到家中，会举行祭祀活动和盂兰盆舞。",
+        "en": "Obon is a Japanese Buddhist custom to honor the spirits of one's ancestors. People believe that their ancestors' spirits return to their homes during this period.",
+        "ja": "お盆は先祖の霊を敬う日本の仏教的な風習です。この期間中、先祖の霊が自宅に戻ってくると信じられています。"
+      },
+      "importance_level": "medium",
+      "customs": {
+        "zh": "祭祀祖先、盂兰盆舞、点灯笼",
+        "en": "Ancestor worship, Bon Odori (dance), lighting lanterns",
+        "ja": "先祖供養、盆踊り、提灯を灯す"
+      }
+    }
+  ]
+}

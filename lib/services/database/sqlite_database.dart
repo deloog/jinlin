@@ -418,4 +418,68 @@ class SQLiteDatabase implements DatabaseInterface {
       rethrow;
     }
   }
+
+  /// 获取应用设置
+  @override
+  Future<String?> getAppSetting(String key) async {
+    await _checkInitialized();
+
+    try {
+      final List<Map<String, dynamic>> maps = await _db!.query(
+        _prefsTable,
+        columns: ['value'],
+        where: 'key = ?',
+        whereArgs: [key],
+      );
+
+      if (maps.isEmpty) {
+        return null;
+      }
+
+      return maps.first['value'] as String?;
+    } catch (e) {
+      debugPrint('获取应用设置失败: $e');
+      return null;
+    }
+  }
+
+  /// 设置应用设置
+  @override
+  Future<void> setAppSetting(String key, String value) async {
+    await _checkInitialized();
+
+    try {
+      // 检查设置是否已存在
+      final List<Map<String, dynamic>> maps = await _db!.query(
+        _prefsTable,
+        columns: ['key'],
+        where: 'key = ?',
+        whereArgs: [key],
+      );
+
+      if (maps.isNotEmpty) {
+        // 更新现有设置
+        await _db!.update(
+          _prefsTable,
+          {'value': value},
+          where: 'key = ?',
+          whereArgs: [key],
+        );
+      } else {
+        // 插入新设置
+        await _db!.insert(
+          _prefsTable,
+          {
+            'key': key,
+            'value': value,
+          },
+        );
+      }
+
+      debugPrint('设置应用设置成功: $key');
+    } catch (e) {
+      debugPrint('设置应用设置失败: $e');
+      rethrow;
+    }
+  }
 }

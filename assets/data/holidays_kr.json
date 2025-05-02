@@ -1,0 +1,86 @@
+{
+  "holidays": [
+    {
+      "id": "kr_seollal",
+      "names": {
+        "zh": "设尔节",
+        "en": "Seollal",
+        "ko": "설날",
+        "ja": "ソルラル"
+      },
+      "type": "traditional",
+      "regions": ["KR"],
+      "calculation_type": "fixed_lunar",
+      "calculation_rule": "L01-01",
+      "descriptions": {
+        "zh": "设尔节是韩国的春节，是韩国最重要的传统节日之一。",
+        "en": "Seollal is Korean New Year and one of the most important traditional Korean holidays.",
+        "ko": "설날은 한국의 새해맞이 명절로, 한국의 가장 중요한 전통 명절 중 하나입니다."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "祭祀祖先、穿韩服、玩民俗游戏",
+        "en": "Ancestral rites, wearing hanbok, playing traditional games",
+        "ko": "차례, 한복 입기, 민속놀이"
+      },
+      "foods": {
+        "zh": "年糕汤、松饼",
+        "en": "Tteokguk (rice cake soup), jeon (pancakes)",
+        "ko": "떡국, 전"
+      }
+    },
+    {
+      "id": "kr_chuseok",
+      "names": {
+        "zh": "秋夕",
+        "en": "Chuseok",
+        "ko": "추석",
+        "ja": "チュソク"
+      },
+      "type": "traditional",
+      "regions": ["KR"],
+      "calculation_type": "fixed_lunar",
+      "calculation_rule": "L08-15",
+      "descriptions": {
+        "zh": "秋夕是韩国的中秋节，是韩国三大传统节日之一，人们会祭祀祖先、团聚和享用传统食物。",
+        "en": "Chuseok is Korean Thanksgiving Day and one of the three major traditional holidays in Korea. People perform ancestral rites, gather with family, and enjoy traditional food.",
+        "ko": "추석은 한국의 추수감사절이자 한국의 3대 명절 중 하나입니다. 사람들은 차례를 지내고, 가족과 모여 전통 음식을 즐깁니다."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "祭祀祖先、访问祖坟、吃松糕",
+        "en": "Ancestral rites, visiting ancestral graves, eating songpyeon",
+        "ko": "차례, 성묘, 송편 먹기"
+      },
+      "foods": {
+        "zh": "松糕、新米酒",
+        "en": "Songpyeon (rice cakes), new rice wine",
+        "ko": "송편, 막걸리"
+      }
+    },
+    {
+      "id": "kr_independence_movement_day",
+      "names": {
+        "zh": "三一运动纪念日",
+        "en": "Independence Movement Day",
+        "ko": "삼일절",
+        "ja": "三一運動記念日"
+      },
+      "type": "statutory",
+      "regions": ["KR"],
+      "calculation_type": "fixed_gregorian",
+      "calculation_rule": "03-01",
+      "descriptions": {
+        "zh": "三一运动纪念日纪念1919年3月1日韩国人民反抗日本殖民统治的和平示威运动。",
+        "en": "Independence Movement Day commemorates the March 1st Movement of 1919, a peaceful demonstration for Korean independence from Japanese colonial rule.",
+        "ko": "삼일절은 1919년 3월 1일 일본 식민 통치에 대항한 한국인들의 평화적인 독립 운동을 기념합니다."
+      },
+      "importance_level": "high",
+      "customs": {
+        "zh": "升国旗、纪念活动、参观历史遗址",
+        "en": "Flag raising, commemorative events, visiting historical sites",
+        "ko": "국기 게양, 기념 행사, 역사 유적지 방문"
+      }
+    }
+  ]
+}

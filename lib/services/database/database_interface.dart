@@ -42,6 +42,12 @@ abstract class DatabaseInterface {
   /// 检查是否是首次启动
   Future<bool> isFirstLaunch();
 
+  /// 获取应用设置
+  Future<String?> getAppSetting(String key);
+
+  /// 设置应用设置
+  Future<void> setAppSetting(String key, String value);
+
   /// 标记首次启动完成
   Future<void> markFirstLaunchComplete();
 

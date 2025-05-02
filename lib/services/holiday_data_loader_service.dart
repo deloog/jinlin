@@ -226,7 +226,7 @@ class HolidayDataLoaderService {
       case 'variable_rule':
         return DateCalculationType.variableRule;
       case 'custom_rule':
-        return DateCalculationType.customRule;
+        return DateCalculationType.custom;
       default:
         return DateCalculationType.fixedGregorian;
     }

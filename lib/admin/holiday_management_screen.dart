@@ -35,7 +35,7 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
     try {
       await _dbManager.initialize(null);
       final holidays = await _dbManager.getAllHolidays();
-      
+
       setState(() {
         _holidays = holidays;
         _isLoading = false;
@@ -45,7 +45,7 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
       setState(() {
         _isLoading = false;
       });
-      
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('加载节日数据失败: $e')),
@@ -59,17 +59,17 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
     return _holidays.where((holiday) {
       // 搜索条件
       final searchMatch = _searchQuery.isEmpty ||
-          holiday.names.values.any((name) => 
+          holiday.names.values.any((name) =>
               name.toLowerCase().contains(_searchQuery.toLowerCase()));
-      
+
       // 地区条件
       final regionMatch = _selectedRegion == 'ALL' ||
           holiday.regions.contains(_selectedRegion);
-      
+
       // 类型条件
-      final typeMatch = _selectedType == null || 
+      final typeMatch = _selectedType == null ||
           holiday.type == _selectedType;
-      
+
       return searchMatch && regionMatch && typeMatch;
     }).toList();
   }
@@ -97,11 +97,11 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
     if (confirmed == true) {
       try {
         await _dbManager.deleteHoliday(holiday.id);
-        
+
         setState(() {
           _holidays.removeWhere((h) => h.id == holiday.id);
         });
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('节日已删除')),
@@ -109,7 +109,7 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
         }
       } catch (e) {
         debugPrint('删除节日失败: $e');
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('删除节日失败: $e')),
@@ -168,7 +168,7 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
   @override
   Widget build(BuildContext context) {
     final filteredHolidays = _getFilteredHolidays();
-    
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('节日管理'),
@@ -264,7 +264,7 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
               ],
             ),
           ),
-          
+
           // 节日列表
           Expanded(
             child: _isLoading
@@ -323,6 +323,12 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
         return '行业节日';
       case HolidayType.international:
         return '国际节日';
+      case HolidayType.solarTerm:
+        return '节气';
+      case HolidayType.custom:
+        return '自定义';
+      case HolidayType.cultural:
+        return '文化节日';
       case HolidayType.other:
         return '其他';
     }

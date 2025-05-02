@@ -328,4 +328,34 @@ class HiveDatabase implements DatabaseInterface {
       rethrow;
     }
   }
+
+  /// 获取应用设置
+  @override
+  Future<String?> getAppSetting(String key) async {
+    await _checkInitialized();
+
+    try {
+      // 获取设置
+      final value = _prefsBox!.get(key);
+      return value?.toString();
+    } catch (e) {
+      debugPrint('获取应用设置失败: $e');
+      return null;
+    }
+  }
+
+  /// 设置应用设置
+  @override
+  Future<void> setAppSetting(String key, String value) async {
+    await _checkInitialized();
+
+    try {
+      // 设置应用设置
+      await _prefsBox!.put(key, value);
+      debugPrint('设置应用设置成功: $key');
+    } catch (e) {
+      debugPrint('设置应用设置失败: $e');
+      rethrow;
+    }
+  }
 }
