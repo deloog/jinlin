@@ -460,5 +460,18 @@
   "userGuideShowNextTime": "下次显示",
   "userGuideShowAgain": "不再显示",
   "userGuideNextButton": "下一步",
-  "userGuideDoneButton": "完成"
+  "userGuideDoneButton": "完成",
+
+  "translationAlmostComplete": "翻译即将完成",
+  "@translationAlmostComplete": {
+    "description": "当翻译接近完成时显示 (>80%)"
+  },
+  "translationPartiallyComplete": "翻译进行中",
+  "@translationPartiallyComplete": {
+    "description": "当翻译部分完成时显示 (>50%)"
+  },
+  "translationInProgress": "翻译尚未完成",
+  "@translationInProgress": {
+    "description": "当翻译刚开始时显示 (<50%)"
+  }
   }

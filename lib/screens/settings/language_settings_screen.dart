@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:jinlin_app/services/localization_service.dart';
+import 'package:jinlin_app/widgets/localization_status_indicator.dart';
 import 'package:provider/provider.dart';
 import 'package:jinlin_app/providers/app_settings_provider.dart';
 
@@ -164,17 +165,28 @@ class _LanguageSettingsScreenState extends State<LanguageSettingsScreen> {
     required String languageName,
     required bool isSelected,
   }) {
-    return ListTile(
-      leading: Text(
-        _getLanguageFlag(languageCode),
-        style: const TextStyle(fontSize: 24),
-      ),
-      title: Text(languageName),
-      subtitle: Text(_getLanguageRegion(languageCode)),
-      trailing: isSelected
-          ? const Icon(Icons.check, color: Colors.green)
-          : null,
-      onTap: () => _changeLanguage(languageCode),
+    return Column(
+      children: [
+        ListTile(
+          leading: Text(
+            _getLanguageFlag(languageCode),
+            style: const TextStyle(fontSize: 24),
+          ),
+          title: Row(
+            children: [
+              Text(languageName),
+              const SizedBox(width: 8),
+              if (languageCode != 'en' && languageCode != 'zh')
+                const LocalizationStatusIndicator(showInSettings: true),
+            ],
+          ),
+          subtitle: Text(_getLanguageRegion(languageCode)),
+          trailing: isSelected
+              ? const Icon(Icons.check, color: Colors.green)
+              : null,
+          onTap: () => _changeLanguage(languageCode),
+        ),
+      ],
     );
   }
 

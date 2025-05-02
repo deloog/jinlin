@@ -470,5 +470,18 @@
   "userGuideShowNextTime": "Show next time",
   "userGuideShowAgain": "Don't show again",
   "userGuideNextButton": "Next",
-  "userGuideDoneButton": "Done"
+  "userGuideDoneButton": "Done",
+
+  "translationAlmostComplete": "Translation almost complete",
+  "@translationAlmostComplete": {
+    "description": "Shown when the translation is almost complete (>80%)"
+  },
+  "translationPartiallyComplete": "Translation in progress",
+  "@translationPartiallyComplete": {
+    "description": "Shown when the translation is partially complete (>50%)"
+  },
+  "translationInProgress": "Translation incomplete",
+  "@translationInProgress": {
+    "description": "Shown when the translation is in progress (<50%)"
+  }
   }
