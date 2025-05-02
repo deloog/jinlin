@@ -240,6 +240,10 @@ class HolidayInitServiceUnified {
         return _getJapaneseHolidays();
       case 'KR':
         return _getKoreanHolidays();
+      case 'FR':
+        return _getFrenchHolidays();
+      case 'DE':
+        return _getGermanHolidays();
       default:
         return [];
     }
@@ -600,6 +604,190 @@ class HolidayInitServiceUnified {
           'ko': '차례, 성묘, 송편 먹기',
         },
         userImportance: 2,
+      ),
+    ];
+  }
+
+  /// 获取法国特定节日
+  List<Holiday> _getFrenchHolidays() {
+    return [
+      // 法国国庆日（巴士底日）
+      Holiday(
+        id: 'fr_bastille_day',
+        isSystemHoliday: true,
+        names: {
+          'zh': '法国国庆日',
+          'en': 'Bastille Day',
+          'fr': 'Fête nationale française',
+          'de': 'Französischer Nationalfeiertag',
+        },
+        type: HolidayType.statutory,
+        regions: ['FR'],
+        calculationType: DateCalculationType.fixedGregorian,
+        calculationRule: '07-14',
+        descriptions: {
+          'zh': '法国国庆日纪念1789年巴士底狱的攻陷，象征着法国大革命的开始和法兰西共和国的诞生。',
+          'en': 'Bastille Day commemorates the Storming of the Bastille in 1789, which marked the beginning of the French Revolution and the birth of the French Republic.',
+          'fr': 'La Fête nationale française commémore la prise de la Bastille en 1789, qui marque le début de la Révolution française et la naissance de la République française.',
+        },
+        importanceLevel: ImportanceLevel.high,
+        customs: {
+          'zh': '阅兵、烟花表演、舞会',
+          'en': 'Military parade, fireworks, public dances',
+          'fr': 'Défilé militaire, feux d\'artifice, bals populaires',
+        },
+        userImportance: 2,
+      ),
+
+      // 光明节
+      Holiday(
+        id: 'fr_chandeleur',
+        isSystemHoliday: true,
+        names: {
+          'zh': '光明节',
+          'en': 'Candlemas',
+          'fr': 'La Chandeleur',
+        },
+        type: HolidayType.traditional,
+        regions: ['FR'],
+        calculationType: DateCalculationType.fixedGregorian,
+        calculationRule: '02-02',
+        descriptions: {
+          'zh': '光明节是法国的传统节日，人们会吃可丽饼庆祝。',
+          'en': 'Candlemas is a traditional French holiday when people eat crêpes.',
+          'fr': 'La Chandeleur est une fête traditionnelle française où l\'on mange des crêpes.',
+        },
+        importanceLevel: ImportanceLevel.medium,
+        customs: {
+          'zh': '吃可丽饼、点蜡烛',
+          'en': 'Eating crêpes, lighting candles',
+          'fr': 'Manger des crêpes, allumer des bougies',
+        },
+        foods: {
+          'zh': '可丽饼',
+          'en': 'Crêpes',
+          'fr': 'Crêpes',
+        },
+        userImportance: 1,
+      ),
+
+      // 劳动节
+      Holiday(
+        id: 'fr_labor_day',
+        isSystemHoliday: true,
+        names: {
+          'zh': '法国劳动节',
+          'en': 'Labor Day',
+          'fr': 'Fête du Travail',
+        },
+        type: HolidayType.statutory,
+        regions: ['FR'],
+        calculationType: DateCalculationType.fixedGregorian,
+        calculationRule: '05-01',
+        descriptions: {
+          'zh': '法国劳动节是法国的法定假日，人们会赠送铃兰花。',
+          'en': 'Labor Day is a public holiday in France when people give lily of the valley flowers.',
+          'fr': 'La Fête du Travail est un jour férié en France où l\'on offre du muguet.',
+        },
+        importanceLevel: ImportanceLevel.high,
+        customs: {
+          'zh': '赠送铃兰花、游行',
+          'en': 'Giving lily of the valley, parades',
+          'fr': 'Offrir du muguet, défilés',
+        },
+        userImportance: 2,
+      ),
+    ];
+  }
+
+  /// 获取德国特定节日
+  List<Holiday> _getGermanHolidays() {
+    return [
+      // 德国统一日
+      Holiday(
+        id: 'de_unity_day',
+        isSystemHoliday: true,
+        names: {
+          'zh': '德国统一日',
+          'en': 'German Unity Day',
+          'de': 'Tag der Deutschen Einheit',
+          'fr': 'Jour de l\'Unité allemande',
+        },
+        type: HolidayType.statutory,
+        regions: ['DE'],
+        calculationType: DateCalculationType.fixedGregorian,
+        calculationRule: '10-03',
+        descriptions: {
+          'zh': '德国统一日纪念1990年东德和西德重新统一，是德国的国庆节。',
+          'en': 'German Unity Day commemorates the reunification of East and West Germany in 1990. It is the national day of Germany.',
+          'de': 'Der Tag der Deutschen Einheit erinnert an die Wiedervereinigung von Ost- und Westdeutschland im Jahr 1990. Es ist der Nationalfeiertag Deutschlands.',
+        },
+        importanceLevel: ImportanceLevel.high,
+        customs: {
+          'zh': '官方庆典、音乐会、游行',
+          'en': 'Official ceremonies, concerts, parades',
+          'de': 'Offizielle Zeremonien, Konzerte, Paraden',
+        },
+        userImportance: 2,
+      ),
+
+      // 啤酒节
+      Holiday(
+        id: 'de_oktoberfest',
+        isSystemHoliday: true,
+        names: {
+          'zh': '慕尼黑啤酒节',
+          'en': 'Oktoberfest',
+          'de': 'Oktoberfest',
+        },
+        type: HolidayType.traditional,
+        regions: ['DE'],
+        calculationType: DateCalculationType.variableRule,
+        calculationRule: '09-3-6', // 9月第三个星期六开始
+        descriptions: {
+          'zh': '慕尼黑啤酒节是世界上最大的民间节日，每年吸引数百万游客。',
+          'en': 'Oktoberfest is the world\'s largest folk festival, attracting millions of visitors each year.',
+          'de': 'Das Oktoberfest ist das größte Volksfest der Welt und zieht jedes Jahr Millionen von Besuchern an.',
+        },
+        importanceLevel: ImportanceLevel.high,
+        customs: {
+          'zh': '喝啤酒、穿传统服装、听民乐',
+          'en': 'Drinking beer, wearing traditional costumes, listening to folk music',
+          'de': 'Bier trinken, Trachten tragen, Volksmusik hören',
+        },
+        foods: {
+          'zh': '啤酒、香肠、椒盐脆饼',
+          'en': 'Beer, sausages, pretzels',
+          'de': 'Bier, Würstchen, Brezeln',
+        },
+        userImportance: 2,
+      ),
+
+      // 圣尼古拉斯节
+      Holiday(
+        id: 'de_st_nicholas_day',
+        isSystemHoliday: true,
+        names: {
+          'zh': '圣尼古拉斯节',
+          'en': 'St. Nicholas Day',
+          'de': 'Nikolaustag',
+        },
+        type: HolidayType.traditional,
+        regions: ['DE'],
+        calculationType: DateCalculationType.fixedGregorian,
+        calculationRule: '12-06',
+        descriptions: {
+          'zh': '圣尼古拉斯节是德国的传统节日，孩子们会在鞋子里收到礼物。',
+          'en': 'St. Nicholas Day is a traditional German holiday when children receive gifts in their shoes.',
+          'de': 'Der Nikolaustag ist ein traditioneller deutscher Feiertag, an dem Kinder Geschenke in ihren Schuhen erhalten.',
+        },
+        importanceLevel: ImportanceLevel.medium,
+        customs: {
+          'zh': '放鞋子、收到礼物',
+          'en': 'Putting out shoes, receiving gifts',
+          'de': 'Schuhe rausstellen, Geschenke erhalten',
+        },
+        userImportance: 1,
       ),
     ];
   }

@@ -298,5 +298,9 @@
     "regionKorea": "Corée",
     "regionFrance": "France",
     "regionGermany": "Allemagne",
-    "regionInternational": "International"
+    "regionInternational": "International",
+
+    "translationAlmostComplete": "Traduction presque complète",
+    "translationPartiallyComplete": "Traduction en cours",
+    "translationInProgress": "Traduction incomplète"
 }
