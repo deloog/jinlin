@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:jinlin_app/special_date.dart';
 
 class Holiday {
@@ -150,8 +149,8 @@ class Holiday {
         return 'solarTermBased';
       case DateCalculationType.relativeTo:
         return 'relativeTo';
-      default:
-        return 'fixedGregorian';
+      // 所有枚举值都已处理完毕
+      // 如果将来添加新的枚举值，在这里处理
     }
   }
 
@@ -178,8 +177,8 @@ class Holiday {
         return 1;
       case ImportanceLevel.high:
         return 2;
-      default:
-        return 0;
+      // 所有枚举值都已处理完毕
+      // 如果将来添加新的枚举值，在这里处理
     }
   }
 }

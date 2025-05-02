@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:jinlin_app/database/database_helper.dart';
-import 'package:jinlin_app/database/holiday_model.dart';
 import 'package:jinlin_app/special_date.dart';
 
 class HolidayService {
@@ -30,7 +29,7 @@ class HolidayService {
   Future<List<SpecialDate>> getHolidaysForCurrentLocale(BuildContext context) async {
     final locale = Localizations.localeOf(context);
     final isChinese = locale.languageCode == 'zh';
-    
+
     // 根据语言环境确定用户所在地区
     String regionId;
     if (isChinese) {
@@ -44,14 +43,14 @@ class HolidayService {
     } else {
       regionId = 'INTL'; // 其他语言用户显示国际节日
     }
-    
+
     // 获取用户所在地区和国际性的节日
     final holidays = await _dbHelper.getHolidaysByRegion(regionId);
     final internationalHolidays = await _dbHelper.getHolidaysByRegion('INTL');
-    
+
     // 合并地区节日和国际节日
     final allHolidays = [...holidays, ...internationalHolidays];
-    
+
     // 转换为 SpecialDate 对象
     return allHolidays.map((holiday) => holiday.toSpecialDate(isChinese)).toList();
   }

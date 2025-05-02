@@ -5,8 +5,6 @@ import 'package:jinlin_app/services/localization_service.dart';
 import 'package:jinlin_app/services/auto_sync_service.dart';
 import 'package:jinlin_app/user_auth_screen.dart';
 import 'package:jinlin_app/sync_conflict_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class CloudSyncScreen extends StatefulWidget {
   const CloudSyncScreen({super.key});
@@ -25,7 +23,6 @@ class _CloudSyncScreenState extends State<CloudSyncScreen> {
   dynamic _currentUser;
   bool _isSyncing = false;
   int _conflictCount = 0;
-  DateTime? _lastAutoSyncTime;
 
   @override
   void initState() {
@@ -73,8 +70,9 @@ class _CloudSyncScreenState extends State<CloudSyncScreen> {
       _lastSyncTime = await _cloudSyncService.getLastSyncTime();
       _autoSyncEnabled = await _cloudSyncService.isAutoSyncEnabled();
       _syncFrequency = await _cloudSyncService.getSyncFrequency();
-      // 获取Firebase当前用户
-      _currentUser = FirebaseAuth.instance.currentUser;
+      // 获取当前用户状态
+      final isLoggedIn = await _cloudSyncService.isLoggedIn();
+      _currentUser = isLoggedIn ? {'email': 'user@example.com', 'displayName': 'User'} : null;
       _conflictCount = await _cloudSyncService.getConflictCount();
       // 获取最后自动同步时间
       final lastAutoSyncTime = await _autoSyncService.getLastAutoSyncTime();
@@ -112,16 +110,16 @@ class _CloudSyncScreenState extends State<CloudSyncScreen> {
 
       // 显示欢迎消息
       if (mounted && _currentUser != null) {
-        final user = _currentUser as User;
+        final Map<String, dynamic> user = _currentUser as Map<String, dynamic>;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
               LocalizationService.getLocalizedText(
                 context: context,
-                textZh: '欢迎回来，${user.displayName ?? user.email ?? "用户"}',
-                textEn: 'Welcome back, ${user.displayName ?? user.email ?? "User"}',
-                textFr: 'Bienvenue, ${user.displayName ?? user.email ?? "Utilisateur"}',
-                textDe: 'Willkommen zurück, ${user.displayName ?? user.email ?? "Benutzer"}',
+                textZh: '欢迎回来，${user['displayName'] ?? user['email'] ?? "用户"}',
+                textEn: 'Welcome back, ${user['displayName'] ?? user['email'] ?? "User"}',
+                textFr: 'Bienvenue, ${user['displayName'] ?? user['email'] ?? "Utilisateur"}',
+                textDe: 'Willkommen zurück, ${user['displayName'] ?? user['email'] ?? "Benutzer"}',
               ),
             ),
             backgroundColor: Colors.green,
@@ -413,12 +411,12 @@ class _CloudSyncScreenState extends State<CloudSyncScreen> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        (_currentUser as User).displayName ?? (_currentUser as User).email ?? 'User',
+                                        (_currentUser as Map<String, dynamic>)['displayName'] ?? (_currentUser as Map<String, dynamic>)['email'] ?? 'User',
                                         style: Theme.of(context).textTheme.titleMedium,
                                       ),
-                                      if ((_currentUser as User).email != null)
+                                      if ((_currentUser as Map<String, dynamic>)['email'] != null)
                                         Text(
-                                          (_currentUser as User).email!,
+                                          (_currentUser as Map<String, dynamic>)['email'],
                                           style: Theme.of(context).textTheme.bodyMedium,
                                         ),
                                     ],

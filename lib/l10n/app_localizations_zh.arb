@@ -386,5 +386,79 @@
         "example": "数据库错误"
       }
     }
-  }
+  },
+
+  "backupFileSubject": "鲸灵提醒备份",
+  "backupSuccessMessage": "备份创建成功",
+  "backupFailedMessage": "创建备份失败",
+  "selectBackupFileTitle": "选择备份文件",
+  "restoreConfirmTitle": "确认恢复",
+  "restoreConfirmMessage": "这将从备份中恢复数据。当前数据可能会被覆盖。是否继续？",
+  "restoreButton": "恢复",
+  "restoreSuccessMessage": "成功恢复 {importedCount} 项",
+  "@restoreSuccessMessage": {
+    "description": "从备份恢复成功时的消息",
+    "placeholders": {
+      "importedCount": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "restoreFailedMessage": "从备份恢复失败",
+  "backupRestoreTitle": "备份与恢复",
+  "backupTitle": "备份数据",
+  "backupDescription": "创建提醒和设置的备份",
+  "lastBackupTime": "上次备份: {time}",
+  "@lastBackupTime": {
+    "description": "显示数据上次备份的时间",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "2023-05-01 14:30"
+      }
+    }
+  },
+  "createBackupButton": "创建备份",
+  "restoreTitle": "恢复数据",
+  "restoreDescription": "从之前的备份中恢复数据",
+  "restoreFromBackupButton": "从备份恢复",
+  "backupRestoreWarning": "警告：备份和恢复操作可能会影响您现有的数据。请确保您了解风险后再继续。",
+
+  "helpCenterTitle": "帮助中心",
+  "helpCenterBasicsTitle": "基础知识",
+  "helpCenterBasicsAddTitle": "添加提醒",
+  "helpCenterBasicsAddDescription": "了解如何在时间线中添加新提醒",
+  "helpCenterBasicsEditTitle": "编辑提醒",
+  "helpCenterBasicsEditDescription": "如何编辑现有提醒",
+  "helpCenterBasicsDeleteTitle": "删除提醒",
+  "helpCenterBasicsDeleteDescription": "如何删除不再需要的提醒",
+  "helpCenterVoiceTitle": "语音功能",
+  "helpCenterVoiceInputTitle": "语音输入",
+  "helpCenterVoiceInputDescription": "如何使用语音命令创建提醒",
+  "helpCenterVoiceTipsTitle": "语音技巧",
+  "helpCenterVoiceTipsDescription": "充分利用语音识别功能",
+  "helpCenterFAQTitle": "常见问题",
+  "helpCenterFAQ1Question": "如何在多个设备间同步数据？",
+  "helpCenterFAQ1Answer": "前往设置 > 数据同步来设置云同步",
+  "helpCenterFAQ2Question": "我可以从日历导入事件吗？",
+  "helpCenterFAQ2Answer": "可以，前往设置 > 导入/导出数据来从日历导入",
+  "helpCenterFAQ3Question": "如何自定义节日显示？",
+  "helpCenterFAQ3Answer": "前往设置 > 节日管理来自定义显示哪些节日",
+
+  "userGuideTitle": "欢迎使用鲸灵提醒",
+  "userGuideSubtitle": "让我们快速了解一下使用方法",
+  "userGuideStep1Title": "轻松添加提醒",
+  "userGuideStep1Description": "点击 + 按钮添加新提醒。使用语音或文本输入快速创建。",
+  "userGuideStep2Title": "智能时间线",
+  "userGuideStep2Description": "您的时间线按时间顺序显示即将到来的提醒和节日。",
+  "userGuideStep3Title": "AI 辅助",
+  "userGuideStep3Description": "我们的 AI 可以帮助生成描述、推荐礼物并提供相关信息。",
+  "userGuideStep4Title": "个性化设置",
+  "userGuideStep4Description": "在设置中个性化您的体验。选择主题、语言等。",
+  "userGuideSkipButton": "跳过",
+  "userGuideShowNextTime": "下次显示",
+  "userGuideShowAgain": "不再显示",
+  "userGuideNextButton": "下一步",
+  "userGuideDoneButton": "完成"
   }

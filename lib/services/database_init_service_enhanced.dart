@@ -3,7 +3,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:jinlin_app/models/holiday_model_extended.dart';
 import 'package:jinlin_app/models/contact_model.dart';
 import 'package:jinlin_app/models/user_settings_model.dart';
-import 'package:jinlin_app/models/reminder_event_model.dart';
 import 'package:jinlin_app/services/hive_database_service_enhanced.dart';
 import 'package:jinlin_app/services/database_migration_manager.dart';
 import 'package:jinlin_app/services/database_validator_service.dart';
@@ -39,7 +38,7 @@ class DatabaseInitServiceEnhanced {
   }
 
   /// 初始化数据库
-  Future<bool> initialize(BuildContext context) async {
+  Future<bool> initialize([BuildContext? context]) async {
     try {
       // 初始化数据库服务
       await _dbService.initialize();
@@ -83,8 +82,8 @@ class DatabaseInitServiceEnhanced {
       // 清除初始化状态
       await _saveInitializationState(false);
 
-      // 重新初始化
-      return await initialize(context);
+      // 重新初始化，不依赖于BuildContext
+      return await initialize();
     } catch (e) {
       debugPrint('重置数据库失败: $e');
       return false;

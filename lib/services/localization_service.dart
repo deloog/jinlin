@@ -127,7 +127,11 @@ class LocalizationService {
   }
 
   /// 根据语言环境获取用户所在地区
-  static String getUserRegion(BuildContext context) {
+  static String getUserRegion(BuildContext? context) {
+    if (context == null) {
+      return 'CN'; // 如果 context 为 null，默认返回中国地区
+    }
+
     final locale = Localizations.localeOf(context);
 
     if (locale.languageCode == 'zh') {

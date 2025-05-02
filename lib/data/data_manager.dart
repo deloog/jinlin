@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logging/logging.dart';
@@ -36,18 +35,18 @@ class DataManager {
     try {
       final prefs = await SharedPreferences.getInstance();
       final String? remindersString = prefs.getString('reminders');
-      
+
       if (remindersString != null) {
         final List<dynamic> reminderJson = jsonDecode(remindersString);
         final loadedReminders = reminderJson
             .map((json) => Reminder.fromJson(json))
             .whereType<Reminder>() // 确保转换成功
             .toList();
-        
+
         // 更新缓存
         _cachedReminders = loadedReminders;
         _lastLoadTime = DateTime.now();
-        
+
         logger.info('Loaded ${loadedReminders.length} reminders from SharedPreferences');
         return loadedReminders;
       } else {
@@ -74,11 +73,11 @@ class DataManager {
       final prefs = await SharedPreferences.getInstance();
       final String remindersString = jsonEncode(reminders.map((r) => r.toJson()).toList());
       await prefs.setString('reminders', remindersString);
-      
+
       // 更新缓存
       _cachedReminders = List.from(reminders);
       _lastLoadTime = DateTime.now();
-      
+
       logger.info('Saved ${reminders.length} reminders to SharedPreferences');
     } catch (e) {
       logger.warning('Failed to save reminders: $e');
@@ -133,7 +132,7 @@ class DataManager {
       // 删除提醒
       final initialLength = reminders.length;
       reminders.removeWhere((r) => r.id == id);
-      
+
       // 检查是否真的删除了
       if (reminders.length < initialLength) {
         // 保存更新后的列表
@@ -157,7 +156,7 @@ class DataManager {
       // 查找要更新的提醒
       final index = reminders.indexWhere((r) => r.id == id);
       if (index != -1) {
-        // 切换完成状态
+        // 切换完成状态并获取新的Reminder实例
         reminders[index] = reminders[index].toggleComplete();
         // 保存更新后的列表
         await saveReminders(reminders);
@@ -184,26 +183,26 @@ class DataManager {
     try {
       // 获取所有提醒
       final reminders = await getReminders();
-      
+
       // 创建导出数据
       final exportData = {
         'reminders': reminders.map((r) => r.toJson()).toList(),
         'exportDate': DateTime.now().toIso8601String(),
         'version': '1.0',
       };
-      
+
       // 转换为 JSON 字符串
       final jsonString = jsonEncode(exportData);
-      
+
       // 获取应用文档目录
       final directory = await getApplicationDocumentsDirectory();
       final fileName = 'jinlin_backup_${DateTime.now().millisecondsSinceEpoch}.json';
       final filePath = '${directory.path}/$fileName';
-      
+
       // 写入文件
       final file = File(filePath);
       await file.writeAsString(jsonString);
-      
+
       logger.info('Data exported to: $filePath');
       return filePath;
     } catch (e) {
@@ -218,28 +217,28 @@ class DataManager {
       // 读取文件
       final file = File(filePath);
       final jsonString = await file.readAsString();
-      
+
       // 解析 JSON
       final importData = jsonDecode(jsonString);
-      
+
       // 验证数据格式
       if (!importData.containsKey('reminders') || !importData.containsKey('version')) {
         throw Exception('Invalid backup file format');
       }
-      
+
       // 转换为 Reminder 对象
       final List<dynamic> reminderJsonList = importData['reminders'];
       final importedReminders = reminderJsonList
           .map((json) => Reminder.fromJson(json))
           .whereType<Reminder>()
           .toList();
-      
+
       // 保存导入的提醒
       await saveReminders(importedReminders);
-      
+
       // 清除缓存
       clearCache();
-      
+
       logger.info('Imported ${importedReminders.length} reminders from: $filePath');
       return importedReminders.length;
     } catch (e) {

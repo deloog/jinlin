@@ -7,10 +7,10 @@ class HolidayFilterDialog extends StatefulWidget {
   final Function(Set<SpecialDateType>) onApply;
 
   const HolidayFilterDialog({
-    Key? key,
+    super.key,
     required this.selectedTypes,
     required this.onApply,
-  }) : super(key: key);
+  });
 
   @override
   State<HolidayFilterDialog> createState() => _HolidayFilterDialogState();

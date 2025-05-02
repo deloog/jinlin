@@ -15,10 +15,10 @@ class TestApp extends StatelessWidget {
   final Widget child;
 
   const TestApp({
-    Key? key,
+    super.key,
     required this.locale,
     required this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +40,7 @@ class TestApp extends StatelessWidget {
 class TestWidget extends StatelessWidget {
   final Function(BuildContext) onBuild;
 
-  const TestWidget({Key? key, required this.onBuild}) : super(key: key);
+  const TestWidget({super.key, required this.onBuild});
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +51,6 @@ class TestWidget extends StatelessWidget {
 
 void main() {
   group('AI描述生成器测试', () {
-    late MockClient mockClient;
     late AIDescriptionGenerator generator;
 
     setUp(() async {
@@ -63,8 +62,8 @@ void main() {
         debugPrint('Warning: .env file not found. Tests will still run.');
       }
 
-      // 创建 Mock HTTP 客户端
-      mockClient = MockClient();
+      // 注意：在实际测试中，我们会使用MockClient来模拟HTTP请求
+      // 但在这个简化的测试中，我们直接使用AIDescriptionGenerator
 
       // 创建 AI 描述生成器实例
       generator = AIDescriptionGenerator();

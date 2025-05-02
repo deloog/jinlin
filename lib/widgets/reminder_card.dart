@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:intl/intl.dart';
 import '../reminder.dart';
 import '../utils/date_formatter.dart';
 
@@ -65,11 +63,11 @@ class ReminderCard extends StatelessWidget {
     Color cardColor;
     if (isToday) {
       cardColor = theme.brightness == Brightness.dark
-          ? Colors.blue.shade900.withOpacity(0.3)
+          ? Colors.blue.shade900.withAlpha(76) // 0.3 * 255 = 76
           : Colors.blue.shade50;
     } else {
       cardColor = theme.brightness == Brightness.dark
-          ? theme.cardColor.withOpacity(0.8)
+          ? theme.cardColor.withAlpha(204) // 0.8 * 255 = 204
           : theme.cardColor;
     }
 
@@ -95,10 +93,10 @@ class ReminderCard extends StatelessWidget {
         accentColor = Colors.purple;
         break;
       case ReminderType.general:
-      default:
         typeIcon = Icons.event_note;
         accentColor = theme.colorScheme.primary;
         break;
+      // 如果将来添加新的ReminderType类型，在这里处理
     }
 
     // 构建卡片内容
@@ -180,7 +178,7 @@ class ReminderCard extends StatelessWidget {
           // 右侧箭头
           Icon(
             Icons.chevron_right,
-            color: theme.colorScheme.onSurface.withOpacity(0.5),
+            color: theme.colorScheme.onSurface.withAlpha(128), // 0.5 * 255 = 128
           ),
         ],
       ),
@@ -196,7 +194,7 @@ class ReminderCard extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12.0),
           side: isToday
-              ? BorderSide(color: accentColor.withOpacity(0.5), width: 1.0)
+              ? BorderSide(color: accentColor.withAlpha(128), width: 1.0) // 0.5 * 255 = 128
               : BorderSide.none,
         ),
         child: InkWell(

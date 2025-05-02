@@ -4,7 +4,6 @@ import 'package:jinlin_app/models/holiday_model.dart';
 import 'package:jinlin_app/services/cloud_sync_service.dart';
 import 'package:jinlin_app/services/localization_service.dart';
 import 'package:jinlin_app/services/hive_database_service.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class SyncConflictScreen extends StatefulWidget {
   const SyncConflictScreen({super.key});
@@ -17,21 +16,21 @@ class _SyncConflictScreenState extends State<SyncConflictScreen> {
   final CloudSyncService _cloudSyncService = CloudSyncService();
   List<HolidayModel> _conflictedHolidays = [];
   bool _isLoading = true;
-  
+
   @override
   void initState() {
     super.initState();
     _loadConflictedHolidays();
   }
-  
+
   Future<void> _loadConflictedHolidays() async {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
       final holidays = await _cloudSyncService.getConflictedHolidays();
-      
+
       if (mounted) {
         setState(() {
           _conflictedHolidays = holidays;
@@ -49,24 +48,24 @@ class _SyncConflictScreenState extends State<SyncConflictScreen> {
       }
     }
   }
-  
+
   Future<void> _resolveConflict(HolidayModel holiday, bool keepLocal) async {
     try {
       if (keepLocal) {
         // 保留本地版本，上传到云端
         final updatedHoliday = holiday.copyWithLastModified();
         await HiveDatabaseService.saveHoliday(updatedHoliday);
-        
+
         // 从冲突列表中移除
         setState(() {
           _conflictedHolidays.removeWhere((h) => h.id == holiday.id);
         });
-        
+
         // 如果冲突全部解决，清除冲突记录
         if (_conflictedHolidays.isEmpty) {
           await _cloudSyncService.clearConflicts();
         }
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('已保留本地版本: ${holiday.name}')),
@@ -75,17 +74,17 @@ class _SyncConflictScreenState extends State<SyncConflictScreen> {
       } else {
         // 使用云端版本，重新下载
         await _cloudSyncService.downloadHolidayData();
-        
+
         // 从冲突列表中移除
         setState(() {
           _conflictedHolidays.removeWhere((h) => h.id == holiday.id);
         });
-        
+
         // 如果冲突全部解决，清除冲突记录
         if (_conflictedHolidays.isEmpty) {
           await _cloudSyncService.clearConflicts();
         }
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('已使用云端版本: ${holiday.name}')),
@@ -100,7 +99,7 @@ class _SyncConflictScreenState extends State<SyncConflictScreen> {
       }
     }
   }
-  
+
   Future<void> _resolveAllConflicts(bool keepLocal) async {
     try {
       if (keepLocal) {
@@ -109,33 +108,33 @@ class _SyncConflictScreenState extends State<SyncConflictScreen> {
           final updatedHoliday = holiday.copyWithLastModified();
           await HiveDatabaseService.saveHoliday(updatedHoliday);
         }
-        
+
         // 清除冲突记录
         await _cloudSyncService.clearConflicts();
-        
+
         setState(() {
           _conflictedHolidays = [];
         });
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('已保留所有本地版本')),
+            const SnackBar(content: Text('已保留所有本地版本')),
           );
         }
       } else {
         // 使用所有云端版本
         await _cloudSyncService.downloadHolidayData();
-        
+
         // 清除冲突记录
         await _cloudSyncService.clearConflicts();
-        
+
         setState(() {
           _conflictedHolidays = [];
         });
-        
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('已使用所有云端版本')),
+            const SnackBar(content: Text('已使用所有云端版本')),
           );
         }
       }
@@ -147,12 +146,11 @@ class _SyncConflictScreenState extends State<SyncConflictScreen> {
       }
     }
   }
-  
+
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
     final isChinese = LocalizationService.isChineseLocale(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(isChinese ? '同步冲突' : 'Sync Conflicts'),
@@ -190,7 +188,7 @@ class _SyncConflictScreenState extends State<SyncConflictScreen> {
                         style: Theme.of(context).textTheme.titleMedium,
                       ),
                     ),
-                    
+
                     // 批量操作按钮
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -222,9 +220,9 @@ class _SyncConflictScreenState extends State<SyncConflictScreen> {
                         ],
                       ),
                     ),
-                    
+
                     const Divider(height: 32),
-                    
+
                     // 冲突列表
                     Expanded(
                       child: ListView.builder(

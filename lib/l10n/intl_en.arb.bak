@@ -1,0 +1,131 @@
+{
+  "@@locale": "en",
+  
+  "appName": "Jinlin",
+  "settings": "Settings",
+  "generalSettings": "General Settings",
+  "dataSettings": "Data Settings",
+  "syncSettings": "Sync Settings",
+  "about": "About",
+  
+  "language": "Language",
+  "currentLanguage": "English",
+  "theme": "Theme",
+  "currentTheme": "Light",
+  "notifications": "Notifications",
+  "notificationSettings": "Notification settings",
+  
+  "backupAndRestore": "Backup & Restore",
+  "backupAndRestoreDescription": "Backup and restore your data",
+  "dataManagement": "Data Management",
+  "dataManagementDescription": "Manage your data",
+  "importExport": "Import & Export",
+  "importExportDescription": "Import and export your data",
+  
+  "autoSync": "Auto Sync",
+  "autoSyncDescription": "Automatically sync data with cloud",
+  "syncManagement": "Sync Management",
+  "syncManagementDescription": "Manage sync settings and conflicts",
+  "syncStatus": "Sync Status",
+  "syncing": "Syncing...",
+  "lastSyncTimeAgo": "Last synced recently",
+  "neverSynced": "Never synced",
+  "sync": "Sync",
+  
+  "appInfo": "App Info",
+  "help": "Help",
+  "privacyPolicy": "Privacy Policy",
+  "termsOfService": "Terms of Service",
+  
+  "syncInterval": "Sync Interval",
+  "selectSyncInterval": "Select sync interval",
+  "minutesCount": "{count, plural, =1{1 minute} other{{count} minutes}}",
+  "@minutesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hour1": "1 hour",
+  "hoursCount": "{count, plural, =1{1 hour} other{{count} hours}}",
+  "@hoursCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "day1": "1 day",
+  "daysCount": "{count, plural, =1{1 day} other{{count} days}}",
+  "@daysCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "syncIntervalMinutes": "{minutes, plural, =1{1 minute} other{{minutes} minutes}}",
+  "@syncIntervalMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  
+  "syncOnlyOnWifi": "Sync Only on Wi-Fi",
+  "syncOnlyOnWifiDescription": "Only sync when connected to Wi-Fi",
+  "incrementalSync": "Incremental Sync",
+  "incrementalSyncDescription": "Only sync changed data",
+  "conflictResolution": "Conflict Resolution",
+  "selectConflictResolution": "Select conflict resolution strategy",
+  "useLocalData": "Use Local Data",
+  "useLocalDataDescription": "Always use local data when conflicts occur",
+  "useServerData": "Use Server Data",
+  "useServerDataDescription": "Always use server data when conflicts occur",
+  "mergeData": "Merge Data",
+  "mergeDataDescription": "Try to merge local and server data",
+  "manualResolution": "Manual Resolution",
+  "manualResolutionDescription": "Manually resolve conflicts",
+  "syncDeletedData": "Sync Deleted Data",
+  "syncDeletedDataDescription": "Sync data that has been deleted",
+  "enableEncryption": "Enable Encryption",
+  "enableEncryptionDescription": "Encrypt data before syncing",
+  "enableCompression": "Enable Compression",
+  "enableCompressionDescription": "Compress data before syncing",
+  "clearSyncData": "Clear Sync Data",
+  "clearSyncDataConfirmation": "Are you sure you want to clear all sync data? This will not delete your actual data, only sync information.",
+  
+  "syncOperations": "Sync Operations",
+  "noSyncOperations": "No sync operations",
+  "syncConflicts": "Sync Conflicts",
+  "noSyncConflicts": "No sync conflicts",
+  "viewAll": "View All",
+  
+  "create": "Create",
+  "update": "Update",
+  "delete": "Delete",
+  "softDelete": "Soft Delete",
+  "restore": "Restore",
+  
+  "pending": "Pending",
+  "synced": "Synced",
+  "failed": "Failed",
+  "conflict": "Conflict",
+  "conflicts": "Conflicts",
+  "idle": "Idle",
+  
+  "lastSyncTime": "Last Sync Time",
+  "lastSyncError": "Last Sync Error",
+  "never": "Never",
+  "retry": "Retry",
+  "cancel": "Cancel",
+  "save": "Save",
+  "clear": "Clear",
+  
+  "resolveConflict": "Resolve Conflict",
+  "skip": "Skip",
+  "resolve": "Resolve"
+}

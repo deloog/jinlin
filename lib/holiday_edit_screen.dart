@@ -4,7 +4,6 @@ import 'package:jinlin_app/models/holiday_model.dart';
 import 'package:jinlin_app/services/hive_database_service.dart';
 import 'package:jinlin_app/services/localization_service.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:jinlin_app/special_date.dart' as special_date;
 
 class HolidayEditScreen extends StatefulWidget {
   final HolidayModel holiday;

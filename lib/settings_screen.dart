@@ -13,6 +13,9 @@ import 'package:jinlin_app/services/holiday_init_service.dart';
 import 'package:jinlin_app/services/layout_service.dart';
 import 'package:jinlin_app/providers/app_settings_provider.dart';
 import 'package:jinlin_app/screens/settings/language_settings_screen.dart';
+import 'package:jinlin_app/admin/admin_main.dart'; // 管理后台
+import 'package:jinlin_app/services/database_manager_unified.dart'; // 统一数据库管理服务
+import 'package:jinlin_app/pages/settings/database_performance_page.dart'; // 数据库性能测试页面
 
 
 class SettingsScreen extends StatefulWidget {
@@ -235,16 +238,34 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
           // --- 数据管理 ---
            _buildSectionTitle(context, l10n.settingsSectionData), // TODO: 本地化
+           // 管理后台入口
            ListTile(
-            leading: const Icon(Icons.festival_outlined),
-            title: Text(l10n.holidayManagementTitle ?? '节日管理'),
-            subtitle: Text(l10n.holidayManagementDescription ?? '管理节日显示和重要性'),
+            leading: const Icon(Icons.admin_panel_settings),
+            title: Text(isChinese ? '节日数据管理后台' : 'Holiday Data Admin'),
+            subtitle: Text(isChinese ? '添加、编辑和删除节日数据（管理员功能）' : 'Add, edit and delete holiday data (admin function)'),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => const HolidayManagementScreen(),
+                  builder: (context) => const AdminApp(),
+                ),
+              );
+            },
+          ),
+           ListTile(
+            leading: const Icon(Icons.festival_outlined),
+            title: Text(isChinese ? '个人节日设置' : 'Holiday Management'),
+            subtitle: Text(isChinese ? '设置节日显示和个人重要性' : 'Set holiday display and personal importance'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Provider<DatabaseManagerUnified>(
+                    create: (_) => DatabaseManagerUnified(),
+                    child: const HolidayManagementScreen(),
+                  ),
                 ),
               );
             },
@@ -278,52 +299,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.speed),
+            title: Text(isChinese ? '数据库性能测试' : 'Database Performance Test'),
+            subtitle: Text(isChinese ? '测试和监控数据库性能' : 'Test and monitor database performance'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const DatabasePerformancePage(),
+                ),
+              );
+            },
+          ),
+          ListTile(
             leading: const Icon(Icons.refresh),
             title: Text(l10n.resetGlobalHolidays),
             subtitle: Text(l10n.resetGlobalHolidaysConfirm),
-            onTap: () async {
+            onTap: () {
               // 显示确认对话框
-              final bool? confirm = await showDialog<bool>(
-                context: context,
-                builder: (context) => AlertDialog(
-                  title: Text(l10n.confirmReset),
-                  content: Text(l10n.resetGlobalHolidaysConfirm),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.of(context).pop(false),
-                      child: Text(l10n.cancelButton),
-                    ),
-                    ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(true),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                      ),
-                      child: Text(l10n.resetGlobalHolidays),
-                    ),
-                  ],
-                ),
-              );
-
-              // 如果用户确认，执行重置
-              if (confirm == true) {
-                try {
-                  final holidayInitService = HolidayInitService();
-                  await holidayInitService.resetGlobalHolidays();
-
-                  if (mounted && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.globalHolidayDataReset)),
-                    );
-                  }
-                } catch (e) {
-                  if (mounted && context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text(l10n.resetFailed(e.toString()))),
-                    );
-                  }
-                }
-              }
+              _showResetConfirmationDialog();
             },
           ),
 
@@ -968,5 +963,59 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.circular(8.0),
       ),
     );
+  }
+
+  // 显示重置确认对话框
+  Future<void> _showResetConfirmationDialog() async {
+    final l10n = AppLocalizations.of(context);
+
+    // 显示确认对话框
+    final bool? confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.confirmReset),
+        content: Text(l10n.resetGlobalHolidaysConfirm),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(l10n.cancelButton),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l10n.resetGlobalHolidays),
+          ),
+        ],
+      ),
+    );
+
+    // 如果用户确认，执行重置
+    if (confirm == true) {
+      // 在异步操作前捕获所需的本地化字符串
+      final successMessage = l10n.globalHolidayDataReset;
+      final failureMessagePrefix = l10n.resetFailed('');
+
+      try {
+        final holidayInitService = HolidayInitService();
+        await holidayInitService.resetGlobalHolidays();
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(successMessage)),
+          );
+        }
+      } catch (e) {
+        if (mounted) {
+          // 移除前缀中的占位符，然后添加实际错误信息
+          final errorMessage = failureMessagePrefix.replaceAll('', '') + e.toString();
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(errorMessage)),
+          );
+        }
+      }
+    }
   }
 }

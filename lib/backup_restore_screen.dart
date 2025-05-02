@@ -17,7 +17,6 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
   final DataManager _dataManager = DataManager();
   final FileManager _fileManager = FileManager();
   bool _isLoading = false;
-  String? _lastBackupPath;
   DateTime? _lastBackupTime;
 
   @override
@@ -34,8 +33,11 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
 
   // 备份数据
   Future<void> _backupData() async {
+    if (!mounted) return;
+
+    // 获取本地化实例，在异步操作前
     final l10n = AppLocalizations.of(context);
-    
+
     setState(() {
       _isLoading = true;
     });
@@ -43,20 +45,21 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
     try {
       // 导出数据到文件
       final filePath = await _dataManager.exportData();
-      
+
+      if (!mounted) return;
+
       // 分享文件
       final shared = await _fileManager.shareFile(
         filePath,
         subject: l10n.backupFileSubject,
       );
-      
+
       if (shared) {
         // 更新上次备份信息
         setState(() {
-          _lastBackupPath = filePath;
           _lastBackupTime = DateTime.now();
         });
-        
+
         // 显示成功消息
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -83,8 +86,11 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
 
   // 恢复数据
   Future<void> _restoreData() async {
+    if (!mounted) return;
+
+    // 获取本地化实例，在异步操作前
     final l10n = AppLocalizations.of(context);
-    
+
     setState(() {
       _isLoading = true;
     });
@@ -95,15 +101,20 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
         allowedExtensions: ['json'],
         dialogTitle: l10n.selectBackupFileTitle,
       );
-      
-      if (filePath == null) {
-        // 用户取消了选择
-        setState(() {
-          _isLoading = false;
-        });
+
+      if (filePath == null || !mounted) {
+        // 用户取消了选择或组件已卸载
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
         return;
       }
-      
+
+      // 显示确认对话框前检查组件是否仍然挂载
+      if (!mounted) return;
+
       // 显示确认对话框
       final confirmed = await showDialog<bool>(
         context: context,
@@ -122,7 +133,7 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
           ],
         ),
       );
-      
+
       if (confirmed != true) {
         // 用户取消了恢复
         setState(() {
@@ -130,10 +141,10 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
         });
         return;
       }
-      
+
       // 导入数据
       final importedCount = await _dataManager.importData(filePath);
-      
+
       // 显示成功消息
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -161,7 +172,7 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final theme = Theme.of(context);
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.backupRestoreTitle),
@@ -199,7 +210,7 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
                             Padding(
                               padding: const EdgeInsets.only(bottom: 16.0),
                               child: Text(
-                                l10n.lastBackupTime(_lastBackupTime!),
+                                l10n.lastBackupTime(_lastBackupTime!.toString()),
                                 style: theme.textTheme.bodySmall,
                               ),
                             ),
@@ -216,7 +227,7 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // 恢复卡片
                   Card(
                     child: Padding(
@@ -250,7 +261,7 @@ class _BackupRestoreScreenState extends State<BackupRestoreScreen> {
                       ),
                     ),
                   ),
-                  
+
                   // 警告信息
                   const SizedBox(height: 24.0),
                   Container(

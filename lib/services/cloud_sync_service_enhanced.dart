@@ -6,7 +6,6 @@ import 'package:jinlin_app/models/contact_model.dart';
 import 'package:jinlin_app/models/user_settings_model.dart';
 import 'package:jinlin_app/models/reminder_event_model.dart';
 import 'package:jinlin_app/services/hive_database_service_enhanced.dart';
-import 'package:http/http.dart' as http;
 import 'package:crypto/crypto.dart';
 
 /// 增强版云同步服务
@@ -20,9 +19,6 @@ class CloudSyncServiceEnhanced {
 
   // 数据库服务
   final _dbService = HiveDatabaseServiceEnhanced();
-
-  // 模拟的API基础URL
-  static const String _apiBaseUrl = 'https://api.example.com';
 
   // 用户认证令牌
   String? _authToken;

@@ -176,9 +176,9 @@ class _HolidayCreateScreenState extends State<HolidayCreateScreen> {
                       Expanded(
                         child: TextField(
                           controller: _idController,
-                          decoration: InputDecoration(
+                          decoration: const InputDecoration(
                             hintText: 'CUSTOM_XXXX_XXXXXXXXXX',
-                            border: const OutlineInputBorder(),
+                            border: OutlineInputBorder(),
                           ),
                           enabled: !_isGeneratingId,
                         ),

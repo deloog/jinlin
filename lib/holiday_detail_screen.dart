@@ -10,10 +10,10 @@ class HolidayDetailScreen extends StatelessWidget {
   final DateTime occurrenceDate;
 
   const HolidayDetailScreen({
-    Key? key,
+    super.key,
     required this.holiday,
     required this.occurrenceDate,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

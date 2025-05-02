@@ -3,6 +3,7 @@ import 'reminder_detail_screen.dart';
 import 'settings_screen.dart';
 import 'holiday_detail_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -20,35 +21,75 @@ import 'firebase_options.dart';
 import 'utils/date_formatter.dart';
 
 import 'package:jinlin_app/holiday_filter_dialog.dart'; // 节日筛选对话框
-import 'package:jinlin_app/special_date.dart'; // 特殊日期数据模型
+import 'package:jinlin_app/special_date.dart' as special_date; // 特殊日期数据模型
 import 'timeline_item.dart';
-import 'package:jinlin_app/services/holiday_storage_service.dart'; // 节日存储服务
-import 'package:jinlin_app/services/hive_database_service.dart'; // Hive数据库服务
-import 'package:jinlin_app/services/holiday_migration_service.dart'; // 节日数据迁移服务
+import 'package:jinlin_app/services/database_manager_enhanced.dart';
 import 'package:jinlin_app/services/theme_service.dart'; // 主题服务
-import 'package:jinlin_app/services/holiday_init_service.dart'; // 节日初始化服务
 import 'package:jinlin_app/services/auto_sync_service.dart'; // 自动同步服务
-import 'package:jinlin_app/services/database_init_service.dart'; // 数据库初始化服务
-import 'package:jinlin_app/services/data_manager_service.dart'; // 数据管理服务
-import 'package:jinlin_app/services/localization_service.dart'; // 本地化服务
+import 'package:jinlin_app/utils/event_bus.dart'; // 事件总线
+import 'dart:async'; // StreamSubscription
+import 'package:jinlin_app/services/localization_service.dart' as localization; // 本地化服务
 import 'package:jinlin_app/providers/app_settings_provider.dart'; // 应用设置提供者
-
-import 'package:jinlin_app/models/holiday_model.dart' as holiday_model; // 节日数据模型
+import 'package:jinlin_app/services/database_manager_unified.dart'; // 统一数据库管理服务
+import 'package:jinlin_app/models/unified/holiday.dart' as models; // 统一的节日模型
 
 import 'widgets/page_transitions.dart';
 import 'widgets/card_icon.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+// 创建一个全局的 NavigatorKey，用于在没有 context 的情况下访问 Navigator
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-  // 初始化Firebase
+// 全局错误处理函数
+void _handleError(Object error, StackTrace stack) {
+  debugPrint('=== 捕获到全局错误 ===');
+  debugPrint('错误: $error');
+  debugPrint('堆栈: $stack');
+  // 这里可以添加错误上报逻辑
+}
+
+Future<void> main() async {
+  // 设置全局错误处理
+  FlutterError.onError = (FlutterErrorDetails details) {
+    debugPrint('=== 捕获到Flutter错误 ===');
+    debugPrint('错误: ${details.exception}');
+    debugPrint('堆栈: ${details.stack}');
+    // 这里可以添加错误上报逻辑
+  };
+
+  // 捕获未处理的异步错误
+  PlatformDispatcher.instance.onError = (error, stack) {
+    _handleError(error, stack);
+    return true; // 返回true表示错误已处理
+  };
+
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    debugPrint("Firebase初始化成功");
-  } catch (e) {
-    debugPrint("Firebase初始化失败: $e");
+    debugPrint('=== 应用启动 ===');
+    debugPrint('平台: ${defaultTargetPlatform.name}');
+
+    WidgetsFlutterBinding.ensureInitialized();
+    debugPrint('Flutter绑定初始化完成');
+
+    // 初始化Firebase
+    try {
+      // 检查当前平台是否支持Firebase
+      if (kIsWeb ||
+          defaultTargetPlatform == TargetPlatform.android ||
+          defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS) {
+        debugPrint('正在初始化Firebase...');
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
+        debugPrint("Firebase初始化成功");
+      } else {
+        debugPrint("当前平台 (${defaultTargetPlatform.name}) 不支持Firebase，跳过初始化");
+      }
+    } catch (e, stack) {
+      debugPrint("Firebase初始化失败: $e");
+      debugPrint("堆栈: $stack");
+    }
+  } catch (e, stack) {
+    _handleError(e, stack);
   }
 
   // 初始化中文 locale，必须在 runApp 前
@@ -59,10 +100,9 @@ Future<void> main() async {
     debugPrint("无法加载 .env 文件: $e");
   }
 
-  // 创建一个临时的 BuildContext 用于数据迁移
-  final navigatorKey = GlobalKey<NavigatorState>();
+  // 创建一个临时的应用用于数据迁移
   final app = MaterialApp(
-    navigatorKey: navigatorKey,
+    navigatorKey: navigatorKey, // 使用全局定义的 navigatorKey
     home: const Scaffold(
       body: Center(child: CircularProgressIndicator()),
     ),
@@ -74,18 +114,14 @@ Future<void> main() async {
   // 等待框架渲染第一帧
   await Future.delayed(const Duration(milliseconds: 100));
 
-  // 使用统一的数据管理服务
-  final dataManager = DataManagerService();
-  final context = navigatorKey.currentContext;
+  // 使用统一的数据库管理服务
+  final dbManager = DatabaseManagerUnified();
 
   // 初始化数据库和节日数据
-  if (context != null) {
-    final success = await dataManager.initialize(context);
-    if (!success) {
-      debugPrint("数据库初始化失败，将使用默认设置");
-    }
-  } else {
-    debugPrint("无法获取有效的BuildContext，数据库初始化失败");
+  // 不使用 BuildContext 初始化数据库，避免跨异步间隙使用 BuildContext
+  final success = await dbManager.initialize(null);
+  if (!success) {
+    debugPrint("数据库初始化失败，将使用默认设置");
   }
 
   // 启用自动同步服务
@@ -96,11 +132,19 @@ Future<void> main() async {
   final appSettingsProvider = AppSettingsProvider();
   await appSettingsProvider.initialize();
 
+  // 创建增强版数据库管理器
+  final dbManagerEnhanced = DatabaseManagerEnhanced();
+  await dbManagerEnhanced.initialize(null); // 不使用 BuildContext 初始化
+
   // 运行实际应用，使用Provider包装
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => appSettingsProvider),
+        // 添加数据库管理服务提供者
+        Provider<DatabaseManagerUnified>.value(value: dbManager),
+        // 添加增强版数据库管理服务提供者
+        ChangeNotifierProvider<DatabaseManagerEnhanced>.value(value: dbManagerEnhanced),
       ],
       child: const MyApp(),
     ),
@@ -109,8 +153,17 @@ Future<void> main() async {
 
 class MyApp extends StatefulWidget {
   const MyApp({super.key});
-  static _MyAppState? of(BuildContext context) =>
+  // 使用私有方法代替公共API中的私有类型
+  static _MyAppState? _of(BuildContext context) =>
       context.findAncestorStateOfType<_MyAppState>();
+
+  // 提供公共方法来访问需要的功能
+  static void updateLocale(BuildContext context, Locale locale) {
+    final state = _of(context);
+    if (state != null && state.mounted) {
+      state._updateLocale(locale);
+    }
+  }
 
   @override
   State<MyApp> createState() => _MyAppState();
@@ -124,6 +177,14 @@ class _MyAppState extends State<MyApp> {
     super.initState();
     _loadSpecialDaysRange(); // 加载特殊纪念日显示范围
     _initThemeService(); // 初始化主题服务
+  }
+
+  // 更新应用程序语言
+  void _updateLocale(Locale locale) {
+    if (mounted) {
+      final appSettings = Provider.of<AppSettingsProvider>(context, listen: false);
+      appSettings.updateLocale(locale);
+    }
   }
 
   // 初始化主题服务
@@ -160,8 +221,7 @@ class _MyAppState extends State<MyApp> {
       });
 
       // 通知所有需要刷新的页面
-      final context = this.context;
-      if (context.mounted) {
+      if (mounted) {
         // 找到 MyHomePage 的状态并刷新
         final homeState = context.findAncestorStateOfType<_MyHomePageState>();
         if (homeState != null && homeState.mounted) {
@@ -178,6 +238,7 @@ class _MyAppState extends State<MyApp> {
 
     return MaterialApp(
       locale: appSettings.locale,
+      navigatorKey: navigatorKey, // 使用全局定义的 navigatorKey
       title: 'CetaMind Reminder',
       theme: _themeService.lightTheme,
       darkTheme: _themeService.darkTheme,
@@ -188,7 +249,7 @@ class _MyAppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: LocalizationService.supportedLocales,
+      supportedLocales: localization.LocalizationService.supportedLocales,
       home: const MyHomePage(title: 'CetaMind Reminder'),
       debugShowCheckedModeBanner: false,
     );
@@ -208,25 +269,52 @@ class _MyHomePageState extends State<MyHomePage> {
   bool _isLoading = true;
   List<TimelineItem> _sortedTimelineItems = [];
 
+  // 事件订阅
+  late StreamSubscription _eventSubscription;
+
   // 节日筛选状态
-  Set<SpecialDateType> _selectedHolidayTypes = {
-    SpecialDateType.statutory,
-    SpecialDateType.traditional,
-    SpecialDateType.memorial,
-    SpecialDateType.solarTerm,
+  Set<special_date.SpecialDateType> _selectedHolidayTypes = {
+    special_date.SpecialDateType.statutory,
+    special_date.SpecialDateType.traditional,
+    special_date.SpecialDateType.memorial,
+    special_date.SpecialDateType.solarTerm,
   };
 
   @override
   void initState() {
     super.initState();
     // 初始化状态，但不调用依赖于 context 的方法
+
+    // 监听刷新时间线事件
+    _eventSubscription = EventBus.instance.on.listen((event) {
+      if (event is RefreshTimelineEvent) {
+        // 收到刷新事件，重新加载时间线
+        _prepareTimelineItems();
+      }
+    });
+
+    // 加载提醒列表
+    _loadReminders();
   }
+
+  @override
+  void dispose() {
+    // 取消事件订阅
+    _eventSubscription.cancel();
+    super.dispose();
+  }
+
+  // 标记是否已经加载过数据
+  bool _hasLoadedData = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // 在这里调用依赖于 context 的方法
-    _prepareTimelineItems();
+    // 在这里调用依赖于 context 的方法，但只在第一次调用时加载数据
+    if (!_hasLoadedData) {
+      _hasLoadedData = true;
+      _prepareTimelineItems();
+    }
   }
 
   // 从 SharedPreferences 加载提醒列表
@@ -247,7 +335,7 @@ class _MyHomePageState extends State<MyHomePage> {
         }
       }
     } catch (e) {
-      print("加载提醒事项失败: $e");
+      debugPrint("加载提醒事项失败: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('加载提醒事项失败')),
@@ -267,7 +355,7 @@ class _MyHomePageState extends State<MyHomePage> {
       final String remindersString = jsonEncode(_reminders.map((r) => r.toJson()).toList());
       await prefs.setString('reminders', remindersString);
     } catch (e) {
-      print("保存提醒事项失败: $e");
+      debugPrint("保存提醒事项失败: $e");
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('保存提醒事项失败')),
@@ -301,7 +389,7 @@ Future<void> _saveRemindersDirectly(List<Reminder> remindersToSave) async {
      final String remindersString = jsonEncode(remindersToSave.map((r) => r.toJson()).toList());
      await prefs.setString('reminders', remindersString);
    } catch (e) {
-     print("直接保存提醒事项失败: $e");
+     debugPrint("直接保存提醒事项失败: $e");
      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('保存提醒事项失败')),
@@ -326,7 +414,7 @@ Future<void> _saveRemindersDirectly(List<Reminder> remindersToSave) async {
         }
      });
   } else {
-     print("错误：尝试删除 ID 为 $id 的提醒，但在列表中未找到。");
+     debugPrint("错误：尝试删除 ID 为 $id 的提醒，但在列表中未找到。");
   }
 }
 
@@ -391,12 +479,13 @@ if (result is Reminder) { // --- 处理单个添加/编辑的情况 ---
      _saveReminders(); // 保存整个列表
      _prepareTimelineItems(); // 刷新首页
   } else {
-     print("错误：编辑返回的索引无效 ($returnedIndex)");
-     ScaffoldMessenger.of(context).showSnackBar( const SnackBar(content: Text('更新提醒失败，请重试')),); // TODO: 本地化
+     debugPrint("错误：编辑返回的索引无效 ($returnedIndex)");
+     final l10n = AppLocalizations.of(context);
+     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.deleteFailed)));
   }
 } else if (result is List<Reminder>) { // --- 新增：处理批量添加返回的情况 ---
   // 如果返回的是一个 Reminder 列表 (来自批量保存)
-  print(">>> MainScreen - Received a list of ${result.length} new reminders.");
+  debugPrint(">>> MainScreen - Received a list of ${result.length} new reminders.");
 
   // 创建一个新的列表，包含旧的和所有新添加的
   final updatedReminders = List<Reminder>.from(_reminders)..addAll(result);
@@ -409,31 +498,12 @@ if (result is Reminder) { // --- 处理单个添加/编辑的情况 ---
   });
 } else {
    // 可以处理其他未知的返回类型，或者忽略
-   print("从 AddReminderScreen 返回了未知类型的结果: $result");
+   debugPrint("从 AddReminderScreen 返回了未知类型的结果: $result");
 }
   } // _navigateToAddEditScreen 结束
 
-  // 获取过滤和排序后的提醒列表 (Getter)
-  List<Reminder> get _filteredReminders {
-    final now = DateTime.now();
-    var filteredList = _reminders.where((r) { // 注意这里是 filteredList
-        if (r.dueDate == null) return true;
-        final reminderDueMinute = DateTime(r.dueDate!.year, r.dueDate!.month, r.dueDate!.day, r.dueDate!.hour, r.dueDate!.minute);
-        final currentMinute = DateTime(now.year, now.month, now.day, now.hour, now.minute);
-        return !reminderDueMinute.isBefore(currentMinute);
-    }).toList();
-
-    // 排序
-    filteredList.sort((a, b) {
-       if (!a.isCompleted && b.isCompleted) return -1;
-       if (a.isCompleted && !b.isCompleted) return 1;
-       if (a.dueDate == null && b.dueDate == null) return 0;
-       if (a.dueDate == null) return 1;
-       if (b.dueDate == null) return -1;
-       return a.dueDate!.compareTo(b.dueDate!);
-    });
-    return filteredList; // 返回排序后的列表
-  } // _filteredReminders 结束 (Getter)
+  // 注意：此方法已被_prepareTimelineItems替代并移除
+  // 如果需要过滤和排序提醒列表的功能，请参考_prepareTimelineItems方法
 
   // 构建主界面 UI
   @override
@@ -478,6 +548,7 @@ if (result is Reminder) { // --- 处理单个添加/编辑的情况 ---
                 _showHolidayFilterDialog();
               },
             ),
+
             // 设置按钮
             IconButton(
               icon: const Icon(Icons.settings),
@@ -491,75 +562,6 @@ if (result is Reminder) { // --- 处理单个添加/编辑的情况 ---
                    ),
                  );
               },
-            ),
-            // 数据库操作按钮
-            PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
-              tooltip: '数据库操作',
-              onSelected: (value) async {
-                switch (value) {
-                  case 'reset':
-                    // 重置数据库
-                    final dataManager = DataManagerService();
-                    final success = await dataManager.resetDatabase(context);
-                    if (mounted) {
-                      if (success) {
-                        // 重新加载节日列表
-                        _prepareTimelineItems();
-                        // 显示提示
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('数据库已重置并重新初始化')),
-                          );
-                        }
-                      } else {
-                        // 显示错误提示
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('数据库重置失败')),
-                          );
-                        }
-                      }
-                    }
-                    break;
-                  case 'create_sample':
-                    // 创建示例节假日数据库
-                    await HolidayMigrationService.createSampleHolidays(context);
-                    if (mounted) {
-                      // 重新加载节日列表
-                      _prepareTimelineItems();
-                      // 显示提示
-                      if (context.mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('示例节假日数据库已创建')),
-                        );
-                      }
-                    }
-                    break;
-                  case 'print':
-                    // 打印所有节日信息
-                    HiveDatabaseService.printAllHolidays();
-                    // 显示提示
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('节日信息已打印到控制台')),
-                    );
-                    break;
-                }
-              },
-              itemBuilder: (context) => [
-                PopupMenuItem<String>(
-                  value: 'reset',
-                  child: Text('重置数据库'),
-                ),
-                PopupMenuItem<String>(
-                  value: 'create_sample',
-                  child: Text('创建示例节假日数据库'),
-                ),
-                PopupMenuItem<String>(
-                  value: 'print',
-                  child: Text('打印节日信息'),
-                ),
-              ],
             ),
          ],
           bottom: PreferredSize( // 使用 PreferredSize 指定 AppBar 底部区域的高度
@@ -636,10 +638,11 @@ Widget _buildCombinedList() {
             .where((item) => item.itemType == TimelineItemType.reminder)
             .map((item) => item.originalObject as Reminder)
             .toList();
-        final todayHolidays = itemsForDate
-            .where((item) => item.itemType == TimelineItemType.holiday)
-            .map((item) => item.originalObject as SpecialDate)
-            .toList();
+        // 获取今天的节日（暂未使用，但保留以备将来使用）
+        // final todayHolidays = itemsForDate
+        //     .where((item) => item.itemType == TimelineItemType.holiday)
+        //     .map((item) => item.originalObject as special_date.SpecialDate)
+        //     .toList();
 
         // 按提醒、节日顺序显示在一个 Column 里
         return Column(
@@ -649,7 +652,7 @@ Widget _buildCombinedList() {
             ...itemsForDate // 遍历今天的 TimelineItem
     .where((item) => item.itemType == TimelineItemType.holiday) // 筛选出节日
     .map((item) {
-      final holiday = item.originalObject as SpecialDate;
+      final holiday = item.originalObject as special_date.SpecialDate;
       final occurrenceDate = item.displayDate; // 先不强制解包
 if (occurrenceDate != null) { // 添加检查
   return _buildHolidayCard(context, holiday, occurrenceDate);
@@ -671,7 +674,7 @@ if (occurrenceDate != null) { // 添加检查
          // （可选）可以为每个非今天的日期组添加一个日期标题
          // Widget dateHeader = dateKey != null
          //    ? Padding(padding: const EdgeInsets.all(8.0), child: Text(dateKey)) // 显示 YYYY-MM-DD
-         //    : Padding(padding: const EdgeInsets.all(8.0), child: Text("无日期")); // TODO: 本地化
+         //    : Padding(padding: const EdgeInsets.all(8.0), child: Text(l10n.noDate)); // 使用本地化字符串
 
          return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -684,7 +687,7 @@ if (occurrenceDate != null) { // 添加检查
                      final originalIndex = _reminders.indexOf(reminder); // 找到原始索引
                      return _buildSingleReminderCard(context, reminder, originalIndex);
                   } else { // itemType is holiday
-                     final holiday = item.originalObject as SpecialDate;
+                     final holiday = item.originalObject as special_date.SpecialDate;
                      // 注意： item.displayDate 是节日发生的日期
                      final holidayDate = item.displayDate; // 先不强制解包
 if (holidayDate != null) { // 添加检查
@@ -693,7 +696,7 @@ if (holidayDate != null) { // 添加检查
    return const SizedBox.shrink(); // 日期为空则不显示（理论上不应发生）
 }
                   }
-               }).toList(),
+               }),
             ],
          );
       }
@@ -706,13 +709,32 @@ Widget _buildEmptyStateWidget() {
   return Center(
     child: Padding(
       padding: const EdgeInsets.all(24.0),
-      child: Text(
-        l10n.emptyStateMessage,
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Colors.grey[600],
-              height: 1.5,
-            ),
-        textAlign: TextAlign.center,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.event_note,
+            size: 80,
+            color: Theme.of(context).disabledColor,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            l10n.emptyStateMessage,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  color: Colors.grey[600],
+                  height: 1.5,
+                ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton(
+            onPressed: () {
+              // 重新加载数据
+              _prepareTimelineItems();
+            },
+            child: const Text("刷新"),
+          ),
+        ],
       ),
     ),
   );
@@ -722,7 +744,7 @@ Widget _buildEmptyStateWidget() {
 
 
 // 方法3：构建单个节日卡片的 Widget
-Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upcomingDate) {
+Widget _buildHolidayCard(BuildContext context, special_date.SpecialDate holiday, DateTime upcomingDate) {
   // 获取本地化实例
   final l10n = AppLocalizations.of(context);
   final locale = Localizations.localeOf(context).toString();
@@ -732,7 +754,7 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
 
   // --- 新增：计算农历日期 (仅当节日类型是农历且是中文环境时) ---
   String? lunarDateString;
-  if (holiday.calculationType == DateCalculationType.fixedLunar &&
+  if (holiday.calculationType == special_date.DateCalculationType.fixedLunar &&
       Localizations.localeOf(context).languageCode == 'zh') {
     try {
       // 对于农历节日，直接从 calculationRule 中获取农历月日
@@ -774,7 +796,7 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
           dayInChinese = lDay.toString();
         }
 
-        lunarDateString = '${l10n.lunar} ${monthInChinese}月${dayInChinese}';
+        lunarDateString = '${l10n.lunar} $monthInChinese月$dayInChinese';
       } else {
         // 如果解析失败，回退到从公历转换
         final solar = Solar.fromDate(upcomingDate);
@@ -854,11 +876,10 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
      final textStyleCompleted = TextStyle( decoration: TextDecoration.lineThrough, color: Colors.grey[500],);
      final textStyleNormal = TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color);
      final dateTextStyle = TextStyle( fontSize: 12, color: reminder.isCompleted ? Colors.grey[500] : Colors.grey[600], decoration: reminder.isCompleted ? TextDecoration.lineThrough : TextDecoration.none, );
-     final locale = Localizations.localeOf(context).toString();
 
      // 简单的安全检查，防止索引越界 (虽然理论上不应该发生)
      if (originalIndex < 0 || originalIndex >= _reminders.length) {
-         print("警告: _buildSingleReminderCard 收到无效索引 $originalIndex");
+         debugPrint("警告: _buildSingleReminderCard 收到无效索引 $originalIndex");
          // 可以返回一个空的 SizedBox 或者一个错误提示 Widget
          // return const SizedBox.shrink();
          // 或者尝试重新查找，但这可能效率低
@@ -902,7 +923,7 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
             if (originalIndex != -1) {
                _deleteReminder(reminder.id);
             } else {
-               print("错误: 在卡片上删除时索引无效");
+               debugPrint("错误: 在卡片上删除时索引无效");
                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(l10n.deleteFailed)));
             }
         },
@@ -910,7 +931,7 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
          isThreeLine: reminder.description.isNotEmpty && reminder.dueDate != null,
          onTap: () {
           if (originalIndex == -1) { // 检查传入的参数 originalIndex
-     print("错误: _buildSingleReminderCard 收到的 originalIndex 无效 (-1)。");
+     debugPrint("错误: _buildSingleReminderCard 收到的 originalIndex 无效 (-1)。");
      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(l10n.cannotOpenReminderDetails)),
@@ -949,12 +970,12 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
 }
             } else if (action == 'deleted' && index == null) {
                // 如果索引无效但标记为删除，可能需要重新加载或提示错误
-               print("从详情页返回删除，但索引无效");
+               debugPrint("从详情页返回删除，但索引无效");
                _loadReminders();
                _prepareTimelineItems();// 尝试重新加载以同步状态
             }
           } else if (result == 'deleted') { // 兼容旧的返回方式 (以防万一)
-             print("从详情页返回 'deleted' 字符串，可能需要刷新");
+             debugPrint("从详情页返回 'deleted' 字符串，可能需要刷新");
              _loadReminders();
              _prepareTimelineItems();// 尝试重新加载
           }
@@ -1116,7 +1137,7 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
                }
             } else if (action == 'deleted' && index == null) {
                // 如果索引无效但标记为删除，可能需要重新加载或提示错误
-               print("从详情页返回删除，但索引无效");
+               debugPrint("从详情页返回删除，但索引无效");
                _loadReminders();
                _prepareTimelineItems();// 尝试重新加载以同步状态
             }
@@ -1138,48 +1159,98 @@ Widget _buildHolidayCard(BuildContext context, SpecialDate holiday, DateTime upc
   // --- 在 _MyHomePageState 类内部，添加这个新方法 ---
 // --- 粘贴开始：用这段完整代码替换你原来的 _prepareTimelineItems 方法 ---
 Future<void> _prepareTimelineItems() async {
-  // 如果 widget 不再显示，则不执行后续操作
-  if (!mounted) return;
+  debugPrint('=== 开始准备时间线项目 ===');
 
-  // 开始处理数据，设置加载状态为 true
-  setState(() {
-    _isLoading = true;
-    // 清空旧的时间线数据，避免重复添加
-    _sortedTimelineItems = [];
-  });
+  // 如果 widget 不再显示，则不执行后续操作
+  if (!mounted) {
+    debugPrint('组件已卸载，取消准备时间线');
+    return;
+  }
 
   // 准备一个临时的列表来存放最终结果
   List<TimelineItem> combinedItems = [];
   // 同时准备一个临时的列表来存放当前加载的提醒，用于更新 _reminders
   List<Reminder> currentReminders = [];
 
-  // 1. 加载提醒事项 (复用之前的逻辑)
   try {
+    // 开始处理数据，设置加载状态为 true
+    setState(() {
+      _isLoading = true;
+      // 清空旧的时间线数据，避免重复添加
+      _sortedTimelineItems = [];
+    });
+    debugPrint('已设置加载状态，清空旧数据');
+    debugPrint('已初始化临时列表');
+  } catch (e, stack) {
+    debugPrint('=== 准备时间线初始化阶段出错 ===');
+    debugPrint('错误: $e');
+    debugPrint('堆栈: $stack');
+
+    // 确保不会因为初始化错误而阻止后续操作
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+    return;
+  }
+
+  // 1. 加载提醒事项
+  try {
+    debugPrint('开始加载提醒事项...');
     final prefs = await SharedPreferences.getInstance();
     final String? remindersString = prefs.getString('reminders');
-    if (remindersString != null) {
-      final List<dynamic> reminderJson = jsonDecode(remindersString);
-      // 先将 JSON 转换为 Reminder 对象
-      currentReminders = reminderJson
-          .map((json) => Reminder.fromJson(json))
-          .whereType<Reminder>() // 过滤掉转换失败的
-          .toList();
 
-      // 再将加载的 Reminder 转换为 TimelineItem
-      final reminderTimelineItems = currentReminders.map((reminder) { // 注意这里从 => 变成了 {
-    // 在这里添加打印语句
-    debugPrint('>>> MainScreen - Creating TimelineItem for "${reminder.title}" with displayDate: ${reminder.dueDate}');
-    // 使用 return 返回 TimelineItem 对象
-    return TimelineItem(
-        displayDate: reminder.dueDate,
-        itemType: TimelineItemType.reminder,
-        originalObject: reminder,
-    );
-});
-      combinedItems.addAll(reminderTimelineItems);
+    if (remindersString != null) {
+      debugPrint('找到提醒事项数据，长度: ${remindersString.length}字节');
+
+      try {
+        final List<dynamic> reminderJson = jsonDecode(remindersString);
+        debugPrint('成功解析JSON，找到${reminderJson.length}个提醒事项');
+
+        // 先将 JSON 转换为 Reminder 对象
+        currentReminders = reminderJson
+            .map((json) {
+              try {
+                return Reminder.fromJson(json);
+              } catch (e, stack) {
+                debugPrint('解析单个提醒事项失败: $e');
+                debugPrint('堆栈: $stack');
+                return null;
+              }
+            })
+            .whereType<Reminder>() // 过滤掉转换失败的
+            .toList();
+
+        debugPrint('成功转换${currentReminders.length}个提醒事项对象');
+
+        // 再将加载的 Reminder 转换为 TimelineItem
+        final reminderTimelineItems = currentReminders.map((reminder) {
+          return TimelineItem(
+            displayDate: reminder.dueDate,
+            itemType: TimelineItemType.reminder,
+            originalObject: reminder,
+          );
+        }).toList();
+
+        debugPrint('成功创建${reminderTimelineItems.length}个时间线项目');
+        combinedItems.addAll(reminderTimelineItems);
+      } catch (e, stack) {
+        debugPrint('=== JSON解析或对象转换失败 ===');
+        debugPrint('错误: $e');
+        debugPrint('堆栈: $stack');
+
+        // 尝试恢复：使用空列表继续
+        currentReminders = [];
+      }
+    } else {
+      debugPrint('未找到提醒事项数据，使用空列表');
     }
-  } catch (e) {
-    debugPrint("加载提醒事项失败 (在 _prepareTimelineItems 中): $e");
+  } catch (e, stack) {
+    debugPrint('=== 加载提醒事项失败 ===');
+    debugPrint('错误: $e');
+    debugPrint('堆栈: $stack');
+
     if (mounted) {
       final l10n = AppLocalizations.of(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1188,219 +1259,184 @@ Future<void> _prepareTimelineItems() async {
     }
   }
 
-  // --- 计算农历年底日期 (仅在中文环境) ---
-  DateTime? endOfLunarYearDateOnly; // 先声明变量
-
-  // 只在中文环境计算农历年底，并确保 widget 仍然挂载
-  if (mounted && Localizations.localeOf(context).languageCode == 'zh') {
-    try {
-      DateTime now = DateTime.now();
-      final currentSolar = Solar.fromDate(now);
-      final currentLunar = currentSolar.getLunar();
-      final currentLunarYear = currentLunar.getYear();
-      const lastLunarMonth = 12;
-      final daysInLastMonth = LunarMonth.fromYm(currentLunarYear, lastLunarMonth)?.getDayCount() ?? 30;
-      final lastLunarDay = Lunar.fromYmd(currentLunarYear, lastLunarMonth, daysInLastMonth);
-
-      // 手动构造 DateTime
-      final solarForLastDay = lastLunarDay.getSolar(); // 先获取 Solar 对象
-      final DateTime endOfCurrentLunarYear = DateTime(
-          solarForLastDay.getYear(),
-          solarForLastDay.getMonth(),
-          solarForLastDay.getDay()
-      );
-
-      endOfLunarYearDateOnly = DateTime( // 给之前声明的变量赋值
-        endOfCurrentLunarYear.year,
-        endOfCurrentLunarYear.month,
-        endOfCurrentLunarYear.day,
-        23, 59, 59
-      );
-      debugPrint('过滤事件，只显示到农历年底: $endOfLunarYearDateOnly');
-    } catch (e) {
-      debugPrint("计算农历年底日期时出错: $e");
-      // 如果计算出错，就不进行过滤，或者采取其他策略
-      endOfLunarYearDateOnly = null;
-    }
-  }
-  // --- 农历年底日期计算结束 ---
-
-
-  // 2. 计算节日 - 已移至步骤3中从数据库加载
-
-  // 3. 从数据库加载特殊纪念日
+  // 2. 从数据库加载特殊纪念日
   try {
+    debugPrint('开始加载特殊纪念日...');
+
     // 获取当前日期
     DateTime now = DateTime.now();
+    debugPrint('当前日期: ${now.toIso8601String()}');
 
     // 获取 MyApp 的状态以访问特殊纪念日显示范围
     int specialDaysRange = 10; // 默认为10天
     if (mounted) {
-      final myAppState = context.findAncestorStateOfType<_MyAppState>();
-      specialDaysRange = myAppState?._specialDaysRange ?? 10;
-    }
-
-    // 使用统一的数据库初始化服务
-    final dbInitService = DatabaseInitService();
-
-    // 检查数据库是否已初始化
-    final isInitialized = await dbInitService.checkInitializationState();
-
-    if (!isInitialized && mounted) {
-      // 如果数据库未初始化，则执行初始化
-      final success = await dbInitService.initialize(context);
-      if (!success) {
-        debugPrint("数据库初始化失败，将使用默认设置");
-      }
-
-      // 执行节日数据迁移
       try {
-        if (mounted) {
-          await HolidayMigrationService.migrateHolidays(context);
-          debugPrint("节日数据迁移成功完成");
-        }
-      } catch (e) {
-        debugPrint("节日数据迁移失败: $e");
+        final myAppState = context.findAncestorStateOfType<_MyAppState>();
+        specialDaysRange = myAppState?._specialDaysRange ?? 10;
+        debugPrint('特殊纪念日显示范围: $specialDaysRange天');
+      } catch (e, stack) {
+        debugPrint('获取特殊纪念日显示范围失败: $e');
+        debugPrint('堆栈: $stack');
+        // 使用默认值继续
       }
     }
 
-    // 打印所有节日信息（调试用）
-    HiveDatabaseService.printAllHolidays();
-
-    // 检查数据库迁移是否完成
-    final migrationComplete = HiveDatabaseService.isMigrationComplete();
-
-    // 获取用户自定义的节日重要性
-    Map<String, int> holidayImportance;
-
-    // 如果数据库迁移已完成，从数据库获取节日重要性
-    if (migrationComplete) {
-      holidayImportance = HiveDatabaseService.getHolidayImportance();
-    } else {
-      // 如果数据库迁移未完成，使用本地存储服务获取节日重要性
-      holidayImportance = await HolidayStorageService.getHolidayImportance();
-    }
-
-    // 从数据库获取节日
-    List<SpecialDate> specialDays = [];
-
-    // 获取用户所在地区
-    final String region;
+    // 使用统一的数据库管理服务
     if (mounted) {
-      final locale = Localizations.localeOf(context);
-      if (locale.languageCode == 'zh') {
-        region = 'CN'; // 中文环境
-      } else if (locale.languageCode == 'ja') {
-        region = 'JP'; // 日语环境
-      } else if (locale.languageCode == 'ko') {
-        region = 'KR'; // 韩语环境
-      } else {
-        region = 'INTL'; // 其他语言环境
-      }
-    } else {
-      region = 'INTL'; // 默认国际节日
-    }
+      try {
+        debugPrint('开始从数据库获取节日数据...');
+        final dbManager = Provider.of<DatabaseManagerUnified>(context, listen: false);
+        final currentLanguageCode = Localizations.localeOf(context).languageCode;
+        final userRegion = localization.LocalizationService.getUserRegion(context);
+        debugPrint('当前语言: $currentLanguageCode, 用户地区: $userRegion');
 
-    // 如果数据库迁移已完成，从数据库获取节日
-    if (migrationComplete) {
-      // 获取当前语言环境
-      final isChineseLocale = mounted && Localizations.localeOf(context).languageCode == 'zh';
+        // 获取用户所在地区的节日
+        final holidays = await dbManager.getHolidaysByRegion(userRegion, languageCode: currentLanguageCode);
+        debugPrint('从数据库获取到${holidays.length}个节日');
 
-      // 获取用户所在地区的节日，并传递语言环境参数
-      final holidayModels = HiveDatabaseService.getHolidaysByRegion(region, isChineseLocale: isChineseLocale);
+        // 将Holiday转换为SpecialDate
+        final specialDays = holidays.map((holiday) {
+          try {
+            return special_date.SpecialDate(
+              id: holiday.id,
+              name: holiday.getLocalizedName(currentLanguageCode),
+              description: holiday.getLocalizedDescription(currentLanguageCode) ?? '',
+              type: _convertHolidayTypeToSpecialDateType(holiday.type),
+              regions: holiday.regions,
+              calculationType: _convertCalculationTypeToSpecialDateCalculationType(holiday.calculationType),
+              calculationRule: holiday.calculationRule,
+              importanceLevel: _convertImportanceLevelToImportanceLevel(holiday.importanceLevel),
+            );
+          } catch (e, stack) {
+            debugPrint('转换节日数据出错 (ID: ${holiday.id}): $e');
+            debugPrint('堆栈: $stack');
+            return null;
+          }
+        }).whereType<special_date.SpecialDate>().toList();
 
-      // 将HolidayModel转换为SpecialDate
-      specialDays = _convertHolidayModelsToSpecialDates(holidayModels);
-      debugPrint("从Hive数据库加载了 ${specialDays.length} 个节日 (语言环境: ${isChineseLocale ? '中文' : '非中文'})");
-    } else {
-      // 如果数据库迁移未完成，使用本地存储服务获取节日
-      if (mounted) {
-        final holidayModels = HolidayStorageService.getHolidaysForRegion(context, region);
-        // 直接转换为SpecialDate对象
-        specialDays = _convertHolidayModelsToSpecialDates(holidayModels);
-        debugPrint("从本地存储服务加载了 ${specialDays.length} 个节日");
-      }
-    }
+        debugPrint('成功转换${specialDays.length}个特殊日期对象');
 
+        // 智能显示策略：根据重要性和时间范围显示节日
+        debugPrint('开始处理节日显示策略...');
+        int processedCount = 0;
+        int addedCount = 0;
 
+        for (var specialDay in specialDays) {
+          try {
+            processedCount++;
+            if (_selectedHolidayTypes.contains(specialDay.type)) {
+              DateTime? occurrence = specialDay.getUpcomingOccurrence(now);
+              if (occurrence != null) {
+                // 计算与当前日期的天数差
+                int daysDifference = occurrence.difference(now).inDays;
 
-    // 智能显示策略：根据重要性和时间范围显示节日
-    for (var specialDay in specialDays) {
-      if (_selectedHolidayTypes.contains(specialDay.type)) {
-        DateTime? occurrence = specialDay.getUpcomingOccurrence(now);
-        if (occurrence != null) {
-          // 计算与当前日期的天数差
-          int daysDifference = occurrence.difference(now).inDays;
+                // 获取当前节日的重要性
+                int importance = 0;
 
-          // 获取当前节日的重要性
-          int importance = 0;
+                // 根据importanceLevel设置importance
+                switch (specialDay.importanceLevel) {
+                  case special_date.ImportanceLevel.high:
+                    importance = 2; // 非常重要
+                    break;
+                  case special_date.ImportanceLevel.medium:
+                    importance = 1; // 重要
+                    break;
+                  default:
+                    importance = 0; // 普通
+                    break;
+                }
 
-          // 如果数据库迁移已完成，从数据库获取节日重要性
-          if (migrationComplete) {
-            final holidayModel = HiveDatabaseService.getHolidayById(specialDay.id);
-            if (holidayModel != null) {
-              importance = holidayModel.userImportance;
+                // 根据重要性和时间范围决定是否显示
+                bool shouldShow = false;
+
+                // 非常重要的节日始终显示
+                if (importance == 2) {
+                  shouldShow = true;
+                }
+                // 重要的节日在较长时间范围内显示（2倍范围）
+                else if (importance == 1) {
+                  shouldShow = daysDifference >= 0 && daysDifference <= specialDaysRange * 2;
+                }
+                // 普通重要性的节日只在指定范围内显示
+                else {
+                  shouldShow = daysDifference >= 0 && daysDifference <= specialDaysRange;
+                }
+
+                // 如果应该显示，则添加到列表中
+                if (shouldShow) {
+                  combinedItems.add(TimelineItem(
+                    displayDate: occurrence,
+                    itemType: TimelineItemType.holiday,
+                    originalObject: specialDay,
+                  ));
+                  addedCount++;
+                }
+              } else {
+                debugPrint('节日 "${specialDay.name}" 无法计算下一个发生日期');
+              }
             }
-          } else {
-            // 如果数据库迁移未完成，使用本地存储服务获取节日重要性
-            importance = holidayImportance[specialDay.id] ?? 0;
-          }
-
-          // 根据重要性和时间范围决定是否显示
-          bool shouldShow = false;
-
-          // 非常重要的节日始终显示
-          if (importance == 2) {
-            shouldShow = true;
-          }
-          // 重要的节日在较长时间范围内显示（2倍范围）
-          else if (importance == 1) {
-            shouldShow = daysDifference >= 0 && daysDifference <= specialDaysRange * 2;
-          }
-          // 普通重要性的节日只在指定范围内显示
-          else {
-            shouldShow = daysDifference >= 0 && daysDifference <= specialDaysRange;
-          }
-
-          // 如果应该显示，则添加到列表中
-          if (shouldShow) {
-            combinedItems.add(TimelineItem(
-              displayDate: occurrence,
-              itemType: TimelineItemType.holiday,
-              originalObject: specialDay,
-            ));
+          } catch (e, stack) {
+            debugPrint('处理节日 "${specialDay.name}" 时出错: $e');
+            debugPrint('堆栈: $stack');
+            // 继续处理下一个节日
           }
         }
+
+        debugPrint('节日处理完成: 处理了$processedCount个节日，添加了$addedCount个到时间线');
+      } catch (e, stack) {
+        debugPrint('=== 获取节日数据出错 ===');
+        debugPrint('错误: $e');
+        debugPrint('堆栈: $stack');
       }
     }
-  } catch (e) {
-    debugPrint("加载特殊纪念日失败: $e");
+  } catch (e, stack) {
+    debugPrint('=== 加载特殊纪念日失败 ===');
+    debugPrint('错误: $e');
+    debugPrint('堆栈: $stack');
   }
 
-  // 4. 过滤掉农历年底之后的事件 (如果成功计算了年底日期)
-  if (endOfLunarYearDateOnly != null) { // *** 修正错误 2：确保变量在此处可用 ***
-      combinedItems = combinedItems.where((item) {
-        if (item.displayDate == null) {
-          return true; // 保留无日期的
-        }
-        // 确保这里的变量名是 endOfLunarYearDateOnly
-        return !item.displayDate!.isAfter(endOfLunarYearDateOnly!);
-      }).toList();
-  } else {
-      debugPrint("警告：未能计算出农历年底日期，未进行日期过滤。");
+  // 3. 排序合并后的列表
+  try {
+    debugPrint('开始排序合并后的列表，共${combinedItems.length}个项目...');
+    combinedItems.sort();
+    debugPrint('排序完成');
+  } catch (e, stack) {
+    debugPrint('=== 排序时间线项目失败 ===');
+    debugPrint('错误: $e');
+    debugPrint('堆栈: $stack');
+    // 尝试恢复：不排序继续
   }
 
+  // 4. 更新状态
+  try {
+    if (mounted) {
+      debugPrint('更新UI状态...');
+      setState(() {
+        _reminders = currentReminders;
+        _sortedTimelineItems = combinedItems;
+        _isLoading = false;
+      });
+      debugPrint('=== 时间线准备完成 ===');
+      debugPrint('提醒事项: ${currentReminders.length}个');
+      debugPrint('时间线项目: ${combinedItems.length}个');
+    } else {
+      debugPrint('组件已卸载，取消更新状态');
+    }
+  } catch (e, stack) {
+    debugPrint('=== 更新UI状态失败 ===');
+    debugPrint('错误: $e');
+    debugPrint('堆栈: $stack');
 
-  // 4. 排序合并后的列表
-  combinedItems.sort();
-
-  // 5. 更新状态
-  if (mounted) {
-    setState(() {
-      _reminders = currentReminders;
-      _sortedTimelineItems = combinedItems;
-      _isLoading = false;
-    });
+    // 尝试最后的恢复：至少关闭加载状态
+    if (mounted) {
+      try {
+        setState(() {
+          _isLoading = false;
+        });
+      } catch (finalError) {
+        debugPrint('最终恢复尝试也失败: $finalError');
+      }
+    }
   }
 }
 // --- 粘贴结束：确认这是 _prepareTimelineItems 方法的结尾 ---
@@ -1422,92 +1458,47 @@ Future<void> _prepareTimelineItems() async {
     }
   }
 
-  // 将HolidayModel列表转换为SpecialDate列表
-  List<SpecialDate> _convertHolidayModelsToSpecialDates(List<dynamic> models) {
-    final List<SpecialDate> result = [];
-
-    // 获取当前语言环境
-    final isChineseLocale = mounted && Localizations.localeOf(context).languageCode == 'zh';
-
-    for (final model in models) {
-      // 根据语言环境选择正确的名称和描述
-      final name = isChineseLocale || model.nameEn == null || model.nameEn.isEmpty
-          ? model.name
-          : model.nameEn;
-
-      final description = isChineseLocale || model.descriptionEn == null || model.descriptionEn.isEmpty
-          ? model.description
-          : model.descriptionEn;
-
-      // 创建SpecialDate对象
-      final specialDate = SpecialDate(
-        id: model.id,
-        name: name,
-        nameEn: model.nameEn,
-        type: _convertToSpecialDateType(model.type),
-        regions: model.regions,
-        calculationType: _convertToSpecialDateCalculationType(model.calculationType),
-        calculationRule: model.calculationRule,
-        description: description,
-        descriptionEn: model.descriptionEn,
-        importanceLevel: _convertToSpecialImportanceLevel(model.importanceLevel),
-        customs: model.customs,
-        taboos: model.taboos,
-        foods: model.foods,
-        greetings: model.greetings,
-        activities: model.activities,
-        history: model.history,
-        imageUrl: model.imageUrl,
-      );
-
-      result.add(specialDate);
-    }
-
-    return result;
-  }
-
-  // 类型转换辅助方法
-  SpecialDateType _convertToSpecialDateType(dynamic type) {
-    if (type == holiday_model.HolidayType.statutory) {
-      return SpecialDateType.statutory;
-    } else if (type == holiday_model.HolidayType.traditional) {
-      return SpecialDateType.traditional;
-    } else if (type == holiday_model.HolidayType.solarTerm) {
-      return SpecialDateType.solarTerm;
-    } else if (type == holiday_model.HolidayType.memorial) {
-      return SpecialDateType.memorial;
-    } else if (type == holiday_model.HolidayType.custom) {
-      return SpecialDateType.custom;
-    } else {
-      return SpecialDateType.other;
+  // 将HolidayType转换为SpecialDateType
+  special_date.SpecialDateType _convertHolidayTypeToSpecialDateType(models.HolidayType type) {
+    switch (type) {
+      case models.HolidayType.statutory:
+        return special_date.SpecialDateType.statutory;
+      case models.HolidayType.traditional:
+        return special_date.SpecialDateType.traditional;
+      case models.HolidayType.solarTerm:
+        return special_date.SpecialDateType.solarTerm;
+      case models.HolidayType.memorial:
+        return special_date.SpecialDateType.memorial;
+      case models.HolidayType.custom:
+        return special_date.SpecialDateType.custom;
+      default:
+        return special_date.SpecialDateType.other;
     }
   }
 
-  DateCalculationType _convertToSpecialDateCalculationType(
-      holiday_model.DateCalculationType type) {
-    if (type == holiday_model.DateCalculationType.fixedGregorian) {
-      return DateCalculationType.fixedGregorian;
-    } else if (type == holiday_model.DateCalculationType.fixedLunar) {
-      return DateCalculationType.fixedLunar;
-    } else if (type == holiday_model.DateCalculationType.nthWeekdayOfMonth) {
-      return DateCalculationType.nthWeekdayOfMonth;
-    } else if (type == holiday_model.DateCalculationType.solarTermBased) {
-      return DateCalculationType.solarTermBased;
+  // 将统一模型的DateCalculationType转换为特殊日期的DateCalculationType
+  dynamic _convertCalculationTypeToSpecialDateCalculationType(models.DateCalculationType type) {
+    if (type == models.DateCalculationType.fixedGregorian) {
+      return special_date.DateCalculationType.fixedGregorian;
+    } else if (type == models.DateCalculationType.fixedLunar) {
+      return special_date.DateCalculationType.fixedLunar;
+    } else if (type == models.DateCalculationType.variableRule) {
+      return special_date.DateCalculationType.nthWeekdayOfMonth;
     } else {
-      return DateCalculationType.relativeTo;
+      return special_date.DateCalculationType.fixedGregorian;
     }
   }
 
-  ImportanceLevel _convertToSpecialImportanceLevel(
-      holiday_model.ImportanceLevel level) {
-    if (level == holiday_model.ImportanceLevel.low) {
-      return ImportanceLevel.low;
-    } else if (level == holiday_model.ImportanceLevel.medium) {
-      return ImportanceLevel.medium;
-    } else if (level == holiday_model.ImportanceLevel.high) {
-      return ImportanceLevel.high;
+  // 将统一模型的ImportanceLevel转换为特殊日期的ImportanceLevel
+  dynamic _convertImportanceLevelToImportanceLevel(models.ImportanceLevel level) {
+    if (level == models.ImportanceLevel.low) {
+      return special_date.ImportanceLevel.low;
+    } else if (level == models.ImportanceLevel.medium) {
+      return special_date.ImportanceLevel.medium;
+    } else if (level == models.ImportanceLevel.high) {
+      return special_date.ImportanceLevel.high;
     } else {
-      return ImportanceLevel.low;
+      return special_date.ImportanceLevel.low;
     }
   }
 
@@ -1527,4 +1518,6 @@ Future<void> _prepareTimelineItems() async {
       ),
     );
   }
+
+
 } // _MyHomePageState 类结束

@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'reminder.dart';
 import 'add_reminder_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:lunar/lunar.dart';
 import 'utils/date_formatter.dart';
 import 'widgets/page_transitions.dart';
 
@@ -55,8 +54,9 @@ class ReminderDetailScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
      final l10n = AppLocalizations.of(context);
 
-    // 提前格式化日期
-    String formattedDate = reminder.dueDate != null
+    // 注意：这里的日期格式化在后续实现中会使用
+    // 暂时保留代码，但不使用变量
+    reminder.dueDate != null
         ? DateFormat('yyyy-MM-dd HH:mm', locale).format(reminder.dueDate!)
         : l10n.dateNotSet; // TODO: 本地化
 

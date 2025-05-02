@@ -44,10 +44,14 @@ dependencies:
 
   # Firebase相关依赖
   firebase_core: ^2.27.1 # Firebase核心功能
-  firebase_auth: ^4.17.9 # Firebase身份验证
-  cloud_firestore: ^4.15.9 # Firebase云数据库
-  firebase_storage: ^11.6.10 # Firebase云存储
-  google_sign_in: ^6.2.1 # Google登录
+  # firebase_auth: ^4.17.9 # Firebase身份验证
+  # cloud_firestore: ^4.15.9 # Firebase云数据库
+  # firebase_storage: ^11.6.10 # Firebase云存储
+  # google_sign_in: ^6.2.1 # Google登录
+
+  # 加密相关依赖
+  encrypt: ^5.0.3 # 用于数据加密
+  flutter_secure_storage: ^4.2.1 # 用于安全存储
 
 dev_dependencies:
   flutter_test:

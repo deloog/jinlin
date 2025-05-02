@@ -12,26 +12,25 @@ enum SlideDirection {
 class SlidePageRoute<T> extends PageRouteBuilder<T> {
   final Widget page;
   final SlideDirection direction;
-  
+
   SlidePageRoute({
     required this.page,
     this.direction = SlideDirection.right,
-    RouteSettings? settings,
+    super.settings,
   }) : super(
-          settings: settings,
           pageBuilder: (context, animation, secondaryAnimation) => page,
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             var begin = _getBeginOffset(direction);
             const end = Offset.zero;
             const curve = Curves.easeInOut;
-            
+
             var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
             var offsetAnimation = animation.drive(tween);
-            
+
             return SlideTransition(position: offsetAnimation, child: child);
           },
         );
-  
+
   static Offset _getBeginOffset(SlideDirection direction) {
     switch (direction) {
       case SlideDirection.right:
@@ -49,12 +48,11 @@ class SlidePageRoute<T> extends PageRouteBuilder<T> {
 // 淡入淡出页面转场动画
 class FadePageRoute<T> extends PageRouteBuilder<T> {
   final Widget page;
-  
+
   FadePageRoute({
     required this.page,
-    RouteSettings? settings,
+    super.settings,
   }) : super(
-          settings: settings,
           pageBuilder: (context, animation, secondaryAnimation) => page,
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return FadeTransition(
@@ -68,12 +66,11 @@ class FadePageRoute<T> extends PageRouteBuilder<T> {
 // 缩放页面转场动画
 class ScalePageRoute<T> extends PageRouteBuilder<T> {
   final Widget page;
-  
+
   ScalePageRoute({
     required this.page,
-    RouteSettings? settings,
+    super.settings,
   }) : super(
-          settings: settings,
           pageBuilder: (context, animation, secondaryAnimation) => page,
           transitionsBuilder: (context, animation, secondaryAnimation, child) {
             return ScaleTransition(

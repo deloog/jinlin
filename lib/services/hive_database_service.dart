@@ -1,8 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:jinlin_app/models/holiday_model.dart';
-import 'package:jinlin_app/special_date.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:jinlin_app/services/holiday_cache_service.dart';
 
 /// Hive数据库服务
@@ -11,7 +9,6 @@ import 'package:jinlin_app/services/holiday_cache_service.dart';
 class HiveDatabaseService {
   static const String _holidaysBoxName = 'holidays';
   static const String _userPreferencesBoxName = 'userPreferences';
-  static const String _holidayImportanceKey = 'holidayImportance';
   static const String _migrationCompleteKey = 'migrationComplete';
 
   static bool _initialized = false;
@@ -38,6 +35,9 @@ class HiveDatabaseService {
         Hive.registerAdapter(ImportanceLevelAdapter());
       }
 
+      // 确保所有适配器都已注册
+      _ensureAllAdaptersRegistered();
+
       // 打开盒子
       await Hive.openBox<HolidayModel>(_holidaysBoxName);
       await Hive.openBox<dynamic>(_userPreferencesBoxName);
@@ -47,6 +47,31 @@ class HiveDatabaseService {
     } catch (e) {
       debugPrint('Hive数据库初始化失败: $e');
       rethrow;
+    }
+  }
+
+  /// 确保所有适配器都已注册
+  static void _ensureAllAdaptersRegistered() {
+    try {
+      // 确保所有必要的适配器都已注册
+      if (!Hive.isAdapterRegistered(0)) {
+        Hive.registerAdapter(HolidayModelAdapter());
+      }
+      if (!Hive.isAdapterRegistered(1)) {
+        Hive.registerAdapter(HolidayTypeAdapter());
+      }
+      if (!Hive.isAdapterRegistered(2)) {
+        Hive.registerAdapter(DateCalculationTypeAdapter());
+      }
+      if (!Hive.isAdapterRegistered(3)) {
+        Hive.registerAdapter(ImportanceLevelAdapter());
+      }
+
+      // 注意：如果需要注册其他适配器，可以在这里添加
+
+      debugPrint('所有适配器注册成功');
+    } catch (e) {
+      debugPrint('注册适配器失败: $e');
     }
   }
 

@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:jinlin_app/models/soft_deletable.dart';
 
 // 这个文件将由build_runner生成
 // 运行命令: flutter pub run build_runner build
@@ -25,7 +26,7 @@ enum RelationType {
 
 /// 联系人模型
 @HiveType(typeId: 13)
-class ContactModel extends HiveObject {
+class ContactModel extends HiveObject implements SoftDeletable {
   @HiveField(0)
   String id;
 
@@ -71,6 +72,18 @@ class ContactModel extends HiveObject {
   @HiveField(14)
   Map<String, String>? specificRelations; // 多语言具体关系
 
+  @HiveField(15)
+  @override
+  bool isDeleted = false;
+
+  @HiveField(16)
+  @override
+  DateTime? deletedAt;
+
+  @HiveField(17)
+  @override
+  String? deletionReason;
+
   ContactModel({
     required this.id,
     required this.name,
@@ -87,6 +100,9 @@ class ContactModel extends HiveObject {
     this.lastModified,
     this.names,
     this.specificRelations,
+    this.isDeleted = false,
+    this.deletedAt,
+    this.deletionReason,
   }) : createdAt = createdAt ?? DateTime.now();
 
   /// 从JSON创建联系人模型
@@ -121,6 +137,11 @@ class ContactModel extends HiveObject {
       specificRelations: json['specificRelations'] != null
           ? Map<String, String>.from(json['specificRelations'] as Map)
           : null,
+      isDeleted: json['isDeleted'] as bool? ?? false,
+      deletedAt: json['deletedAt'] != null
+          ? DateTime.parse(json['deletedAt'] as String)
+          : null,
+      deletionReason: json['deletionReason'] as String?,
     );
   }
 
@@ -142,6 +163,9 @@ class ContactModel extends HiveObject {
       'lastModified': lastModified?.toIso8601String(),
       'names': names,
       'specificRelations': specificRelations,
+      'isDeleted': isDeleted,
+      'deletedAt': deletedAt?.toIso8601String(),
+      'deletionReason': deletionReason,
     };
   }
 
@@ -163,6 +187,9 @@ class ContactModel extends HiveObject {
       lastModified: DateTime.now(),
       names: names,
       specificRelations: specificRelations,
+      isDeleted: isDeleted,
+      deletedAt: deletedAt,
+      deletionReason: deletionReason,
     );
   }
 
@@ -182,6 +209,34 @@ class ContactModel extends HiveObject {
     }
 
     return specificRelation; // 默认返回主具体关系
+  }
+
+  /// 创建带有修改的副本
+  ContactModel copyWith({
+    bool? isDeleted,
+    DateTime? deletedAt,
+    String? deletionReason,
+  }) {
+    return ContactModel(
+      id: id,
+      name: name,
+      relationType: relationType,
+      specificRelation: specificRelation,
+      phoneNumber: phoneNumber,
+      email: email,
+      avatarUrl: avatarUrl,
+      birthday: birthday,
+      isBirthdayLunar: isBirthdayLunar,
+      additionalInfo: additionalInfo,
+      associatedHolidayIds: associatedHolidayIds,
+      createdAt: createdAt,
+      lastModified: DateTime.now(),
+      names: names,
+      specificRelations: specificRelations,
+      isDeleted: isDeleted ?? this.isDeleted,
+      deletedAt: deletedAt ?? this.deletedAt,
+      deletionReason: deletionReason ?? this.deletionReason,
+    );
   }
 
   /// 解析关系类型

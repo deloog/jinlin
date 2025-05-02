@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jinlin_app/database/holiday_model.dart';
 import 'package:jinlin_app/database/region_model.dart';

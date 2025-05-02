@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:lunar/lunar.dart'; // 引入 lunar 包用于农历计算
 import 'package:intl/intl.dart'; // 用于日期格式化
 import 'package:intl/date_symbol_data_local.dart'; // 确保中文星期名称可用
@@ -51,6 +50,9 @@ class SpecialDate {
   final String? activities;      // 相关活动
   final String? history;         // 历史背景
   final String? imageUrl;        // 图片URL
+
+  // 发生日期（计算得出）
+  DateTime? occurrenceDate;
 
   SpecialDate({
     required this.id,
@@ -132,8 +134,8 @@ class SpecialDate {
               }
               break;
            case DateCalculationType.solarTermBased:
-             // TODO: 实现基于节气的计算 (如清明节)
-             // 暂时使用固定日期作为近似值
+             // 基于节气的计算 (如清明节)
+             // 注意：这里使用固定日期作为近似值，将来可以使用更精确的计算方法
              if (calculationRule == 'QingMing') {
                // 清明节通常在4月4日或5日
                calculatedDate = DateTime(year, 4, 5);

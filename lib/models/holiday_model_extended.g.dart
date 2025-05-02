@@ -53,11 +53,11 @@ class HolidayModelExtendedAdapter extends TypeAdapter<HolidayModelExtended> {
       aiGeneratedGreetings: (fields[33] as List?)?.cast<String>(),
       aiGeneratedGiftSuggestions: (fields[34] as List?)
           ?.map((dynamic e) => (e as Map).cast<String, dynamic>())
-          ?.toList(),
+          .toList(),
       aiGeneratedTips: (fields[35] as Map?)?.cast<String, String>(),
       reminderSettings: (fields[36] as List?)
           ?.map((dynamic e) => (e as Map).cast<String, dynamic>())
-          ?.toList(),
+          .toList(),
       isRepeating: fields[37] as bool,
       repeatRule: fields[38] as String?,
       isShared: fields[39] as bool,

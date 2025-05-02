@@ -2,7 +2,6 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:jinlin_app/services/hive_database_service.dart';
 import 'package:jinlin_app/services/localization_service.dart';
 import 'package:jinlin_app/models/holiday_model.dart';
@@ -312,7 +311,7 @@ class _HolidaySyncScreenState extends State<HolidaySyncScreen> {
                   Container(
                     padding: const EdgeInsets.all(16.0),
                     decoration: BoxDecoration(
-                      color: Colors.amber.withOpacity(0.2),
+                      color: Colors.amber.withAlpha(51),
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     child: Row(

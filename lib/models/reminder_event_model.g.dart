@@ -32,7 +32,7 @@ class ReminderEventModelAdapter extends TypeAdapter<ReminderEventModel> {
       repeatUntil: fields[12] as DateTime?,
       reminderTimes: (fields[13] as List?)
           ?.map((dynamic e) => (e as Map).cast<String, dynamic>())
-          ?.toList(),
+          .toList(),
       contactId: fields[14] as String?,
       holidayId: fields[15] as String?,
       location: fields[16] as String?,
@@ -46,7 +46,7 @@ class ReminderEventModelAdapter extends TypeAdapter<ReminderEventModel> {
       aiGeneratedGreetings: (fields[24] as List?)?.cast<String>(),
       aiGeneratedGiftSuggestions: (fields[25] as List?)
           ?.map((dynamic e) => (e as Map).cast<String, dynamic>())
-          ?.toList(),
+          .toList(),
       createdAt: fields[26] as DateTime?,
       lastModified: fields[27] as DateTime?,
       importance: fields[28] as int,
@@ -56,13 +56,16 @@ class ReminderEventModelAdapter extends TypeAdapter<ReminderEventModel> {
       sharedWith: (fields[32] as List?)?.cast<String>(),
       lastSynced: fields[33] as DateTime?,
       isSyncConflict: fields[34] as bool,
+      isDeleted: fields[35] as bool,
+      deletedAt: fields[36] as DateTime?,
+      deletionReason: fields[37] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ReminderEventModel obj) {
     writer
-      ..writeByte(35)
+      ..writeByte(38)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -132,7 +135,13 @@ class ReminderEventModelAdapter extends TypeAdapter<ReminderEventModel> {
       ..writeByte(33)
       ..write(obj.lastSynced)
       ..writeByte(34)
-      ..write(obj.isSyncConflict);
+      ..write(obj.isSyncConflict)
+      ..writeByte(35)
+      ..write(obj.isDeleted)
+      ..writeByte(36)
+      ..write(obj.deletedAt)
+      ..writeByte(37)
+      ..write(obj.deletionReason);
   }
 
   @override

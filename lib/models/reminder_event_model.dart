@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:jinlin_app/models/soft_deletable.dart';
 
 // 这个文件将由build_runner生成
 // 运行命令: flutter pub run build_runner build
@@ -47,7 +48,7 @@ enum ReminderStatus {
 
 /// 提醒事件模型
 @HiveType(typeId: 19)
-class ReminderEventModel extends HiveObject {
+class ReminderEventModel extends HiveObject implements SoftDeletable {
   // 基本信息
   @HiveField(0)
   String id;
@@ -166,6 +167,19 @@ class ReminderEventModel extends HiveObject {
   @HiveField(34)
   bool isSyncConflict;
 
+  // 软删除相关
+  @HiveField(35)
+  @override
+  bool isDeleted = false;
+
+  @HiveField(36)
+  @override
+  DateTime? deletedAt;
+
+  @HiveField(37)
+  @override
+  String? deletionReason;
+
   ReminderEventModel({
     required this.id,
     required this.title,
@@ -202,6 +216,9 @@ class ReminderEventModel extends HiveObject {
     this.sharedWith,
     this.lastSynced,
     this.isSyncConflict = false,
+    this.isDeleted = false,
+    this.deletedAt,
+    this.deletionReason,
   }) : createdAt = createdAt ?? DateTime.now();
 
   /// 从JSON创建提醒事件模型
@@ -268,6 +285,11 @@ class ReminderEventModel extends HiveObject {
           ? DateTime.parse(json['lastSynced'] as String)
           : null,
       isSyncConflict: json['isSyncConflict'] as bool? ?? false,
+      isDeleted: json['isDeleted'] as bool? ?? false,
+      deletedAt: json['deletedAt'] != null
+          ? DateTime.parse(json['deletedAt'] as String)
+          : null,
+      deletionReason: json['deletionReason'] as String?,
     );
   }
 
@@ -309,6 +331,9 @@ class ReminderEventModel extends HiveObject {
       'sharedWith': sharedWith,
       'lastSynced': lastSynced?.toIso8601String(),
       'isSyncConflict': isSyncConflict,
+      'isDeleted': isDeleted,
+      'deletedAt': deletedAt?.toIso8601String(),
+      'deletionReason': deletionReason,
     };
   }
 
@@ -350,6 +375,9 @@ class ReminderEventModel extends HiveObject {
       sharedWith: sharedWith,
       lastSynced: lastSynced,
       isSyncConflict: isSyncConflict,
+      isDeleted: isDeleted,
+      deletedAt: deletedAt,
+      deletionReason: deletionReason,
     );
   }
 
@@ -369,6 +397,57 @@ class ReminderEventModel extends HiveObject {
     }
 
     return description; // 默认返回主描述
+  }
+
+  /// 创建带有修改的副本
+  ReminderEventModel copyWith({
+    bool? isDeleted,
+    DateTime? deletedAt,
+    String? deletionReason,
+    ReminderStatus? status,
+    bool? isCompleted,
+    DateTime? completedAt,
+  }) {
+    return ReminderEventModel(
+      id: id,
+      title: title,
+      description: description,
+      type: type,
+      dueDate: dueDate,
+      isAllDay: isAllDay,
+      isLunarDate: isLunarDate,
+      status: status ?? this.status,
+      isCompleted: isCompleted ?? this.isCompleted,
+      completedAt: completedAt ?? this.completedAt,
+      isRepeating: isRepeating,
+      repeatRule: repeatRule,
+      repeatUntil: repeatUntil,
+      reminderTimes: reminderTimes,
+      contactId: contactId,
+      holidayId: holidayId,
+      location: location,
+      latitude: latitude,
+      longitude: longitude,
+      tags: tags,
+      category: category,
+      titles: titles,
+      descriptions: descriptions,
+      aiGeneratedDescription: aiGeneratedDescription,
+      aiGeneratedGreetings: aiGeneratedGreetings,
+      aiGeneratedGiftSuggestions: aiGeneratedGiftSuggestions,
+      createdAt: createdAt,
+      lastModified: DateTime.now(),
+      importance: importance,
+      customColor: customColor,
+      customIcon: customIcon,
+      isShared: isShared,
+      sharedWith: sharedWith,
+      lastSynced: lastSynced,
+      isSyncConflict: isSyncConflict,
+      isDeleted: isDeleted ?? this.isDeleted,
+      deletedAt: deletedAt ?? this.deletedAt,
+      deletionReason: deletionReason ?? this.deletionReason,
+    );
   }
 
   /// 解析提醒事件类型

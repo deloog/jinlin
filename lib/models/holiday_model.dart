@@ -1,4 +1,5 @@
 import 'package:hive/hive.dart';
+import 'package:jinlin_app/special_date.dart';
 
 part 'holiday_model.g.dart';
 
@@ -143,6 +144,15 @@ class HolidayModel extends HiveObject {
   @HiveField(18)
   DateTime? lastModified; // 最后修改时间
 
+  @HiveField(19)
+  bool isSystemHoliday = true; // 是否为系统节日
+
+  @HiveField(20)
+  String? contactId; // 关联的联系人ID
+
+  @HiveField(21)
+  DateTime createdAt = DateTime.now(); // 创建时间
+
   HolidayModel({
     required this.id,
     required this.name,
@@ -163,10 +173,21 @@ class HolidayModel extends HiveObject {
     this.nameEn,
     this.descriptionEn,
     this.lastModified,
-  });
+    this.isSystemHoliday = true,
+    this.contactId,
+    DateTime? createdAt,
+  }) : createdAt = createdAt ?? DateTime.now();
 
   // 从SpecialDate转换为HolidayModel
   factory HolidayModel.fromSpecialDate(dynamic specialDate) {
+    // 根据节日类型设置用户重要性
+    int userImportance = 2; // 默认设置为非常重要，确保显示在首页
+
+    // 如果是自定义节日，则设置为普通重要性
+    if (specialDate.type == SpecialDateType.custom) {
+      userImportance = 0;
+    }
+
     return HolidayModel(
       id: specialDate.id,
       name: specialDate.name,
@@ -183,10 +204,13 @@ class HolidayModel extends HiveObject {
       activities: specialDate.activities,
       history: specialDate.history,
       imageUrl: specialDate.imageUrl,
-      userImportance: 0, // 默认为普通重要性
+      userImportance: userImportance, // 设置为非常重要，确保显示在首页
       nameEn: specialDate.nameEn,
       descriptionEn: specialDate.descriptionEn,
       lastModified: DateTime.now(), // 设置当前时间为最后修改时间
+      isSystemHoliday: specialDate.type != SpecialDateType.custom, // 自定义节日不是系统节日
+      contactId: null, // 默认没有关联联系人
+      createdAt: DateTime.now(), // 设置当前时间为创建时间
     );
   }
 
@@ -262,6 +286,11 @@ class HolidayModel extends HiveObject {
       lastModified: json['lastModified'] != null
           ? DateTime.parse(json['lastModified'] as String)
           : null,
+      isSystemHoliday: json['isSystemHoliday'] as bool? ?? true,
+      contactId: json['contactId'] as String?,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'] as String)
+          : DateTime.now(),
     );
   }
 
@@ -287,6 +316,9 @@ class HolidayModel extends HiveObject {
       'nameEn': nameEn,
       'descriptionEn': descriptionEn,
       'lastModified': lastModified?.toIso8601String(),
+      'isSystemHoliday': isSystemHoliday,
+      'contactId': contactId,
+      'createdAt': createdAt.toIso8601String(),
     };
   }
 
@@ -312,6 +344,9 @@ class HolidayModel extends HiveObject {
       nameEn: nameEn,
       descriptionEn: descriptionEn,
       lastModified: DateTime.now(),
+      isSystemHoliday: isSystemHoliday,
+      contactId: contactId,
+      createdAt: createdAt,
     );
   }
 

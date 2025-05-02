@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:jinlin_app/services/cloud_sync_service.dart';
 import 'package:jinlin_app/services/localization_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class UserAuthScreen extends StatefulWidget {
   const UserAuthScreen({super.key});
@@ -57,7 +56,8 @@ class _UserAuthScreenState extends State<UserAuthScreen> {
       await _cloudSyncService.signInWithEmailAndPassword(email, password);
 
       // 登录成功后，尝试同步数据
-      if (_cloudSyncService.isLoggedIn) {
+      final isLoggedIn = await _cloudSyncService.isLoggedIn();
+      if (isLoggedIn) {
         try {
           // 显示同步中的提示
           if (mounted) {
@@ -85,89 +85,19 @@ class _UserAuthScreenState extends State<UserAuthScreen> {
       if (mounted) {
         Navigator.pop(context, true); // 返回true表示登录成功
       }
-    } on FirebaseAuthException catch (e) {
-      String message;
-
-      // 保存当前上下文，以便在异步操作后使用
-      final currentContext = context;
-
-      switch (e.code) {
-        case 'user-not-found':
-          message = '没有找到该电子邮件对应的用户';
-          if (currentContext.mounted) {
-            message = LocalizationService.getLocalizedText(
-              context: currentContext,
-              textZh: '没有找到该电子邮件对应的用户',
-              textEn: 'No user found for that email',
-              textFr: 'Aucun utilisateur trouvé pour cet e-mail',
-              textDe: 'Kein Benutzer für diese E-Mail gefunden',
-            );
-          }
-          break;
-        case 'wrong-password':
-          message = '密码错误';
-          if (currentContext.mounted) {
-            message = LocalizationService.getLocalizedText(
-              context: currentContext,
-              textZh: '密码错误',
-              textEn: 'Wrong password',
-              textFr: 'Mot de passe incorrect',
-              textDe: 'Falsches Passwort',
-            );
-          }
-          break;
-        case 'invalid-email':
-          message = '电子邮件格式无效';
-          if (currentContext.mounted) {
-            message = LocalizationService.getLocalizedText(
-              context: currentContext,
-              textZh: '电子邮件格式无效',
-              textEn: 'Invalid email format',
-              textFr: 'Format d\'e-mail invalide',
-              textDe: 'Ungültiges E-Mail-Format',
-            );
-          }
-          break;
-        case 'user-disabled':
-          message = '该用户账号已被禁用';
-          if (currentContext.mounted) {
-            message = LocalizationService.getLocalizedText(
-              context: currentContext,
-              textZh: '该用户账号已被禁用',
-              textEn: 'This user account has been disabled',
-              textFr: 'Ce compte utilisateur a été désactivé',
-              textDe: 'Dieses Benutzerkonto wurde deaktiviert',
-            );
-          }
-          break;
-        case 'too-many-requests':
-          message = '登录尝试次数过多，请稍后再试';
-          if (currentContext.mounted) {
-            message = LocalizationService.getLocalizedText(
-              context: currentContext,
-              textZh: '登录尝试次数过多，请稍后再试',
-              textEn: 'Too many login attempts, please try again later',
-              textFr: 'Trop de tentatives de connexion, veuillez réessayer plus tard',
-              textDe: 'Zu viele Anmeldeversuche, bitte versuchen Sie es später erneut',
-            );
-          }
-          break;
-        default:
-          message = e.message ?? 'An unknown error occurred';
-      }
-
-      if (mounted) {
-        setState(() {
-          _errorMessage = message;
-        });
-      }
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString();
-      });
-    } finally {
       if (mounted) {
+        // 处理错误信息
+        final errorMessage = LocalizationService.getLocalizedText(
+          context: context,
+          textZh: '登录失败: ${e.toString()}',
+          textEn: 'Login failed: ${e.toString()}',
+          textFr: 'Échec de la connexion: ${e.toString()}',
+          textDe: 'Anmeldung fehlgeschlagen: ${e.toString()}',
+        );
+
         setState(() {
+          _errorMessage = errorMessage;
           _isLoading = false;
         });
       }
@@ -219,7 +149,7 @@ class _UserAuthScreenState extends State<UserAuthScreen> {
       await _cloudSyncService.registerWithEmailAndPassword(email, password);
 
       // 注册成功后，尝试上传本地数据
-      if (_cloudSyncService.isLoggedIn) {
+      if (await _cloudSyncService.isLoggedIn()) {
         try {
           // 显示同步中的提示
           if (mounted) {
@@ -247,79 +177,19 @@ class _UserAuthScreenState extends State<UserAuthScreen> {
       if (mounted) {
         Navigator.pop(context, true); // 返回true表示注册成功
       }
-    } on FirebaseAuthException catch (e) {
-      String message;
-
-      // 保存当前上下文，以便在异步操作后使用
-      final currentContext = context;
-
-      switch (e.code) {
-        case 'weak-password':
-          message = '密码太弱';
-          if (currentContext.mounted) {
-            message = LocalizationService.getLocalizedText(
-              context: currentContext,
-              textZh: '密码太弱',
-              textEn: 'The password is too weak',
-              textFr: 'Le mot de passe est trop faible',
-              textDe: 'Das Passwort ist zu schwach',
-            );
-          }
-          break;
-        case 'email-already-in-use':
-          message = '该电子邮件已被使用';
-          if (currentContext.mounted) {
-            message = LocalizationService.getLocalizedText(
-              context: currentContext,
-              textZh: '该电子邮件已被使用',
-              textEn: 'The email is already in use',
-              textFr: 'Cet e-mail est déjà utilisé',
-              textDe: 'Diese E-Mail wird bereits verwendet',
-            );
-          }
-          break;
-        case 'invalid-email':
-          message = '电子邮件格式无效';
-          if (currentContext.mounted) {
-            message = LocalizationService.getLocalizedText(
-              context: currentContext,
-              textZh: '电子邮件格式无效',
-              textEn: 'Invalid email format',
-              textFr: 'Format d\'e-mail invalide',
-              textDe: 'Ungültiges E-Mail-Format',
-            );
-          }
-          break;
-        case 'operation-not-allowed':
-          message = '此操作不被允许';
-          if (currentContext.mounted) {
-            message = LocalizationService.getLocalizedText(
-              context: currentContext,
-              textZh: '此操作不被允许',
-              textEn: 'This operation is not allowed',
-              textFr: 'Cette opération n\'est pas autorisée',
-              textDe: 'Dieser Vorgang ist nicht erlaubt',
-            );
-          }
-          break;
-        default:
-          message = e.message ?? 'An unknown error occurred';
-      }
-
-      if (mounted) {
-        setState(() {
-          _errorMessage = message;
-        });
-      }
     } catch (e) {
       if (mounted) {
+        // 处理错误信息
+        final errorMessage = LocalizationService.getLocalizedText(
+          context: context,
+          textZh: '注册失败: ${e.toString()}',
+          textEn: 'Registration failed: ${e.toString()}',
+          textFr: 'Échec de l\'inscription: ${e.toString()}',
+          textDe: 'Registrierung fehlgeschlagen: ${e.toString()}',
+        );
+
         setState(() {
-          _errorMessage = e.toString();
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
+          _errorMessage = errorMessage;
           _isLoading = false;
         });
       }
@@ -338,7 +208,8 @@ class _UserAuthScreenState extends State<UserAuthScreen> {
       await _cloudSyncService.signInWithGoogle();
 
       // 登录成功后，尝试同步数据
-      if (_cloudSyncService.isLoggedIn) {
+      final isLoggedIn = await _cloudSyncService.isLoggedIn();
+      if (isLoggedIn) {
         try {
           // 显示同步中的提示
           if (mounted) {
@@ -371,21 +242,19 @@ class _UserAuthScreenState extends State<UserAuthScreen> {
       if (mounted) {
         Navigator.pop(context, true); // 返回true表示登录成功
       }
-    } on FirebaseAuthException catch (e) {
-      if (mounted) {
-        setState(() {
-          _errorMessage = e.message ?? 'Authentication failed';
-        });
-      }
     } catch (e) {
       if (mounted) {
+        // 处理错误信息
+        final errorMessage = LocalizationService.getLocalizedText(
+          context: context,
+          textZh: 'Google登录失败: ${e.toString()}',
+          textEn: 'Google login failed: ${e.toString()}',
+          textFr: 'Échec de la connexion Google: ${e.toString()}',
+          textDe: 'Google-Anmeldung fehlgeschlagen: ${e.toString()}',
+        );
+
         setState(() {
-          _errorMessage = e.toString();
-        });
-      }
-    } finally {
-      if (mounted) {
-        setState(() {
+          _errorMessage = errorMessage;
           _isLoading = false;
         });
       }

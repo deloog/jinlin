@@ -70,7 +70,8 @@ class AutoSyncService {
   /// 执行自动同步
   Future<void> _performAutoSync() async {
     // 检查是否已登录
-    if (!_cloudSyncService.isLoggedIn) {
+    final isLoggedIn = await _cloudSyncService.isLoggedIn();
+    if (!isLoggedIn) {
       debugPrint('用户未登录，跳过自动同步');
       return;
     }
@@ -101,7 +102,8 @@ class AutoSyncService {
 
   /// 执行同步
   Future<SyncResult> performSync() async {
-    if (!_cloudSyncService.isLoggedIn) {
+    final isLoggedIn = await _cloudSyncService.isLoggedIn();
+    if (!isLoggedIn) {
       return SyncResult(
         success: false,
         message: '用户未登录',

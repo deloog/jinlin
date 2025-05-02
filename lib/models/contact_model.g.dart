@@ -32,13 +32,16 @@ class ContactModelAdapter extends TypeAdapter<ContactModel> {
       lastModified: fields[12] as DateTime?,
       names: (fields[13] as Map?)?.cast<String, String>(),
       specificRelations: (fields[14] as Map?)?.cast<String, String>(),
+      isDeleted: fields[15] as bool,
+      deletedAt: fields[16] as DateTime?,
+      deletionReason: fields[17] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, ContactModel obj) {
     writer
-      ..writeByte(15)
+      ..writeByte(18)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
@@ -68,7 +71,13 @@ class ContactModelAdapter extends TypeAdapter<ContactModel> {
       ..writeByte(13)
       ..write(obj.names)
       ..writeByte(14)
-      ..write(obj.specificRelations);
+      ..write(obj.specificRelations)
+      ..writeByte(15)
+      ..write(obj.isDeleted)
+      ..writeByte(16)
+      ..write(obj.deletedAt)
+      ..writeByte(17)
+      ..write(obj.deletionReason);
   }
 
   @override

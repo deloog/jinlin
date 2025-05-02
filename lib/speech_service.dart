@@ -1,6 +1,7 @@
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
+import 'package:logging/logging.dart';
 
 // 定义回调函数的类型别名，让代码更清晰
 typedef SpeechResultCallback = void Function(SpeechRecognitionResult result);
@@ -12,6 +13,9 @@ class SpeechService {
   bool _isAvailable = false; // 语音服务是否可用
   bool _isInitializing = false; // 是否正在初始化
 
+  // 创建日志记录器
+  final logger = Logger('SpeechService');
+
   // Getter 方法，让外部可以查询是否可用
   bool get isAvailable => _isAvailable;
 
@@ -22,7 +26,7 @@ class SpeechService {
   }) async {
     // 防止重复初始化
     if (_isInitializing || _isAvailable) {
-      print("语音服务正在初始化或已初始化。");
+      logger.info("语音服务正在初始化或已初始化。");
       return _isAvailable;
     }
     _isInitializing = true;
@@ -31,13 +35,13 @@ class SpeechService {
       // 调用 speech_to_text 包的初始化方法
       _isAvailable = await _speech.initialize(
         onError: (error) {
-          print("SpeechService 初始化错误: ${error.errorMsg}");
+          logger.warning("SpeechService 初始化错误: ${error.errorMsg}");
           _isAvailable = false; // 初始化失败
           _isInitializing = false;
           onError?.call(error); // 调用外部传入的错误回调
         },
         onStatus: (status) {
-          print("SpeechService 状态: $status");
+          logger.fine("SpeechService 状态: $status");
           // 当状态变为 'notListening' 时，通常表示初始化完成（或失败后结束）
           if (status == stt.SpeechToText.listeningStatus || status == stt.SpeechToText.notListeningStatus) {
              _isInitializing = false; // 初始化流程结束
@@ -49,10 +53,10 @@ class SpeechService {
         // debugLog: true, // 可以在开发时开启详细日志
       );
       _isInitializing = false; // 确保在 await 返回后设置
-      print("SpeechService 初始化完成, 可用状态: $_isAvailable");
+      logger.info("SpeechService 初始化完成, 可用状态: $_isAvailable");
       return _isAvailable;
     } catch (e) {
-      print("捕获到 SpeechService 初始化异常: $e");
+      logger.severe("捕获到 SpeechService 初始化异常: $e");
       _isAvailable = false;
       _isInitializing = false;
       // 如果需要，可以构造一个 SpeechRecognitionError 并调用 onError
@@ -68,7 +72,7 @@ class SpeechService {
     Duration pauseFor = const Duration(seconds: 3), // 停顿 3 秒后认为结束
   }) async {
     if (!_isAvailable || _speech.isListening) {
-      print("语音服务不可用或已在监听中");
+      logger.warning("语音服务不可用或已在监听中");
       return; // 如果服务不可用或已在监听，则不执行
     }
     try {
@@ -80,7 +84,7 @@ class SpeechService {
          // partialResults: true, // 如果需要实时反馈（未确认的）结果，可以设为 true
        );
     } catch (e) {
-        print("启动监听时出错: $e");
+        logger.severe("启动监听时出错: $e");
         // 这里可以向上抛出异常或调用错误回调
         rethrow; // 重新抛出，让调用者处理
     }
@@ -93,9 +97,9 @@ class SpeechService {
     }
     try {
         await _speech.stop();
-        print("SpeechService 已停止监听");
+        logger.info("SpeechService 已停止监听");
     } catch (e) {
-        print("停止监听时出错: $e");
+        logger.warning("停止监听时出错: $e");
         // 这里可以向上抛出异常或调用错误回调
     }
   }
@@ -107,9 +111,9 @@ class SpeechService {
       }
       try {
           await _speech.cancel();
-          print("SpeechService 已取消监听");
+          logger.info("SpeechService 已取消监听");
       } catch (e) {
-          print("取消监听时出错: $e");
+          logger.warning("取消监听时出错: $e");
       }
     }
 

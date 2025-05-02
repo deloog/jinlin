@@ -396,5 +396,79 @@
         "example": "Database error"
       }
     }
-  }
+  },
+
+  "backupFileSubject": "CetaMind Reminder Backup",
+  "backupSuccessMessage": "Backup created successfully",
+  "backupFailedMessage": "Failed to create backup",
+  "selectBackupFileTitle": "Select Backup File",
+  "restoreConfirmTitle": "Confirm Restore",
+  "restoreConfirmMessage": "This will restore data from backup. Current data may be overwritten. Continue?",
+  "restoreButton": "Restore",
+  "restoreSuccessMessage": "Successfully restored {importedCount} items",
+  "@restoreSuccessMessage": {
+    "description": "Success message when restoring from backup",
+    "placeholders": {
+      "importedCount": {
+        "type": "int",
+        "example": "10"
+      }
+    }
+  },
+  "restoreFailedMessage": "Failed to restore from backup",
+  "backupRestoreTitle": "Backup & Restore",
+  "backupTitle": "Backup Data",
+  "backupDescription": "Create a backup of your reminders and settings",
+  "lastBackupTime": "Last backup: {time}",
+  "@lastBackupTime": {
+    "description": "Shows when data was last backed up",
+    "placeholders": {
+      "time": {
+        "type": "String",
+        "example": "2023-05-01 14:30"
+      }
+    }
+  },
+  "createBackupButton": "Create Backup",
+  "restoreTitle": "Restore Data",
+  "restoreDescription": "Restore your data from a previous backup",
+  "restoreFromBackupButton": "Restore from Backup",
+  "backupRestoreWarning": "Warning: Backup and restore operations may affect your existing data. Make sure you understand the risks before proceeding.",
+
+  "helpCenterTitle": "Help Center",
+  "helpCenterBasicsTitle": "Basics",
+  "helpCenterBasicsAddTitle": "Adding Reminders",
+  "helpCenterBasicsAddDescription": "Learn how to add new reminders to your timeline",
+  "helpCenterBasicsEditTitle": "Editing Reminders",
+  "helpCenterBasicsEditDescription": "How to edit existing reminders",
+  "helpCenterBasicsDeleteTitle": "Deleting Reminders",
+  "helpCenterBasicsDeleteDescription": "How to remove reminders you no longer need",
+  "helpCenterVoiceTitle": "Voice Features",
+  "helpCenterVoiceInputTitle": "Voice Input",
+  "helpCenterVoiceInputDescription": "How to use voice commands to create reminders",
+  "helpCenterVoiceTipsTitle": "Voice Tips",
+  "helpCenterVoiceTipsDescription": "Get the most out of voice recognition",
+  "helpCenterFAQTitle": "Frequently Asked Questions",
+  "helpCenterFAQ1Question": "How do I sync my data across devices?",
+  "helpCenterFAQ1Answer": "Go to Settings > Data Synchronization to set up cloud sync",
+  "helpCenterFAQ2Question": "Can I import events from my calendar?",
+  "helpCenterFAQ2Answer": "Yes, go to Settings > Import/Export Data to import from your calendar",
+  "helpCenterFAQ3Question": "How do I customize holiday displays?",
+  "helpCenterFAQ3Answer": "Go to Settings > Holiday Management to customize which holidays appear",
+
+  "userGuideTitle": "Welcome to CetaMind Reminder",
+  "userGuideSubtitle": "Let's get you started with a quick tour",
+  "userGuideStep1Title": "Add Reminders Easily",
+  "userGuideStep1Description": "Tap the + button to add new reminders. Use voice or text input for quick entry.",
+  "userGuideStep2Title": "Smart Timeline",
+  "userGuideStep2Description": "Your timeline shows upcoming reminders and holidays in chronological order.",
+  "userGuideStep3Title": "AI Assistance",
+  "userGuideStep3Description": "Our AI can help generate descriptions, suggest gifts, and provide relevant information.",
+  "userGuideStep4Title": "Customization",
+  "userGuideStep4Description": "Personalize your experience in Settings. Choose themes, languages, and more.",
+  "userGuideSkipButton": "Skip",
+  "userGuideShowNextTime": "Show next time",
+  "userGuideShowAgain": "Don't show again",
+  "userGuideNextButton": "Next",
+  "userGuideDoneButton": "Done"
   }

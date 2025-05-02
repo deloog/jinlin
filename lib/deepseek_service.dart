@@ -4,10 +4,14 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/intl.dart';
+import 'package:logging/logging.dart';
 
 class DeepseekService {
   final String? _apiKey = dotenv.env['DEEPSEEK_API_KEY'];
   static const String _apiUrl = 'https://api.deepseek.com/v1/chat/completions';
+
+  // 创建日志记录器
+  final logger = Logger('DeepseekService');
 
   // --- processText (生成描述) 方法保持不变 ---
   Future<String> processText(String inputText) async {
@@ -43,8 +47,7 @@ class DeepseekService {
     "stream": false,
   });
 
-  print("发送给 DeepSeek (生成描述) 的内容: $inputText");
-
+  // 记录请求信息
   try {
     final response = await http.post(
       Uri.parse(_apiUrl),
@@ -56,8 +59,6 @@ class DeepseekService {
       // 可以为描述生成设置不同的超时时间，例如 30 秒
     ).timeout(const Duration(seconds: 30));
 
-    print("DeepSeek (生成描述) 响应状态码: ${response.statusCode}");
-
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(utf8.decode(response.bodyBytes));
       if (responseBody['choices'] != null &&
@@ -66,7 +67,7 @@ class DeepseekService {
           responseBody['choices'][0]['message']['content'] != null) {
         // 直接获取 AI 生成的文本内容
         String description = responseBody['choices'][0]['message']['content'].trim();
-        print("DeepSeek 返回的描述: $description");
+        logger.info("DeepSeek 返回的描述: $description");
         // 可以进行一些简单的后处理，比如去掉可能的多余引号
         if (description.startsWith('"') && description.endsWith('"')) {
            description = description.substring(1, description.length - 1);
@@ -78,11 +79,11 @@ class DeepseekService {
     } else {
       // 尝试从错误响应中获取更多信息
       String errorBody = utf8.decode(response.bodyBytes);
-      print("DeepSeek (生成描述) 错误响应体: $errorBody");
+      logger.warning("DeepSeek (生成描述) 错误响应体: $errorBody");
       throw Exception('DeepSeek API (生成描述) 请求失败 (${response.statusCode})');
     }
   } catch (e) {
-    print('调用 DeepSeek API (生成描述) 时出错: $e');
+    logger.severe('调用 DeepSeek API (生成描述) 时出错: $e');
     if (e is TimeoutException) {
       throw Exception('请求 DeepSeek (生成描述) 超时');
     }
@@ -102,10 +103,10 @@ class DeepseekService {
     final String currentYear = now.year.toString();
 
     // 添加详细日志
-    print("===== DeepSeek API 调试信息 =====");
-    print("输入文本: $naturalInput");
-    print("当前日期: $currentDate");
-    print("当前年份: $currentYear");
+    logger.info("===== DeepSeek API 调试信息 =====");
+    logger.info("输入文本: $naturalInput");
+    logger.info("当前日期: $currentDate");
+    logger.info("当前年份: $currentYear");
 
     // --- 优化后的 Prompt 指令，增加描述生成功能 ---
 final String systemPrompt = """
@@ -153,7 +154,7 @@ Rules:
       // "response_format": {"type": "json_object"} // 如果支持，启用 JSON 模式
     });
 
-    print("发送给 DeepSeek (提取信息) 的内容: $naturalInput");
+    logger.info("发送给 DeepSeek (提取信息) 的内容: $naturalInput");
 
     try {
       final response = await http.post(
@@ -162,12 +163,12 @@ Rules:
         body: body,
       ).timeout(const Duration(seconds: 90));
 
-      print("DeepSeek (提取信息) 响应状态码: ${response.statusCode}");
-      print("DeepSeek 响应头: ${response.headers}");
+      logger.info("DeepSeek (提取信息) 响应状态码: ${response.statusCode}");
+      logger.fine("DeepSeek 响应头: ${response.headers}");
 
       // 检查响应内容长度
       if (response.headers.containsKey('content-length')) {
-        print("响应内容长度: ${response.headers['content-length']} 字节");
+        logger.fine("响应内容长度: ${response.headers['content-length']} 字节");
       }
 
       if (response.statusCode == 200) {
@@ -177,7 +178,7 @@ Rules:
             responseBody['choices'][0]['message']['content'] != null) {
 
           String rawContent = responseBody['choices'][0]['message']['content'].trim();
-          print("DeepSeek 返回的原始内容: $rawContent");
+          logger.info("DeepSeek 返回的原始内容: $rawContent");
 
           // --- 替换 try {...} catch (e) {...} 中解析 JSON 的部分 ---
 try {
@@ -217,15 +218,15 @@ try {
            });
         }
      } else {
-        print("警告：AI 返回的数组中包含非对象元素: $item");
+        logger.warning("警告：AI 返回的数组中包含非对象元素: $item");
      }
   }
 
-  print("提取到的事件列表: $results");
+  logger.info("提取到的事件列表: $results");
   return results; // 返回包含多个事件 Map 的列表
 } catch (jsonError) {
   // JSON解析失败，尝试手动修复常见问题
-  print("JSON解析失败，尝试修复: $jsonError");
+  logger.warning("JSON解析失败，尝试修复: $jsonError");
 
   // 尝试手动解析JSON
   List<Map<String, String?>> results = [];
@@ -268,7 +269,7 @@ try {
       }
 
       if (results.isNotEmpty) {
-        print("使用单独字段匹配成功，提取到 ${results.length} 个事件");
+        logger.info("使用单独字段匹配成功，提取到 ${results.length} 个事件");
         return results;
       }
     }
@@ -289,8 +290,8 @@ try {
   }
 
   if (results.isNotEmpty) {
-    print("手动解析成功，提取到 ${results.length} 个事件");
-    print("提取到的事件列表: $results");
+    logger.info("手动解析成功，提取到 ${results.length} 个事件");
+    logger.fine("提取到的事件列表: $results");
     return results;
   }
 
@@ -299,8 +300,8 @@ try {
 }
 
 } catch (e) {
-  print("错误：解析 AI 返回的 JSON 数组失败: $e");
-  print("原始返回内容: $rawContent");
+  logger.severe("错误：解析 AI 返回的 JSON 数组失败: $e");
+  logger.severe("原始返回内容: $rawContent");
   // 如果解析失败，可以返回一个空列表或者重新抛出异常
   // return []; // 或者
   throw Exception("与 DeepSeek 通信时发生错误");
@@ -309,7 +310,7 @@ try {
         } else { throw Exception('DeepSeek (提取信息) 返回了无效的响应格式'); }
       } else { throw Exception('DeepSeek API (提取信息) 请求失败 (${response.statusCode})'); }
     } catch (e) {
-      print('调用 DeepSeek API (提取信息) 时出错: $e');
+      logger.severe('调用 DeepSeek API (提取信息) 时出错: $e');
       if (e is TimeoutException) { throw Exception('请求 DeepSeek 超时'); }
       throw Exception('与 DeepSeek 通信时发生错误');
     }

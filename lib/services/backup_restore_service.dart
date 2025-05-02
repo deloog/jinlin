@@ -309,8 +309,8 @@ class BackupRestoreService {
 
   /// 加密数据
   List<int> _encryptData(List<int> data, String password) {
-    // 生成密钥
-    final key = _generateKey(password);
+    // 生成密钥 - 在TODO实现后会使用
+    final _ = _generateKey(password);
 
     // TODO: 实现真正的加密逻辑
     // 这里只是一个简单的示例，实际应用中应该使用更安全的加密算法
@@ -319,8 +319,8 @@ class BackupRestoreService {
 
   /// 解密数据
   List<int> _decryptData(List<int> encryptedData, String password) {
-    // 生成密钥
-    final key = _generateKey(password);
+    // 生成密钥 - 在TODO实现后会使用
+    final _ = _generateKey(password);
 
     // TODO: 实现真正的解密逻辑
     // 这里只是一个简单的示例，实际应用中应该使用更安全的解密算法

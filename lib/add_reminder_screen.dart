@@ -1,7 +1,5 @@
 // 文件： jinlin_app/lib/add_reminder_screen.dart
 import 'package:flutter/material.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:permission_handler/permission_handler.dart';
 import 'package:intl/intl.dart';
 import 'reminder.dart';
 import 'deepseek_service.dart';
@@ -28,12 +26,11 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
   final SpeechService _speechService = SpeechService();
 
   final bool _isListening = false;
-  final String _spokenText = '';
   final bool _isInitializingSpeech = false;
   bool _isProcessingSmartInput = false;
   DateTime? _selectedDateTime;
   List<Map<String, String?>>? _detectedEvents; // 用于存储识别出的事件列表
-  Set<int> _selectedEventIndices = {};
+  final Set<int> _selectedEventIndices = {};
 
   // --- Computed Property ---
   ScreenMode get _screenMode => widget.initialReminder == null ? ScreenMode.add : ScreenMode.edit;
@@ -59,22 +56,18 @@ class _AddReminderScreenState extends State<AddReminderScreen> {
   }
 
   // --- Helper Methods (Speech, DeepSeek Desc, DateTime Pickers) ---
-  // _initSpeech, _toggleListening, _startListening, _stopListening 不变
+  // 语音和日期时间相关方法
   Future<void> _initSpeech() async { /* ... */ }
   Future<void> _toggleListening() async { /* ... */ }
-  Future<void> _startListening() async { /* ... */ }
-  Future<void> _stopListening() async { /* ... */ }
   // 已移除 _processWithDeepSeek 方法，因为描述现在随事件一起生成
-  // _pickDate, _pickTime, _clearDateTime 不变
   Future<void> _pickDate() async { /* ... */ }
-  Future<void> _pickTime(DateTime pickedDate) async { /* ... */ }
   void _clearDateTime() { /* ... */ }
 
 
   // --- 处理自然语言输入的智能识别 ---
   // --- 用这个版本替换原来的 _processNaturalLanguageInput 方法 ---
 Future<void> _processNaturalLanguageInput() async {
-  final l10n = AppLocalizations.of(context)!; // 确保 l10n 在顶部获取
+  final l10n = AppLocalizations.of(context); // 获取本地化实例
   final userInput = _titleController.text.trim();
   if (userInput.isEmpty) {
     _showInfoSnackBar(l10n.inputTitleFirstInfo);
@@ -456,64 +449,4 @@ Future<void> _saveSelectedReminders() async {
   }
 }
 // --- _saveSelectedReminders 方法结束 ---
-
-  Reminder? _findConflict(DateTime newDueDate, List<Reminder> remindersToCheck) {
-    for (final existingReminder in remindersToCheck) {
-      // 跳过自身（编辑模式）
-      if (_screenMode == ScreenMode.edit && existingReminder == widget.initialReminder) {
-        continue;
-      }
-
-      // 只比较有日期的提醒
-      if (existingReminder.dueDate == null) {
-        continue;
-      }
-
-      // 检查是否是同一天
-      final isSameDay = newDueDate.year == existingReminder.dueDate!.year &&
-                        newDueDate.month == existingReminder.dueDate!.month &&
-                        newDueDate.day == existingReminder.dueDate!.day;
-
-      if (isSameDay) {
-        // 简单冲突检查：小时和分钟完全相同
-        final isSameTime = newDueDate.hour == existingReminder.dueDate!.hour &&
-                           newDueDate.minute == existingReminder.dueDate!.minute;
-
-        // 更复杂的检查可以考虑时间段重叠，例如：
-        // Duration eventDuration = const Duration(hours: 1); // 假设事件持续1小时
-        // DateTime newEndTime = newDueDate.add(eventDuration);
-        // DateTime existingEndTime = existingReminder.dueDate!.add(eventDuration);
-        // bool overlap = newDueDate.isBefore(existingEndTime) && newEndTime.isAfter(existingReminder.dueDate!);
-
-        if (isSameTime) { // 或者使用 overlap 变量
-          return existingReminder; // 找到冲突，返回冲突的事件
-        }
-      }
-    }
-    return null; // 没有找到冲突
-  }
-
-  Future<bool?> _showConflictDialog(BuildContext context, String conflictingTitle) {
-    final l10n = AppLocalizations.of(context);
-    return showDialog<bool>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(l10n.conflictDialogTitle),
-        content: Text(l10n.conflictDialogContent(conflictingTitle)), // 传递参数
-        actions: <Widget>[
-          TextButton(
-            child: Text(l10n.cancelButton), // 使用 l10n
-            onPressed: () => Navigator.of(context).pop(false),
-          ),
-          TextButton(
-            child: Text(l10n.saveAnywayButton), // 使用 l10n
-            onPressed: () => Navigator.of(context).pop(true),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
 } // _AddReminderScreenState 结束

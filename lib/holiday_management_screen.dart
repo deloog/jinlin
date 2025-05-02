@@ -1,5 +1,6 @@
 // 文件： lib/holiday_management_screen.dart
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:jinlin_app/special_date.dart' as special_date;
 import 'package:jinlin_app/services/holiday_storage_service.dart';
 import 'package:jinlin_app/services/hive_database_service.dart';
@@ -7,9 +8,10 @@ import 'package:jinlin_app/services/holiday_migration_service.dart';
 import 'package:jinlin_app/services/localization_service.dart';
 import 'package:jinlin_app/models/holiday_model.dart';
 import 'package:jinlin_app/holiday_edit_screen.dart';
-import 'package:jinlin_app/holiday_create_screen.dart';
-import 'package:jinlin_app/holiday_simple_create_screen.dart';
+import 'package:jinlin_app/holiday_one_step_create_screen.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:jinlin_app/services/database_manager_unified.dart';
+import 'package:jinlin_app/adapters/unified_holiday_adapter.dart';
 
 // 导入类型别名，以避免命名冲突
 typedef SpecialDate = special_date.SpecialDate;
@@ -49,6 +51,66 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
       _isLoading = true;
     });
 
+    try {
+      // 获取用户所在地区
+      final String userRegion;
+      if (mounted) {
+        final locale = Localizations.localeOf(context);
+        if (locale.languageCode == 'zh') {
+          userRegion = 'CN'; // 中文环境
+        } else if (locale.languageCode == 'ja') {
+          userRegion = 'JP'; // 日语环境
+        } else if (locale.languageCode == 'ko') {
+          userRegion = 'KR'; // 韩语环境
+        } else {
+          userRegion = 'INTL'; // 其他语言环境
+        }
+      } else {
+        userRegion = 'INTL'; // 默认国际节日
+      }
+
+      // 获取用户所在地区的节日
+      if (mounted) {
+        // 获取当前语言环境
+        final isChineseLocale = Localizations.localeOf(context).languageCode == 'zh';
+        final languageCode = isChineseLocale ? 'zh' : 'en';
+
+        // 获取数据库管理器
+        final dbManager = Provider.of<DatabaseManagerUnified>(context, listen: false);
+        await dbManager.initialize(context);
+
+        // 创建适配器
+        final adapter = UnifiedHolidayAdapter(dbManager);
+
+        // 获取节日数据
+        final holidays = await dbManager.getHolidaysByRegion(userRegion, languageCode: languageCode);
+
+        // 将统一模型转换为SpecialDate
+        _allHolidays = holidays.map((holiday) => adapter.convertToSpecialDate(holiday)).toList();
+
+        debugPrint("从统一数据库加载了 ${_allHolidays.length} 个节日 (语言环境: ${isChineseLocale ? '中文' : '非中文'})");
+
+        // 同步节日重要性
+        if (mounted) {
+          await adapter.syncHolidayImportanceToOldDb(context);
+        }
+      }
+    } catch (e) {
+      debugPrint("加载节日数据失败，回退到旧方法: $e");
+
+      // 回退到旧方法
+      await _loadHolidaysLegacy();
+    }
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // 旧的加载节日方法（作为备份）
+  Future<void> _loadHolidaysLegacy() async {
     // 初始化Hive数据库
     await HiveDatabaseService.initialize();
 
@@ -101,12 +163,6 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
         _allHolidays = _convertHolidayModelsToSpecialDates(holidayModels);
         debugPrint("从本地存储服务加载了 ${_allHolidays.length} 个节日");
       }
-    }
-
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -187,10 +243,43 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
 
   // 设置节日重要性
   Future<void> _setHolidayImportance(String holidayId, int importance) async {
+    if (!mounted) return;
+
     setState(() {
       _holidayImportance[holidayId] = importance;
     });
 
+    try {
+      // 获取数据库管理器
+      final dbManager = Provider.of<DatabaseManagerUnified>(context, listen: false);
+
+      // 在异步操作前获取context
+      final currentContext = context;
+
+      await dbManager.initialize(currentContext);
+
+      // 更新统一数据库中的节日重要性
+      await dbManager.updateHolidayImportance(holidayId, importance);
+      debugPrint("节日重要性已更新到统一数据库");
+
+      // 创建适配器
+      final adapter = UnifiedHolidayAdapter(dbManager);
+
+      // 同步到旧数据库
+      if (mounted) {
+        await adapter.syncHolidayImportanceToOldDb(context);
+        debugPrint("节日重要性已同步到旧数据库");
+      }
+    } catch (e) {
+      debugPrint("更新节日重要性失败，回退到旧方法: $e");
+
+      // 回退到旧方法
+      await _setHolidayImportanceLegacy(holidayId, importance);
+    }
+  }
+
+  // 旧的设置节日重要性方法（作为备份）
+  Future<void> _setHolidayImportanceLegacy(String holidayId, int importance) async {
     try {
       // 初始化Hive数据库
       await HiveDatabaseService.initialize();
@@ -260,7 +349,7 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
       final result = await Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => const HolidaySimpleCreateScreen(),
+          builder: (context) => const HolidayOneStepCreateScreen(),
         ),
       );
 

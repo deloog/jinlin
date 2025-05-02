@@ -25,8 +25,7 @@ String formatReminderDate(BuildContext context, DateTime? date, ReminderType rem
   if (shouldShowLunar) {
     final solar = Solar.fromDate(date);
     final lunar = solar.getLunar();
-    // 获取更详细的农历，例如带年份（如果需要）
-    final lunarYear = lunar.getYearInChinese();
+    // 获取农历月日
     final lunarMonth = lunar.getMonthInChinese();
     final lunarDay = lunar.getDayInChinese();
     final lunarDateString = '(${AppLocalizations.of(context).lunar} $lunarMonth月$lunarDay)'; // 简洁格式

@@ -3,7 +3,6 @@ import 'package:jinlin_app/database/database_helper.dart';
 import 'package:jinlin_app/database/holiday_model.dart';
 import 'package:jinlin_app/database/region_model.dart';
 import 'package:jinlin_app/database/holiday_type_model.dart';
-import 'package:jinlin_app/special_date.dart';
 import 'package:jinlin_app/data/special_days.dart' as special_days;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,7 +22,10 @@ class HolidayMigrationService {
   }
 
   // 执行迁移
-  static Future<void> migrateHolidays(BuildContext context) async {
+  static Future<void> migrateHolidays([dynamic context]) async {
+    // 获取硬编码的节日数据
+    final specialDays = special_days.getDefaultSpecialDays();
+
     // 检查是否已经完成迁移
     final migrationComplete = await isMigrationComplete();
     if (migrationComplete) {
@@ -43,7 +45,7 @@ class HolidayMigrationService {
     await _migrateHolidayTypes(dbHelper);
 
     // 3. 迁移节日数据
-    await _migrateHolidayData(dbHelper, context);
+    await _migrateHolidayData(dbHelper, specialDays);
 
     // 标记迁移已完成
     await markMigrationComplete();
@@ -127,11 +129,8 @@ class HolidayMigrationService {
   }
 
   // 迁移节日数据
-  static Future<void> _migrateHolidayData(DatabaseHelper dbHelper, BuildContext context) async {
+  static Future<void> _migrateHolidayData(DatabaseHelper dbHelper, List<dynamic> specialDays) async {
     debugPrint('迁移节日数据...');
-
-    // 获取硬编码的节日数据
-    final specialDays = special_days.getSpecialDays(context);
 
     // 转换并插入节日数据
     for (final specialDay in specialDays) {

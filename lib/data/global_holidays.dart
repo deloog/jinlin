@@ -1,13 +1,11 @@
 // 文件： lib/data/global_holidays.dart
 import 'package:jinlin_app/models/holiday_model.dart';
-import 'package:uuid/uuid.dart';
 
 /// 全球重要节日数据
 ///
 /// 包含10个全球性重要节日，这些节日在大多数国家/地区都有庆祝或认可
 class GlobalHolidays {
-  static final Uuid _uuid = Uuid();
-  
+
   /// 获取全球重要节日列表
   static List<HolidayModel> getGlobalHolidays() {
     return [
@@ -25,7 +23,7 @@ class GlobalHolidays {
         nameEn: "New Year's Day",
         descriptionEn: "New Year's Day is a global holiday celebrating the beginning of a new calendar year. People typically celebrate with fireworks, parties, and family gatherings.",
       ),
-      
+
       // 2. 情人节 (全球性)
       HolidayModel(
         id: 'global_valentines_day',
@@ -40,7 +38,7 @@ class GlobalHolidays {
         nameEn: "Valentine's Day",
         descriptionEn: "Valentine's Day is a holiday when lovers express their affection with greetings and gifts. It is celebrated in many countries around the world.",
       ),
-      
+
       // 3. 国际妇女节 (全球性)
       HolidayModel(
         id: 'global_womens_day',
@@ -55,7 +53,7 @@ class GlobalHolidays {
         nameEn: "International Women's Day",
         descriptionEn: "International Women's Day is a global day celebrating the social, economic, cultural, and political achievements of women.",
       ),
-      
+
       // 4. 地球日 (全球性)
       HolidayModel(
         id: 'global_earth_day',
@@ -70,7 +68,7 @@ class GlobalHolidays {
         nameEn: "Earth Day",
         descriptionEn: "Earth Day is an annual event celebrated around the world to demonstrate support for environmental protection.",
       ),
-      
+
       // 5. 国际劳动节 (全球性)
       HolidayModel(
         id: 'global_labor_day',
@@ -85,7 +83,7 @@ class GlobalHolidays {
         nameEn: "International Labor Day",
         descriptionEn: "International Labor Day, also known as May Day, is a celebration of laborers and the working classes.",
       ),
-      
+
       // 6. 国际儿童节 (全球性)
       HolidayModel(
         id: 'global_childrens_day',
@@ -100,7 +98,7 @@ class GlobalHolidays {
         nameEn: "International Children's Day",
         descriptionEn: "International Children's Day is a day to promote mutual understanding among children and to promote children's welfare worldwide.",
       ),
-      
+
       // 7. 中秋节 (亚洲地区)
       HolidayModel(
         id: 'asia_mid_autumn',
@@ -115,7 +113,7 @@ class GlobalHolidays {
         nameEn: "Mid-Autumn Festival",
         descriptionEn: "The Mid-Autumn Festival is a traditional festival celebrated in East Asian countries. People gather for family reunions, eat mooncakes, and appreciate the full moon.",
       ),
-      
+
       // 8. 万圣节 (西方国家)
       HolidayModel(
         id: 'western_halloween',
@@ -130,7 +128,7 @@ class GlobalHolidays {
         nameEn: "Halloween",
         descriptionEn: "Halloween is a celebration observed in many Western countries, where people dress up in costumes, carve pumpkins, and children go trick-or-treating.",
       ),
-      
+
       // 9. 感恩节 (美国)
       HolidayModel(
         id: 'us_thanksgiving',
@@ -145,7 +143,7 @@ class GlobalHolidays {
         nameEn: "Thanksgiving",
         descriptionEn: "Thanksgiving is a national holiday celebrated in the United States and Canada, where people gather with family for a traditional turkey dinner and express gratitude.",
       ),
-      
+
       // 10. 圣诞节 (全球性)
       HolidayModel(
         id: 'global_christmas',
@@ -161,10 +159,5 @@ class GlobalHolidays {
         descriptionEn: "Christmas is an annual festival commemorating the birth of Jesus Christ. It is widely celebrated around the world, both as a religious and cultural event.",
       ),
     ];
-  }
-  
-  /// 生成随机ID
-  static String _generateId() {
-    return _uuid.v4();
   }
 }

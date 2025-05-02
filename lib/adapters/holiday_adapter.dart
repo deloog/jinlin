@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:jinlin_app/models/holiday_model.dart' as hive;
 import 'package:jinlin_app/special_date.dart' as app;
 
 /// 节日适配器
-/// 
+///
 /// 用于将Hive模型转换为应用程序中使用的SpecialDate类。
 class HolidayAdapter {
   /// 将HolidayModel转换为SpecialDate
@@ -72,6 +71,14 @@ class HolidayAdapter {
         return app.SpecialDateType.memorial;
       case hive.HolidayType.custom:
         return app.SpecialDateType.custom;
+      case hive.HolidayType.religious:
+        return app.SpecialDateType.other; // 宗教节日映射到其他类型
+      case hive.HolidayType.international:
+        return app.SpecialDateType.other; // 国际节日映射到其他类型
+      case hive.HolidayType.professional:
+        return app.SpecialDateType.other; // 职业节日映射到其他类型
+      case hive.HolidayType.cultural:
+        return app.SpecialDateType.other; // 文化节日映射到其他类型
       case hive.HolidayType.other:
         return app.SpecialDateType.other;
     }
@@ -108,9 +115,19 @@ class HolidayAdapter {
         return app.DateCalculationType.solarTermBased;
       case hive.DateCalculationType.relativeTo:
         return app.DateCalculationType.relativeTo;
+      case hive.DateCalculationType.lastWeekdayOfMonth:
+        return app.DateCalculationType.nthWeekdayOfMonth; // 映射到最接近的类型
+      case hive.DateCalculationType.easterBased:
+        return app.DateCalculationType.relativeTo; // 映射到相对日期类型
+      case hive.DateCalculationType.lunarPhase:
+        return app.DateCalculationType.relativeTo; // 映射到相对日期类型
+      case hive.DateCalculationType.seasonBased:
+        return app.DateCalculationType.relativeTo; // 映射到相对日期类型
+      case hive.DateCalculationType.weekOfYear:
+        return app.DateCalculationType.relativeTo; // 映射到相对日期类型
     }
   }
-  
+
   // 转换日期计算规则类型（从App到Hive）
   static hive.DateCalculationType _convertToHiveCalculationType(app.DateCalculationType type) {
     switch (type) {
@@ -138,7 +155,7 @@ class HolidayAdapter {
         return app.ImportanceLevel.high;
     }
   }
-  
+
   // 转换重要性级别（从App到Hive）
   static hive.ImportanceLevel _convertToHiveImportanceLevel(app.ImportanceLevel level) {
     switch (level) {

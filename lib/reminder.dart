@@ -14,9 +14,9 @@ class Reminder {
   String title;
   String description;
   final DateTime? dueDate;
-  bool isCompleted; 
+  bool isCompleted;
   final ReminderType type;// <--- 新增：标记是否已完成
-  DateTime? completedDate; 
+  DateTime? completedDate;
 
   Reminder({
     String? id,
@@ -31,7 +31,7 @@ class Reminder {
   // 从 JSON 对象创建 Reminder 实例
   factory Reminder.fromJson(Map<String, dynamic> json) {
   // 辅助函数：将字符串安全转换为 ReminderType
-  ReminderType _typeFromString(String? typeString) {
+  ReminderType typeFromString(String? typeString) {
     if (typeString == null) return ReminderType.general;
     // 从 ReminderType.values 中查找匹配的枚举值
     return ReminderType.values.firstWhere(
@@ -47,7 +47,7 @@ class Reminder {
     dueDate: json['dueDate'] != null ? DateTime.tryParse(json['dueDate']) : null,
     isCompleted: json['isCompleted'] ?? false,
     // --- 添加这行 ---
-    type: _typeFromString(json['type']), // 从字符串转换回枚举
+    type: typeFromString(json['type']), // 从字符串转换回枚举
     // --- 添加结束 ---
   );
 }
@@ -81,6 +81,14 @@ Reminder copyWith({
     isCompleted: isCompleted ?? this.isCompleted,
     type: type ?? this.type,
     completedDate: completedDate ?? this.completedDate,
+  );
+}
+
+// 切换完成状态的方法，返回一个新的Reminder实例
+Reminder toggleComplete() {
+  return copyWith(
+    isCompleted: !isCompleted,
+    completedDate: !isCompleted ? DateTime.now() : null,
   );
 }
 }

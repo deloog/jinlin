@@ -6,7 +6,6 @@ import 'package:jinlin_app/models/holiday_model_extended.dart';
 import 'package:jinlin_app/models/contact_model.dart';
 import 'package:jinlin_app/models/user_settings_model.dart';
 import 'package:jinlin_app/models/reminder_event_model.dart';
-import 'package:jinlin_app/services/hive_database_service.dart';
 
 /// 数据库迁移管理器
 ///
