@@ -1,4 +1,5 @@
 import 'package:jinlin_app/models/holiday_model.dart' as hive;
+import 'package:jinlin_app/models/unified/holiday.dart' as unified;
 import 'package:jinlin_app/special_date.dart' as app;
 
 /// 节日适配器
@@ -166,5 +167,40 @@ class HolidayAdapter {
       case app.ImportanceLevel.high:
         return hive.ImportanceLevel.high;
     }
+  }
+
+  /// 获取统一模型的节日日期
+  static DateTime getDate(unified.Holiday holiday, DateTime? occurrenceDate) {
+    // 如果提供了发生日期，则使用发生日期
+    if (occurrenceDate != null) {
+      return occurrenceDate;
+    }
+
+    // 否则，使用当前日期（这是一个简化处理，实际应该根据计算规则计算日期）
+    return DateTime.now();
+  }
+
+  /// 检查统一模型的节日是否为农历节日
+  static bool isLunar(unified.Holiday holiday) {
+    return holiday.calculationType == unified.DateCalculationType.fixedLunar;
+  }
+
+  /// 获取统一模型的节日名称
+  static String getName(unified.Holiday holiday, String languageCode) {
+    return holiday.getLocalizedName(languageCode);
+  }
+
+  /// 获取统一模型的节日描述
+  static String? getDescription(unified.Holiday holiday, String languageCode) {
+    return holiday.getLocalizedDescription(languageCode);
+  }
+
+  /// 将统一模型的HolidayType.statutory映射为HolidayType.national
+  static unified.HolidayType mapHolidayType(unified.HolidayType type) {
+    if (type == unified.HolidayType.statutory) {
+      // 将法定节日映射为国际节日
+      return unified.HolidayType.international;
+    }
+    return type;
   }
 }

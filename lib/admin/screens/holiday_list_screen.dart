@@ -57,9 +57,11 @@ class _HolidayListScreenState extends State<HolidayListScreen> {
 
       List<Holiday> holidays;
       if (_selectedRegion == 'ALL') {
-        holidays = await dbManager.getAllHolidays();
+        final result = await dbManager.getAllHolidays();
+        holidays = List<Holiday>.from(result);
       } else {
-        holidays = await dbManager.getHolidaysByRegion(_selectedRegion);
+        final result = await dbManager.getHolidaysByRegion(_selectedRegion);
+        holidays = List<Holiday>.from(result);
       }
 
       if (mounted) {

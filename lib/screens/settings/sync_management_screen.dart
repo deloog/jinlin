@@ -215,8 +215,6 @@ class SyncManagementScreen extends StatelessWidget {
   /// 构建同步配置卡片
   Widget _buildSyncConfigCard(BuildContext context, SyncProvider syncProvider) {
     final s = S.of(context);
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
 
     return CustomCard(
       title: s.syncSettings,
@@ -320,7 +318,7 @@ class SyncManagementScreen extends StatelessWidget {
               icon: const Icon(Icons.delete_forever),
               label: Text(s.clearSyncData),
               style: ElevatedButton.styleFrom(
-                foregroundColor: theme.colorScheme.error,
+                foregroundColor: Theme.of(context).colorScheme.error,
               ),
               onPressed: () => _showClearSyncDataDialog(context, syncProvider),
             ),
@@ -349,7 +347,6 @@ class SyncManagementScreen extends StatelessWidget {
   /// 显示同步间隔对话框
   Future<void> _showSyncIntervalDialog(BuildContext context, SyncProvider syncProvider) async {
     final s = S.of(context);
-    final theme = Theme.of(context);
 
     final intervals = [15, 30, 60, 120, 240, 480, 720, 1440];
     int selectedInterval = syncProvider.config.autoSyncIntervalMinutes;
@@ -435,7 +432,6 @@ class SyncManagementScreen extends StatelessWidget {
   /// 显示冲突解决策略对话框
   Future<void> _showConflictResolutionDialog(BuildContext context, SyncProvider syncProvider) async {
     final s = S.of(context);
-    final theme = Theme.of(context);
 
     ConflictResolutionStrategy selectedStrategy = syncProvider.config.conflictResolutionStrategy;
 
@@ -563,8 +559,6 @@ class SyncManagementScreen extends StatelessWidget {
   /// 构建同步操作卡片
   Widget _buildSyncOperationsCard(BuildContext context, SyncProvider syncProvider) {
     final s = S.of(context);
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
 
     final operations = syncProvider.operations;
 
@@ -651,13 +645,11 @@ class SyncManagementScreen extends StatelessWidget {
 
   /// 获取操作状态图标
   Widget _getOperationStatusIcon(BuildContext context, SyncStatus status) {
-    final theme = Theme.of(context);
-
     switch (status) {
       case SyncStatus.pending:
-        return Icon(Icons.schedule, color: Colors.blue);
+        return const Icon(Icons.schedule, color: Colors.blue);
       case SyncStatus.syncing:
-        return SizedBox(
+        return const SizedBox(
           width: 24.0,
           height: 24.0,
           child: CircularProgressIndicator(
@@ -666,19 +658,17 @@ class SyncManagementScreen extends StatelessWidget {
           ),
         );
       case SyncStatus.synced:
-        return Icon(Icons.check_circle, color: Colors.green);
+        return const Icon(Icons.check_circle, color: Colors.green);
       case SyncStatus.failed:
-        return Icon(Icons.error, color: Colors.red);
+        return const Icon(Icons.error, color: Colors.red);
       case SyncStatus.conflict:
-        return Icon(Icons.warning, color: Colors.purple);
+        return const Icon(Icons.warning, color: Colors.purple);
     }
   }
 
   /// 构建同步冲突卡片
   Widget _buildSyncConflictsCard(BuildContext context, SyncProvider syncProvider) {
     final s = S.of(context);
-    final theme = Theme.of(context);
-    final textTheme = theme.textTheme;
 
     final conflicts = syncProvider.conflicts;
 
@@ -706,8 +696,8 @@ class SyncManagementScreen extends StatelessWidget {
                       ),
                       subtitle: Text(conflict.operation.entityId),
                       trailing: conflict.isResolved
-                          ? Icon(Icons.check_circle, color: Colors.green)
-                          : Icon(Icons.warning, color: Colors.orange),
+                          ? const Icon(Icons.check_circle, color: Colors.green)
+                          : const Icon(Icons.warning, color: Colors.orange),
                       onTap: () {
                         if (!conflict.isResolved) {
                           _showConflictResolutionDetailDialog(context, syncProvider, conflict);

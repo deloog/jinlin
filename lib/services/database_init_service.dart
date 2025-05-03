@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:jinlin_app/services/hive_database_service.dart';
 import 'package:jinlin_app/services/holiday_migration_service.dart';
-import 'package:jinlin_app/services/holiday_init_service.dart';
+import 'package:jinlin_app/services/holiday_data_loader_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// 数据库初始化服务
@@ -72,8 +72,8 @@ class DatabaseInitService {
 
       // 4. 初始化全球节日数据
       try {
-        final holidayInitService = HolidayInitService();
-        await holidayInitService.initializeGlobalHolidays();
+        final holidayDataLoader = HolidayDataLoaderService();
+        await holidayDataLoader.initializeBasicData();
         debugPrint('全球节日数据初始化成功');
       } catch (e) {
         debugPrint('全球节日数据初始化失败: $e');
@@ -111,6 +111,19 @@ class DatabaseInitService {
 
       // 2. 重新初始化，不依赖于BuildContext
       final success = await initialize();
+
+      // 3. 重新加载预设节日数据
+      if (success) {
+        try {
+          final holidayDataLoader = HolidayDataLoaderService();
+          // 强制重新加载预设节日数据
+          await holidayDataLoader.initializeBasicData();
+          debugPrint('预设节日数据重新加载成功');
+        } catch (e) {
+          debugPrint('预设节日数据重新加载失败: $e');
+          // 继续执行，不要因为节日数据初始化失败而中断整个流程
+        }
+      }
 
       return success;
     } catch (e) {

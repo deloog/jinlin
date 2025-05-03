@@ -1,0 +1,40 @@
+{
+  "holidays": [
+    {
+      "id": "new_year_day",
+      "name": "New Year's Day",
+      "description": "New Year's Day is the first day of the year, January 1, in the Gregorian calendar.",
+      "type": "statutory",
+      "calculationType": "fixedGregorian",
+      "calculationRule": "01-01",
+      "importanceLevel": "high",
+      "customs": "Fireworks, parties, and making resolutions for the new year.",
+      "foods": "Varies by culture, often includes special cakes or dishes symbolizing luck and prosperity.",
+      "greetings": "Happy New Year!"
+    },
+    {
+      "id": "valentines_day",
+      "name": "Valentine's Day",
+      "description": "Valentine's Day is celebrated annually on February 14 as a day of romance and love.",
+      "type": "traditional",
+      "calculationType": "fixedGregorian",
+      "calculationRule": "02-14",
+      "importanceLevel": "medium",
+      "customs": "Exchanging cards, flowers, chocolates, and gifts with loved ones.",
+      "foods": "Chocolates, candies, and romantic dinners.",
+      "greetings": "Happy Valentine's Day!"
+    },
+    {
+      "id": "earth_day",
+      "name": "Earth Day",
+      "description": "Earth Day is an annual event celebrated around the world on April 22 to demonstrate support for environmental protection.",
+      "type": "memorial",
+      "calculationType": "fixedGregorian",
+      "calculationRule": "04-22",
+      "importanceLevel": "medium",
+      "customs": "Environmental activities, such as planting trees, cleaning up litter, and reducing pollution.",
+      "foods": "Sustainable and locally sourced foods.",
+      "greetings": "Happy Earth Day!"
+    }
+  ]
+}

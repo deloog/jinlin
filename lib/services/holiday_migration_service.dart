@@ -233,13 +233,60 @@ class HolidayMigrationService {
   }
 
   /// 迁移节日数据（兼容旧版本）
-  static Future<void> migrateHolidays(BuildContext context) async {
+  ///
+  /// [context] 可选参数，如果为null，将使用默认值
+  static Future<void> migrateHolidays([BuildContext? context]) async {
     // 检查是否已经迁移过
     if (isMigrationComplete()) {
+      debugPrint('节日数据已迁移，跳过');
       return;
     }
 
-    // 直接创建示例节假日数据
-    await createSampleHolidays(context);
+    try {
+      // 直接创建示例节假日数据
+      if (context != null) {
+        await createSampleHolidays(context);
+      } else {
+        debugPrint('警告：BuildContext为null，使用默认节日数据');
+        // 初始化Hive数据库
+        await HiveDatabaseService.initialize();
+
+        // 创建一个简化版的默认节日列表
+        final List<SpecialDate> basicHolidays = [
+          SpecialDate(
+            id: 'INTL_NewYearDay',
+            name: '新年',
+            nameEn: 'New Year\'s Day',
+            type: SpecialDateType.statutory,
+            regions: ['INTL', 'ALL'],
+            calculationType: DateCalculationType.fixedGregorian,
+            calculationRule: '01-01',
+            importanceLevel: ImportanceLevel.high,
+          ),
+          SpecialDate(
+            id: 'INTL_Christmas',
+            name: '圣诞节',
+            nameEn: 'Christmas',
+            type: SpecialDateType.traditional,
+            regions: ['INTL', 'ALL'],
+            calculationType: DateCalculationType.fixedGregorian,
+            calculationRule: '12-25',
+            importanceLevel: ImportanceLevel.high,
+          ),
+        ];
+
+        // 迁移基本节日到数据库
+        await HiveDatabaseService.migrateFromSpecialDates(basicHolidays);
+        debugPrint('成功创建 ${basicHolidays.length} 个基本节日');
+
+        // 标记迁移完成
+        await HiveDatabaseService.setMigrationComplete(true);
+      }
+
+      debugPrint('节日数据迁移完成');
+    } catch (e) {
+      debugPrint('节日数据迁移失败: $e');
+      // 不抛出异常，让应用继续运行
+    }
   }
 }

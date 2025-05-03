@@ -1,5 +1,6 @@
 // 文件： lib/widgets/localization_status_indicator.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// 本地化状态指示器
 ///
@@ -54,7 +55,7 @@ class LocalizationStatusIndicator extends StatelessWidget {
 
   /// 获取指定语言的翻译完整性
   double _getCompletenessForLocale(String languageCode) {
-    // 使用硬编码的值
+    // 使用与completeness_report.json一致的值
     switch (languageCode) {
       case 'en':
         return 100.0;
@@ -65,9 +66,9 @@ class LocalizationStatusIndicator extends StatelessWidget {
       case 'ko':
         return 65.0;
       case 'fr':
-        return 10.0;
+        return 95.0;
       case 'de':
-        return 10.0;
+        return 95.0;
       default:
         return 0.0;
     }
@@ -86,15 +87,16 @@ class LocalizationStatusIndicator extends StatelessWidget {
 
   /// 根据完整性获取消息
   String _getMessageForCompleteness(BuildContext context, double completeness) {
+    final l10n = AppLocalizations.of(context);
     if (completeness >= 80) {
       // 翻译几乎完成
-      return "Translation almost complete";
+      return l10n.translationAlmostComplete;
     } else if (completeness >= 50) {
       // 翻译部分完成
-      return "Translation in progress";
+      return l10n.translationPartiallyComplete;
     } else {
       // 翻译不完整
-      return "Translation incomplete";
+      return l10n.translationInProgress;
     }
   }
 }

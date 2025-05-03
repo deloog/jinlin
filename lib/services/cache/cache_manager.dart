@@ -237,6 +237,26 @@ class CacheManager {
     return true;
   }
 
+  /// 获取JSON缓存
+  Future<Map<String, dynamic>?> getJson(String key) async {
+    try {
+      final data = get<Map<String, dynamic>>('json_cache', key);
+      return data;
+    } catch (e) {
+      logger.e(_tag, '获取JSON缓存失败: $e');
+      return null;
+    }
+  }
+
+  /// 设置JSON缓存
+  Future<void> setJson(String key, Map<String, dynamic> value, {int? expireTimeMs}) async {
+    try {
+      set<Map<String, dynamic>>('json_cache', key, value, expireTimeMs: expireTimeMs);
+    } catch (e) {
+      logger.e(_tag, '设置JSON缓存失败: $e');
+    }
+  }
+
   /// 获取缓存大小
   int size(String cacheName) {
     if (!_caches.containsKey(cacheName)) {

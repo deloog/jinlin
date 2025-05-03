@@ -3,7 +3,6 @@
 // 请运行 flutter pub run intl_generator:generate_from_arb --output-dir=lib/generated --no-use-deferred-loading lib/l10n/app_localizations_*.arb
 
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 class S {
   final String localeName;

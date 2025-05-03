@@ -17,7 +17,7 @@ dependencies:
   cupertino_icons: ^1.0.6
   http: ^1.2.1 # 用于网络请求
   shared_preferences: ^2.2.3 # 用于本地存储
-  speech_to_text: ^6.6.1 # 用于语音转文字
+  speech_to_text: ^6.5.1 # 用于语音转文字
   permission_handler: ^11.3.1 # 用于处理权限请求
   flutter_dotenv: ^5.1.0 # 用于加载 .env 文件中的环境变量
   # uuid已在下面定义
@@ -31,7 +31,7 @@ dependencies:
   share_plus: ^7.2.2 # 用于分享
   sqflite: ^2.3.2 # 用于SQLite数据库
   sqflite_common_ffi: ^2.3.2+1 # 用于在非移动平台上使用SQLite
-  sqflite_common_ffi_web: ^0.4.2+3 # 用于在Web平台上使用SQLite
+  sqflite_common_ffi_web: ^0.4.3+1 # 用于在Web平台上使用SQLite
   path: ^1.9.0 # 用于处理路径
   hive: ^2.2.3 # 用于跨平台数据库
   hive_flutter: ^1.1.0 # Hive的Flutter扩展
@@ -44,14 +44,40 @@ dependencies:
 
   # Firebase相关依赖
   firebase_core: ^2.27.1 # Firebase核心功能
-  # firebase_auth: ^4.17.9 # Firebase身份验证
-  # cloud_firestore: ^4.15.9 # Firebase云数据库
-  # firebase_storage: ^11.6.10 # Firebase云存储
-  # google_sign_in: ^6.2.1 # Google登录
+  firebase_auth: ^4.17.9 # Firebase身份验证
+  cloud_firestore: ^4.15.9 # Firebase云数据库
+  firebase_storage: ^11.6.10 # Firebase云存储
+
+  # 第三方登录相关依赖
+  google_sign_in: ^6.2.1 # Google登录
+  sign_in_with_apple: ^5.0.0 # Apple登录
+  flutter_facebook_auth: ^6.0.4 # Facebook登录
+  twitter_login: ^4.4.2 # Twitter登录
+
+  # 中国区第三方登录
+  fluwx: ^4.4.5 # 微信登录
+  tencent_kit: ^4.0.0 # QQ登录
+  weibo_kit: ^4.0.0 # 微博登录
+
+  # 工具依赖
+  package_info_plus: ^8.3.0 # 获取应用信息
+  url_launcher: ^6.2.5 # 打开URL
 
   # 加密相关依赖
   encrypt: ^5.0.3 # 用于数据加密
   flutter_secure_storage: ^4.2.1 # 用于安全存储
+
+  # 新增依赖
+  flutter_colorpicker: ^1.0.3 # 用于颜色选择器
+  cached_network_image: ^3.3.1 # 用于缓存网络图片
+  flutter_local_notifications: ^16.3.2 # 用于本地通知
+  timezone: ^0.9.2 # 用于时区处理
+  rxdart: ^0.27.7 # 用于响应式编程
+  connectivity_plus: ^5.0.2 # 用于网络连接检测
+  flutter_markdown: ^0.6.20 # 用于Markdown渲染
+  table_calendar: ^3.0.9 # 用于日历组件
+  flutter_slidable: ^3.0.1 # 用于滑动操作
+  animations: ^2.0.11 # 用于动画效果
 
 dev_dependencies:
   flutter_test:
@@ -64,12 +90,19 @@ flutter:
   uses-material-design: true
   generate: true # 启用 intl 代码生成
 
-  # --- 这里是重要的修改 ---
-  # 声明需要包含的资源文件
+  # 资源文件
   assets:
     - .env # 环境变量文件
     - assets/data/ # 数据文件目录
-  # --- 修改结束 ---
+
+# 本地化配置
+flutter_localizations:
+  enabled: true
+
+flutter_intl:
+  enabled: true
+  arb_dir: lib/l10n
+  output_dir: lib/generated
 
 
   # To add assets to your application, add an assets section, like this:

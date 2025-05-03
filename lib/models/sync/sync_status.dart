@@ -1,12 +1,30 @@
 // 注意：这个文件原本使用了json_annotation库，但该库尚未添加到依赖中
 // 暂时使用手动实现的JSON序列化方法
 
+/// 同步状态枚举
+enum SyncStatusEnum {
+  /// 空闲状态
+  idle,
+
+  /// 同步中
+  syncing,
+
+  /// 错误状态
+  error,
+
+  /// 冲突状态
+  conflict,
+}
+
 /// 同步状态
 ///
 /// 表示同步的状态信息
 class SyncStatus {
   /// 最后同步时间
   final DateTime? lastSyncTime;
+
+  /// 同步状态
+  final SyncStatusEnum? status;
 
   /// 是否正在同步
   final bool isSyncing;
@@ -35,6 +53,7 @@ class SyncStatus {
   /// 构造函数
   SyncStatus({
     this.lastSyncTime,
+    this.status = SyncStatusEnum.idle,
     this.isSyncing = false,
     this.syncProgress = 0.0,
     this.pendingOperationsCount = 0,
@@ -47,10 +66,24 @@ class SyncStatus {
 
   /// 从JSON创建
   factory SyncStatus.fromJson(Map<String, dynamic> json) {
+    // 解析同步状态
+    SyncStatusEnum? statusEnum;
+    if (json['status'] != null) {
+      try {
+        statusEnum = SyncStatusEnum.values.firstWhere(
+          (e) => e.toString().split('.').last == json['status'],
+          orElse: () => SyncStatusEnum.idle,
+        );
+      } catch (_) {
+        statusEnum = SyncStatusEnum.idle;
+      }
+    }
+
     return SyncStatus(
       lastSyncTime: json['lastSyncTime'] != null
           ? DateTime.parse(json['lastSyncTime'] as String)
           : null,
+      status: statusEnum,
       isSyncing: json['isSyncing'] as bool? ?? false,
       syncProgress: (json['syncProgress'] as num?)?.toDouble() ?? 0.0,
       pendingOperationsCount: json['pendingOperationsCount'] as int? ?? 0,
@@ -66,6 +99,7 @@ class SyncStatus {
   Map<String, dynamic> toJson() {
     return {
       'lastSyncTime': lastSyncTime?.toIso8601String(),
+      'status': status?.toString().split('.').last,
       'isSyncing': isSyncing,
       'syncProgress': syncProgress,
       'pendingOperationsCount': pendingOperationsCount,
@@ -80,6 +114,7 @@ class SyncStatus {
   /// 创建带有更新的副本
   SyncStatus copyWith({
     DateTime? lastSyncTime,
+    SyncStatusEnum? status,
     bool? isSyncing,
     double? syncProgress,
     int? pendingOperationsCount,
@@ -91,6 +126,7 @@ class SyncStatus {
   }) {
     return SyncStatus(
       lastSyncTime: lastSyncTime ?? this.lastSyncTime,
+      status: status ?? this.status,
       isSyncing: isSyncing ?? this.isSyncing,
       syncProgress: syncProgress ?? this.syncProgress,
       pendingOperationsCount: pendingOperationsCount ?? this.pendingOperationsCount,
@@ -105,6 +141,7 @@ class SyncStatus {
   /// 标记为同步开始
   SyncStatus markAsSyncStarted() {
     return copyWith(
+      status: SyncStatusEnum.syncing,
       isSyncing: true,
       syncProgress: 0.0,
     );
@@ -113,6 +150,7 @@ class SyncStatus {
   /// 标记为同步完成
   SyncStatus markAsSyncCompleted() {
     return copyWith(
+      status: SyncStatusEnum.idle,
       lastSyncTime: DateTime.now(),
       isSyncing: false,
       syncProgress: 1.0,
@@ -122,6 +160,7 @@ class SyncStatus {
   /// 标记为同步失败
   SyncStatus markAsSyncFailed(String error) {
     return copyWith(
+      status: SyncStatusEnum.error,
       isSyncing: false,
       lastSyncError: error,
     );

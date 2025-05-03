@@ -280,13 +280,31 @@ class SQLiteDatabase implements DatabaseInterface {
     await _checkInitialized();
 
     try {
-      // 获取所有节日
-      final allHolidays = await getAllHolidays();
+      // 使用SQL查询筛选节日，避免加载所有节日到内存
+      // 由于regions是JSON数组，我们需要使用LIKE进行模糊匹配
+      final List<Map<String, dynamic>> maps = await _db!.query(
+        _holidaysTable,
+        where: "regions LIKE ? OR regions LIKE ?",
+        whereArgs: [
+          '%"$region"%', // 匹配包含指定地区的JSON数组
+          '%"ALL"%',     // 匹配包含ALL的JSON数组
+        ],
+      );
 
-      // 筛选出指定地区的节日
-      return allHolidays.where((holiday) {
-        return holiday.regions.contains(region) || holiday.regions.contains('ALL');
-      }).toList();
+      // 将查询结果转换为Holiday对象
+      final List<Holiday> holidays = [];
+      for (final map in maps) {
+        try {
+          final holiday = Holiday.fromMap(map);
+          holidays.add(holiday);
+        } catch (e) {
+          debugPrint('解析节日数据失败: $e');
+          // 继续处理下一条记录
+        }
+      }
+
+      debugPrint('根据地区 $region 获取到 ${holidays.length} 个节日');
+      return holidays;
     } catch (e) {
       debugPrint('根据地区获取节日失败: $e');
       return [];

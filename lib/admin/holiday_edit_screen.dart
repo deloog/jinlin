@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jinlin_app/models/unified/holiday.dart';
 import 'package:jinlin_app/services/database_manager_unified.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// 管理后台节日编辑界面
 class HolidayEditScreen extends StatefulWidget {
@@ -51,7 +50,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
       // 编辑现有节日
       _id = widget.holiday!.id;
       _names.addAll(widget.holiday!.names);
-      _descriptions.addAll(widget.holiday!.descriptions ?? {});
+      _descriptions.addAll(widget.holiday!.descriptions);
       _customs.addAll(widget.holiday!.customs ?? {});
       _foods.addAll(widget.holiday!.foods ?? {});
       _greetings.addAll(widget.holiday!.greetings ?? {});
@@ -91,7 +90,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
         regions: _regions,
         calculationType: _calculationType,
         calculationRule: _calculationRule,
-        descriptions: _descriptions.isEmpty ? null : _descriptions,
+        descriptions: _descriptions,
         importanceLevel: _importanceLevel,
         customs: _customs.isEmpty ? null : _customs,
         foods: _foods.isEmpty ? null : _foods,
@@ -342,7 +341,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                             },
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),
@@ -379,7 +378,7 @@ class _HolidayEditScreenState extends State<HolidayEditScreen> {
                             },
                           ),
                         );
-                      }).toList(),
+                      }),
                     ],
                   ),
                 ),

@@ -104,6 +104,62 @@ class Holiday implements SoftDeletable {
     descriptions = Map.unmodifiable(descriptions ?? {}),
     createdAt = createdAt ?? DateTime.now();
 
+  // 从API JSON创建对象
+  factory Holiday.fromApiJson(Map<String, dynamic> json) {
+    // 解析类型
+    HolidayType type;
+    try {
+      type = HolidayType.values.firstWhere(
+        (e) => e.toString().split('.').last == json['type'],
+        orElse: () => HolidayType.other
+      );
+    } catch (_) {
+      type = HolidayType.other;
+    }
+
+    // 解析计算类型
+    DateCalculationType calculationType;
+    try {
+      calculationType = DateCalculationType.values.firstWhere(
+        (e) => e.toString().split('.').last == json['calculationType'],
+        orElse: () => DateCalculationType.fixedGregorian
+      );
+    } catch (_) {
+      calculationType = DateCalculationType.fixedGregorian;
+    }
+
+    // 解析重要性级别
+    ImportanceLevel importanceLevel;
+    try {
+      importanceLevel = ImportanceLevel.values.firstWhere(
+        (e) => e.toString().split('.').last == json['importanceLevel'].toString(),
+        orElse: () => ImportanceLevel.medium
+      );
+    } catch (_) {
+      importanceLevel = ImportanceLevel.medium;
+    }
+
+    return Holiday(
+      id: json['id'],
+      isSystemHoliday: true,
+      names: {json['language_code'] ?? 'en': json['name']},
+      descriptions: {json['language_code'] ?? 'en': json['description'] ?? ''},
+      type: type,
+      regions: json['regions'] is List
+          ? List<String>.from(json['regions'])
+          : [json['region_code'] ?? 'GLOBAL'],
+      calculationType: calculationType,
+      calculationRule: json['calculationRule'],
+      importanceLevel: importanceLevel,
+      customs: json['customs'] != null ? {json['language_code'] ?? 'en': json['customs']} : null,
+      foods: json['foods'] != null ? {json['language_code'] ?? 'en': json['foods']} : null,
+      greetings: json['greetings'] != null ? {json['language_code'] ?? 'en': json['greetings']} : null,
+      createdAt: json['createdAt'] != null
+          ? DateTime.parse(json['createdAt'])
+          : DateTime.now(),
+    );
+  }
+
   // 从Map创建对象（用于从数据库加载）
   factory Holiday.fromMap(Map<String, dynamic> map) {
     return Holiday(
@@ -372,6 +428,9 @@ class Holiday implements SoftDeletable {
     }
   }
 
+  // 获取名称（简化方法）
+  String getName(String languageCode) => getLocalizedName(languageCode);
+
   // 获取指定语言的描述
   String? getLocalizedDescription(String languageCode) {
     if (descriptions.containsKey(languageCode)) {
@@ -386,6 +445,9 @@ class Holiday implements SoftDeletable {
       return null;
     }
   }
+
+  // 获取描述（简化方法）
+  String? getDescription(String languageCode) => getLocalizedDescription(languageCode);
 
   // 获取指定语言的习俗
   String? getLocalizedCustoms(String languageCode) {

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:jinlin_app/generated/l10n.dart';
 import 'package:jinlin_app/providers/sync_provider.dart';
-import 'package:jinlin_app/screens/settings/sync_management_screen.dart';
+import 'package:jinlin_app/routes/app_router.dart';
 
 /// 设置页面
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     final s = S.of(context);
-    final theme = Theme.of(context);
     final syncProvider = SyncProvider.of(context);
 
     return Scaffold(
@@ -54,7 +53,7 @@ class SettingsScreen extends StatelessWidget {
             subtitle: Text(s.currentLanguage),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16.0),
             onTap: () {
-              // TODO: 导航到语言设置页面
+              AppRouter.navigateToLanguage(context);
             },
           ),
           ListTile(
@@ -63,7 +62,7 @@ class SettingsScreen extends StatelessWidget {
             subtitle: Text(s.currentTheme),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16.0),
             onTap: () {
-              // TODO: 导航到主题设置页面
+              AppRouter.navigateToTheme(context);
             },
           ),
           ListTile(
@@ -72,7 +71,7 @@ class SettingsScreen extends StatelessWidget {
             subtitle: Text(s.notificationSettings),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16.0),
             onTap: () {
-              // TODO: 导航到通知设置页面
+              AppRouter.navigateToNotification(context);
             },
           ),
         ],
@@ -190,11 +189,7 @@ class SettingsScreen extends StatelessWidget {
                   ],
                 ),
                 onTap: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => const SyncManagementScreen(),
-                    ),
-                  );
+                  AppRouter.navigateToSyncSettings(context);
                 },
               ),
               ListTile(

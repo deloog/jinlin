@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:jinlin_app/models/unified/holiday.dart';
 import 'package:jinlin_app/services/database_manager_unified.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:jinlin_app/admin/holiday_edit_screen.dart';
 
 /// 管理后台节日管理界面
@@ -217,14 +216,14 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
                           border: OutlineInputBorder(),
                         ),
                         value: _selectedRegion,
-                        items: [
-                          const DropdownMenuItem(value: 'ALL', child: Text('所有地区')),
-                          const DropdownMenuItem(value: 'CN', child: Text('中国')),
-                          const DropdownMenuItem(value: 'US', child: Text('美国')),
-                          const DropdownMenuItem(value: 'JP', child: Text('日本')),
-                          const DropdownMenuItem(value: 'KR', child: Text('韩国')),
-                          const DropdownMenuItem(value: 'FR', child: Text('法国')),
-                          const DropdownMenuItem(value: 'DE', child: Text('德国')),
+                        items: const [
+                          DropdownMenuItem(value: 'ALL', child: Text('所有地区')),
+                          DropdownMenuItem(value: 'CN', child: Text('中国')),
+                          DropdownMenuItem(value: 'US', child: Text('美国')),
+                          DropdownMenuItem(value: 'JP', child: Text('日本')),
+                          DropdownMenuItem(value: 'KR', child: Text('韩国')),
+                          DropdownMenuItem(value: 'FR', child: Text('法国')),
+                          DropdownMenuItem(value: 'DE', child: Text('德国')),
                         ],
                         onChanged: (value) {
                           setState(() {
@@ -242,15 +241,15 @@ class _HolidayManagementScreenState extends State<HolidayManagementScreen> {
                           border: OutlineInputBorder(),
                         ),
                         value: _selectedType,
-                        items: [
-                          const DropdownMenuItem(value: null, child: Text('所有类型')),
-                          const DropdownMenuItem(value: HolidayType.statutory, child: Text('法定节日')),
-                          const DropdownMenuItem(value: HolidayType.traditional, child: Text('传统节日')),
-                          const DropdownMenuItem(value: HolidayType.memorial, child: Text('纪念日')),
-                          const DropdownMenuItem(value: HolidayType.religious, child: Text('宗教节日')),
-                          const DropdownMenuItem(value: HolidayType.professional, child: Text('行业节日')),
-                          const DropdownMenuItem(value: HolidayType.international, child: Text('国际节日')),
-                          const DropdownMenuItem(value: HolidayType.other, child: Text('其他')),
+                        items: const [
+                          DropdownMenuItem(value: null, child: Text('所有类型')),
+                          DropdownMenuItem(value: HolidayType.statutory, child: Text('法定节日')),
+                          DropdownMenuItem(value: HolidayType.traditional, child: Text('传统节日')),
+                          DropdownMenuItem(value: HolidayType.memorial, child: Text('纪念日')),
+                          DropdownMenuItem(value: HolidayType.religious, child: Text('宗教节日')),
+                          DropdownMenuItem(value: HolidayType.professional, child: Text('行业节日')),
+                          DropdownMenuItem(value: HolidayType.international, child: Text('国际节日')),
+                          DropdownMenuItem(value: HolidayType.other, child: Text('其他')),
                         ],
                         onChanged: (value) {
                           setState(() {

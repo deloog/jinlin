@@ -483,5 +483,66 @@
   "translationInProgress": "Translation incomplete",
   "@translationInProgress": {
     "description": "Shown when the translation is in progress (<50%)"
+  },
+
+  "iconShape": "Icon Shape",
+  "@iconShape": {
+    "description": "Title for icon shape setting"
+  },
+  "iconSize": "Icon Size",
+  "@iconSize": {
+    "description": "Title for icon size setting"
+  },
+  "colorSaturation": "Color Saturation",
+  "@colorSaturation": {
+    "description": "Title for color saturation setting"
+  },
+  "squareIcons": "Square Icons",
+  "@squareIcons": {
+    "description": "Option for square icon shape"
+  },
+  "circleIcons": "Circle Icons",
+  "@circleIcons": {
+    "description": "Option for circle icon shape"
+  },
+  "adjustIconSize": "Adjust card icon size",
+  "@adjustIconSize": {
+    "description": "Description for icon size adjustment"
+  },
+  "adjustColorSaturation": "Adjust card color saturation",
+  "@adjustColorSaturation": {
+    "description": "Description for color saturation adjustment"
+  },
+  "holidayDataAdmin": "Holiday Data Admin",
+  "@holidayDataAdmin": {
+    "description": "Title for holiday data admin panel"
+  },
+  "holidayDataAdminDescription": "Add, edit and delete holiday data (admin function)",
+  "@holidayDataAdminDescription": {
+    "description": "Description for holiday data admin panel"
+  },
+  "personalHolidaySettings": "Personal Holiday Settings",
+  "@personalHolidaySettings": {
+    "description": "Title for personal holiday settings"
+  },
+  "personalHolidaySettingsDescription": "Set holiday display and personal importance",
+  "@personalHolidaySettingsDescription": {
+    "description": "Description for personal holiday settings"
+  },
+  "cloudSync": "Cloud Sync",
+  "@cloudSync": {
+    "description": "Title for cloud sync settings"
+  },
+  "cloudSyncDescription": "Sync data between devices",
+  "@cloudSyncDescription": {
+    "description": "Description for cloud sync settings"
+  },
+  "databasePerformanceTest": "Database Performance Test",
+  "@databasePerformanceTest": {
+    "description": "Title for database performance test"
+  },
+  "databasePerformanceTestDescription": "Test and monitor database performance",
+  "@databasePerformanceTestDescription": {
+    "description": "Description for database performance test"
   }
   }

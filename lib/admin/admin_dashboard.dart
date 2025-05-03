@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:jinlin_app/admin/holiday_management_screen.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 /// 管理后台仪表盘
 class AdminDashboard extends StatelessWidget {
@@ -38,14 +37,14 @@ class AdminDashboard extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            
+
             // 功能区域
             const Text(
               '数据管理',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            
+
             // 节日管理
             _buildFeatureCard(
               context,
@@ -60,7 +59,7 @@ class AdminDashboard extends StatelessWidget {
                 );
               },
             ),
-            
+
             // 用户管理
             _buildFeatureCard(
               context,
@@ -73,16 +72,16 @@ class AdminDashboard extends StatelessWidget {
                 );
               },
             ),
-            
+
             const SizedBox(height: 16),
-            
+
             // 系统设置
             const Text(
               '系统设置',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
-            
+
             // 应用设置
             _buildFeatureCard(
               context,
@@ -95,7 +94,7 @@ class AdminDashboard extends StatelessWidget {
                 );
               },
             ),
-            
+
             // 数据备份
             _buildFeatureCard(
               context,

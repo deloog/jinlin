@@ -29,6 +29,12 @@ class SyncConfig {
   /// 是否仅在WiFi下同步
   final bool syncOnlyOnWifi;
 
+  /// 是否仅在充电时同步
+  final bool syncOnCharging;
+
+  /// 最大同步批次大小
+  final int maxSyncBatchSize;
+
   /// 是否启用增量同步
   final bool enableIncrementalSync;
 
@@ -58,6 +64,8 @@ class SyncConfig {
     this.enableAutoSync = true,
     this.autoSyncIntervalMinutes = 60,
     this.syncOnlyOnWifi = true,
+    this.syncOnCharging = false,
+    this.maxSyncBatchSize = 50,
     this.enableIncrementalSync = true,
     this.conflictResolutionStrategy = ConflictResolutionStrategy.manual,
     this.maxBatchSize = 50,
@@ -74,6 +82,8 @@ class SyncConfig {
       enableAutoSync: json['enableAutoSync'] as bool? ?? true,
       autoSyncIntervalMinutes: json['autoSyncIntervalMinutes'] as int? ?? 60,
       syncOnlyOnWifi: json['syncOnlyOnWifi'] as bool? ?? true,
+      syncOnCharging: json['syncOnCharging'] as bool? ?? false,
+      maxSyncBatchSize: json['maxSyncBatchSize'] as int? ?? 50,
       enableIncrementalSync: json['enableIncrementalSync'] as bool? ?? true,
       conflictResolutionStrategy: ConflictResolutionStrategy.values.firstWhere(
         (e) => e.toString() == json['conflictResolutionStrategy'],
@@ -94,6 +104,8 @@ class SyncConfig {
       'enableAutoSync': enableAutoSync,
       'autoSyncIntervalMinutes': autoSyncIntervalMinutes,
       'syncOnlyOnWifi': syncOnlyOnWifi,
+      'syncOnCharging': syncOnCharging,
+      'maxSyncBatchSize': maxSyncBatchSize,
       'enableIncrementalSync': enableIncrementalSync,
       'conflictResolutionStrategy': conflictResolutionStrategy.toString(),
       'maxBatchSize': maxBatchSize,
@@ -110,6 +122,8 @@ class SyncConfig {
     bool? enableAutoSync,
     int? autoSyncIntervalMinutes,
     bool? syncOnlyOnWifi,
+    bool? syncOnCharging,
+    int? maxSyncBatchSize,
     bool? enableIncrementalSync,
     ConflictResolutionStrategy? conflictResolutionStrategy,
     int? maxBatchSize,
@@ -123,6 +137,8 @@ class SyncConfig {
       enableAutoSync: enableAutoSync ?? this.enableAutoSync,
       autoSyncIntervalMinutes: autoSyncIntervalMinutes ?? this.autoSyncIntervalMinutes,
       syncOnlyOnWifi: syncOnlyOnWifi ?? this.syncOnlyOnWifi,
+      syncOnCharging: syncOnCharging ?? this.syncOnCharging,
+      maxSyncBatchSize: maxSyncBatchSize ?? this.maxSyncBatchSize,
       enableIncrementalSync: enableIncrementalSync ?? this.enableIncrementalSync,
       conflictResolutionStrategy: conflictResolutionStrategy ?? this.conflictResolutionStrategy,
       maxBatchSize: maxBatchSize ?? this.maxBatchSize,

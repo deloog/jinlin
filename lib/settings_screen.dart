@@ -182,7 +182,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           // 卡片图标形状设置
           ListTile(
             leading: Icon(_layoutService.getIconShapeTypeIcon()),
-            title: Text(isChinese ? '图标形状' : 'Icon Shape'),
+            title: Text(l10n.iconShape),
             subtitle: Text(_layoutService.getIconShapeTypeName(context, isChinese)),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {

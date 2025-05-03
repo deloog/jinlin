@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:jinlin_app/services/logging/logging_service.dart';
 
 /// 应用程序设置提供者
 ///
 /// 管理应用程序的设置，包括语言、主题等
 class AppSettingsProvider extends ChangeNotifier {
+  final LoggingService _logger = LoggingService();
   // 当前语言环境
   Locale? _locale;
   Locale? get locale => _locale;
@@ -49,6 +51,13 @@ class AppSettingsProvider extends ChangeNotifier {
   bool _enableCloudSync = false;
   bool get enableCloudSync => _enableCloudSync;
 
+  // 是否使用模拟数据
+  bool _useMockData = true;
+  bool get useMockData => _useMockData;
+
+  // 语言代码
+  String get languageCode => _locale?.languageCode ?? 'zh';
+
   // 是否启用通知
   bool _enableNotifications = true;
   bool get enableNotifications => _enableNotifications;
@@ -59,12 +68,14 @@ class AppSettingsProvider extends ChangeNotifier {
 
   // 初始化
   Future<void> initialize() async {
+    _logger.debug('初始化应用设置提供者');
     await _loadSettings();
   }
 
   // 从SharedPreferences加载设置
   Future<void> _loadSettings() async {
     try {
+      _logger.debug('加载应用设置');
       final prefs = await SharedPreferences.getInstance();
 
       // 检查是否是首次启动
@@ -90,15 +101,15 @@ class AppSettingsProvider extends ChangeNotifier {
           await prefs.setString('countryCode', systemLocale.countryCode!);
         }
 
-        debugPrint('首次启动，自动检测系统语言: ${systemLocale.languageCode}');
+        _logger.info('首次启动，自动检测系统语言: ${systemLocale.languageCode}');
       } else if (languageCode != null && !followSystemLanguage) {
         // 如果用户已经设置了语言且不跟随系统语言，则使用用户设置的语言
         _locale = Locale(languageCode);
-        debugPrint('使用用户设置的语言: $languageCode');
+        _logger.debug('使用用户设置的语言: $languageCode');
       } else if (followSystemLanguage) {
         // 如果跟随系统语言，则使用系统语言
         _locale = null; // 设置为null，让系统自动选择语言
-        debugPrint('跟随系统语言');
+        _logger.debug('跟随系统语言');
       }
 
       // 保存跟随系统语言的设置
@@ -120,11 +131,13 @@ class AppSettingsProvider extends ChangeNotifier {
       _enableAIFeatures = prefs.getBool('enableAIFeatures') ?? true;
       _enableCloudSync = prefs.getBool('enableCloudSync') ?? false;
       _enableNotifications = prefs.getBool('enableNotifications') ?? true;
+      _useMockData = prefs.getBool('useMockData') ?? true;
       _specialDaysRange = prefs.getInt('specialDaysRange') ?? 10;
 
       notifyListeners();
-    } catch (e) {
-      debugPrint('加载设置失败: $e');
+      _logger.debug('应用设置加载完成');
+    } catch (e, stack) {
+      _logger.error('加载设置失败', e, stack);
     }
   }
 
@@ -347,7 +360,57 @@ class AppSettingsProvider extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt('specialDaysRange', range);
     } catch (e) {
-      debugPrint('保存特殊纪念日显示范围失败: $e');
+      _logger.error('保存特殊纪念日显示范围失败', e);
+    }
+  }
+
+  // 设置是否使用模拟数据
+  Future<void> setUseMockData(bool value) async {
+    if (_useMockData == value) return;
+
+    _useMockData = value;
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('useMockData', value);
+      _logger.debug('设置使用模拟数据: $value');
+    } catch (e) {
+      _logger.error('保存模拟数据设置失败', e);
+    }
+  }
+
+  // 设置主题模式
+  Future<void> setThemeMode(ThemeMode mode) async {
+    if (_themeMode == mode) return;
+
+    _themeMode = mode;
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('themeMode', mode.toString().split('.').last);
+      _logger.debug('设置主题模式: $mode');
+    } catch (e) {
+      _logger.error('保存主题模式设置失败', e);
+    }
+  }
+
+  // 设置语言
+  Future<void> setLanguage(String languageCode) async {
+    if (_locale?.languageCode == languageCode) return;
+
+    _locale = Locale(languageCode);
+    _followSystemLanguage = false;
+    notifyListeners();
+
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('languageCode', languageCode);
+      await prefs.setBool('followSystemLanguage', false);
+      _logger.debug('设置语言: $languageCode');
+    } catch (e) {
+      _logger.error('保存语言设置失败', e);
     }
   }
 

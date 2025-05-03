@@ -1,6 +1,8 @@
 // 文件： lib/services/holiday_init_service.dart
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:jinlin_app/data/global_holidays.dart';
+import 'package:flutter/services.dart';
+import 'package:jinlin_app/models/holiday_model.dart';
 import 'package:jinlin_app/services/hive_database_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -39,11 +41,11 @@ class HolidayInitService {
         return;
       }
 
-      // 获取全球节日列表
-      final globalHolidays = GlobalHolidays.getGlobalHolidays();
-
       // 初始化Hive数据库
       await HiveDatabaseService.initialize();
+
+      // 从JSON文件加载全球节日数据
+      final globalHolidays = await _loadGlobalHolidaysFromJson();
 
       // 保存节日数据
       int count = 0;
@@ -63,6 +65,103 @@ class HolidayInitService {
     } catch (e) {
       debugPrint('初始化全球节日数据失败: $e');
       rethrow;
+    }
+  }
+
+  /// 从JSON文件加载全球节日数据
+  Future<List<HolidayModel>> _loadGlobalHolidaysFromJson() async {
+    try {
+      // 加载JSON文件
+      final jsonString = await rootBundle.loadString('assets/data/preset_holidays.json');
+      final jsonData = json.decode(jsonString);
+
+      // 解析全球节日数据
+      final List<dynamic> holidaysJson = jsonData['global_holidays'];
+      final List<HolidayModel> holidays = [];
+
+      for (final holidayJson in holidaysJson) {
+        try {
+          final holiday = _parseHolidayJson(holidayJson);
+          holidays.add(holiday);
+        } catch (e) {
+          debugPrint('解析节日数据失败: $e');
+        }
+      }
+
+      debugPrint('从JSON文件加载了 ${holidays.length} 个全球节日');
+      return holidays;
+    } catch (e) {
+      debugPrint('加载全球节日数据失败: $e');
+      return [];
+    }
+  }
+
+  /// 解析节日JSON数据
+  HolidayModel _parseHolidayJson(Map<String, dynamic> json) {
+    return HolidayModel(
+      id: json['id'],
+      name: json['names']['zh'],
+      nameEn: json['names']['en'],
+      type: _parseHolidayType(json['type']),
+      regions: List<String>.from(json['regions']),
+      calculationType: _parseCalculationType(json['calculation_type']),
+      calculationRule: json['calculation_rule'],
+      description: json['descriptions']?['zh'],
+      descriptionEn: json['descriptions']?['en'],
+      importanceLevel: _parseImportanceLevel(json['importance_level']),
+      userImportance: 0,
+    );
+  }
+
+  /// 解析节日类型
+  HolidayType _parseHolidayType(String type) {
+    switch (type) {
+      case 'statutory':
+        return HolidayType.statutory;
+      case 'traditional':
+        return HolidayType.traditional;
+      case 'memorial':
+        return HolidayType.memorial;
+      case 'religious':
+        return HolidayType.religious;
+      case 'professional':
+        return HolidayType.professional;
+      case 'international':
+        return HolidayType.international;
+      default:
+        return HolidayType.other;
+    }
+  }
+
+  /// 解析日期计算类型
+  DateCalculationType _parseCalculationType(String type) {
+    switch (type) {
+      case 'fixed_gregorian':
+        return DateCalculationType.fixedGregorian;
+      case 'fixed_lunar':
+        return DateCalculationType.fixedLunar;
+      case 'variable_rule':
+      case 'nth_weekday_of_month':
+        return DateCalculationType.nthWeekdayOfMonth;
+      case 'custom_rule':
+      case 'custom':
+        return DateCalculationType.relativeTo;
+      default:
+        return DateCalculationType.fixedGregorian;
+    }
+  }
+
+  /// 解析重要性级别
+  ImportanceLevel _parseImportanceLevel(String level) {
+    switch (level) {
+      case 'high':
+        return ImportanceLevel.high;
+      case 'medium':
+        return ImportanceLevel.medium;
+      case 'low':
+        return ImportanceLevel.low;
+      default:
+        return ImportanceLevel.medium;
     }
   }
 
@@ -89,11 +188,11 @@ class HolidayInitService {
   /// 重置基础节日数据
   Future<void> resetGlobalHolidays() async {
     try {
-      // 获取全球节日列表
-      final globalHolidays = GlobalHolidays.getGlobalHolidays();
-
       // 初始化Hive数据库
       await HiveDatabaseService.initialize();
+
+      // 从JSON文件加载全球节日数据
+      final globalHolidays = await _loadGlobalHolidaysFromJson();
 
       // 删除现有的全球节日
       for (final holiday in globalHolidays) {

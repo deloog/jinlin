@@ -83,6 +83,16 @@ class SyncProvider extends ChangeNotifier implements SyncListener {
   /// 获取同步配置
   SyncConfig get config => _config;
 
+  /// 获取同步状态（异步方法）
+  Future<status_model.SyncStatus> getSyncStatus() async {
+    return _status;
+  }
+
+  /// 获取同步配置（异步方法）
+  Future<SyncConfig> getSyncConfig() async {
+    return _config;
+  }
+
   /// 获取同步冲突
   List<SyncConflict> get conflicts => List.unmodifiable(_conflicts);
 
